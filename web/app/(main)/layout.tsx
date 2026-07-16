@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useUserStore, isAdmin } from "@/lib/store/useUserStore";
+import { useUserStore } from "@/lib/store/useUserStore";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Code, SignOut, User, Trophy, BookOpen, Sun, Moon, ShieldCheck } from "@phosphor-icons/react";
@@ -57,7 +57,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { label: "Dashboard", href: "/dashboard", icon: <BookOpen size={20} /> },
     { label: "Leaderboard", href: "/leaderboard", icon: <Trophy size={20} /> },
     { label: "Profil", href: "/profile", icon: <User size={20} /> },
-    ...(user && isAdmin(user) ? [{ label: "Admin", href: "/admin", icon: <ShieldCheck size={20} /> }] : []),
+    { label: "Admin", href: "/admin", icon: <ShieldCheck size={20} /> },
   ];
 
   return (

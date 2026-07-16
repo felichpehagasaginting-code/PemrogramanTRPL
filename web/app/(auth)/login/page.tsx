@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
@@ -8,13 +8,28 @@ import { Code, GoogleLogo } from "@phosphor-icons/react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginWithGoogle } = useUserStore();
+  const { user, loginWithGoogle, handleRedirectResult } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const [checkingRedirect, setCheckingRedirect] = useState(true);
+
+  useEffect(() => {
+    handleRedirectResult().then((signedIn) => {
+      if (signedIn) {
+        router.push("/dashboard");
+      }
+      setCheckingRedirect(false);
+    });
+  }, [handleRedirectResult, router]);
+
+  useEffect(() => {
+    if (user && !checkingRedirect) {
+      router.push("/dashboard");
+    }
+  }, [user, checkingRedirect, router]);
 
   const handleSSOLogin = async () => {
     setLoading(true);
     await loginWithGoogle();
-    router.push("/dashboard");
   };
 
   return (
@@ -30,7 +45,6 @@ export default function LoginPage() {
         padding: "20px",
       }}
     >
-      {/* Decorative Orbs */}
       <div
         className="glow-dot"
         style={{
@@ -70,7 +84,6 @@ export default function LoginPage() {
           zIndex: 1,
         }}
       >
-        {/* Branding header */}
         <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
           <div
             style={{
@@ -95,12 +108,11 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* SSO Button */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleSSOLogin}
-          disabled={loading}
+          disabled={loading || checkingRedirect}
           style={{
             width: "100%",
             padding: "var(--space-3) var(--space-4)",
@@ -125,7 +137,7 @@ export default function LoginPage() {
           }}
         >
           <GoogleLogo size={20} weight="bold" color="#FF6B00" />
-          {loading ? "Menghubungkan..." : "Login dengan Google"}
+          {loading ? "Mengarahkan ke Google..." : checkingRedirect ? "Memeriksa..." : "Login dengan Google"}
         </motion.button>
       </motion.div>
     </main>

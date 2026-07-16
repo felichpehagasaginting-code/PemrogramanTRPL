@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { isMockFirebase, db, auth, googleProvider, signInWithPopup, signOut as fbSignOut } from "../firebase";
+import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
 import { doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 export const ADMIN_NAME = "Felich Pehagasa Ginting";
@@ -98,6 +98,7 @@ interface UserState {
   
   login: (name: string, email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  handleRedirectResult: () => Promise<boolean>;
   fetchLeaderboard: () => Promise<void>;
   fetchAllUsers: () => Promise<void>;
   logout: () => void;
@@ -113,6 +114,9 @@ interface UserState {
   syncUserToFirestore: () => Promise<void>;
   resetUserProgress: (uid: string) => Promise<void>;
   awardXP: (uid: string, amount: number) => Promise<void>;
+  addUser: (data: { name: string; email: string; xp?: number; level?: string; badges?: string[]; streak?: number }) => Promise<void>;
+  updateUser: (uid: string, data: Partial<UserProfile>) => Promise<void>;
+  deleteUser: (uid: string) => Promise<void>;
 }
 
 const getLevelName = (xp: number): string => {
@@ -122,7 +126,45 @@ const getLevelName = (xp: number): string => {
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      const processFirebaseUser = async (fbUser: any) => {
+        const uid = fbUser.uid;
+        const userRef = doc(db, "users", uid);
+        const tempProfile: UserProfile = {
+          uid,
+          name: fbUser.displayName || "Maba TRPL",
+          email: fbUser.email || "",
+          avatar: "avatar_default",
+          xp: 0,
+          level: "Script Kiddie",
+          badges: ["langkah_pertama"],
+          streak: 1,
+          progress: INITIAL_PROGRESS,
+        };
+
+        try {
+          const firestorePromise = getDoc(userRef).then(async (userDoc) => {
+            if (userDoc.exists()) {
+              set({ user: userDoc.data() as UserProfile });
+            } else {
+              await setDoc(userRef, tempProfile);
+              set({ user: tempProfile });
+            }
+          });
+
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Firestore timeout")), 2500)
+          );
+
+          await Promise.race([firestorePromise, timeoutPromise]);
+          await get().fetchLeaderboard();
+        } catch (fsError) {
+          console.warn("Firestore sync failed or timed out, using local profile:", fsError);
+          set({ user: tempProfile });
+        }
+      };
+
+      return {
       user: null,
       leaderboard: DEFAULT_MOCK_LEADERBOARD,
       allUsers: [],
@@ -175,50 +217,25 @@ export const useUserStore = create<UserState>()(
       },
 
       loginWithGoogle: async () => {
-        try {
-          const result = await signInWithPopup(auth, googleProvider);
-          const fbUser = result.user;
-          
-          if (!fbUser) return;
-
-          const uid = fbUser.uid;
-          const userRef = doc(db, "users", uid);
-          const tempProfile: UserProfile = {
-            uid,
-            name: fbUser.displayName || "Maba TRPL",
-            email: fbUser.email || "",
-            avatar: "avatar_default",
-            xp: 0,
-            level: "Script Kiddie",
-            badges: ["langkah_pertama"],
-            streak: 1,
-            progress: INITIAL_PROGRESS,
-          };
-
-          try {
-            const firestorePromise = getDoc(userRef).then(async (userDoc) => {
-              if (userDoc.exists()) {
-                set({ user: userDoc.data() as UserProfile });
-              } else {
-                await setDoc(userRef, tempProfile);
-                set({ user: tempProfile });
-              }
-            });
-
-            const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error("Firestore timeout")), 2500)
-            );
-
-            await Promise.race([firestorePromise, timeoutPromise]);
-            await get().fetchLeaderboard();
-          } catch (fsError) {
-            console.warn("Firestore sync failed or timed out, using local profile:", fsError);
-            set({ user: tempProfile });
-          }
-        } catch (e) {
-          console.error("Firebase Google Auth login failed", e);
-          // Fallback mock login if Google Auth fails or is cancelled
+        if (isMockFirebase) {
           await get().login("Budi Google Fallback", "budi.fallback@student.polsri.ac.id");
+          return;
+        }
+        const result = await signInWithPopup(auth, googleProvider);
+        const fbUser = result.user;
+        if (!fbUser) return;
+        await processFirebaseUser(fbUser);
+      },
+
+      handleRedirectResult: async () => {
+        try {
+          const result = await getRedirectResult(auth);
+          if (!result || !result.user) return false;
+          await processFirebaseUser(result.user);
+          return true;
+        } catch (e) {
+          console.error("Redirect result error:", e);
+          return false;
         }
       },
 
@@ -499,6 +516,60 @@ export const useUserStore = create<UserState>()(
         }
       },
 
+      addUser: async (data) => {
+        const uid = `user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        const newUser: UserProfile = {
+          uid,
+          name: data.name,
+          email: data.email,
+          avatar: "avatar_default",
+          xp: data.xp ?? 0,
+          level: data.level ?? getLevelName(data.xp ?? 0),
+          badges: data.badges ?? ["langkah_pertama"],
+          streak: data.streak ?? 1,
+          progress: INITIAL_PROGRESS,
+        };
+        const { allUsers } = get();
+        set({ allUsers: [...allUsers, newUser] });
+        if (!isMockFirebase) {
+          try {
+            const userRef = doc(db, "users", uid);
+            await setDoc(userRef, newUser);
+          } catch (e) {
+            console.error("Firestore addUser failed", e);
+          }
+        }
+      },
+
+      updateUser: async (uid, data) => {
+        const { allUsers } = get();
+        const updated = allUsers.map((u) =>
+          u.uid === uid ? { ...u, ...data } : u
+        );
+        set({ allUsers: updated });
+        if (!isMockFirebase) {
+          try {
+            const userRef = doc(db, "users", uid);
+            await updateDoc(userRef, data);
+          } catch (e) {
+            console.error("Firestore updateUser failed", e);
+          }
+        }
+      },
+
+      deleteUser: async (uid) => {
+        const { allUsers } = get();
+        set({ allUsers: allUsers.filter((u) => u.uid !== uid) });
+        if (!isMockFirebase) {
+          try {
+            const userRef = doc(db, "users", uid);
+            await updateDoc(userRef, { deleted: true });
+          } catch (e) {
+            console.error("Firestore deleteUser failed", e);
+          }
+        }
+      },
+
       updateAvatar: async (avatarId) => {
         const { user } = get();
         if (!user) return;
@@ -523,9 +594,10 @@ export const useUserStore = create<UserState>()(
           console.error("Firestore sync failed", e);
         }
       },
-    }),
-    {
-      name: "matrikulasi-user-storage",
-    }
+    };
+  },
+  {
+    name: "matrikulasi-user-storage",
+  }
   )
 );

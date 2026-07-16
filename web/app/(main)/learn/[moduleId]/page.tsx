@@ -689,7 +689,7 @@ export default function LearnModulePage() {
       </div>
 
       {/* Slide Container Card */}
-      <div
+      <div className="learn-slide-card"
         style={{
           background: "var(--bg-card)",
           border: "1.5px solid var(--border-color-strong)",
@@ -754,7 +754,7 @@ export default function LearnModulePage() {
               gap: "6px",
             }}
           >
-            <ArrowLeft size={16} weight="bold" /> Kembali
+            <ArrowLeft size={16} weight="bold" /> <span className="nav-btn-text">Kembali</span>
           </button>
 
           <button
@@ -774,15 +774,25 @@ export default function LearnModulePage() {
               boxShadow: "0 4px 12px rgba(255,107,0,0.25)",
             }}
           >
-            {isLastSlide ? (
-              moduleId === "M0" ? "Mulai Pre-Test" : "Lanjut ke Coding"
-            ) : (
-              "Lanjut"
-            )}
+            <span className="nav-btn-text">
+              {isLastSlide ? (
+                moduleId === "M0" ? "Mulai Pre-Test" : "Lanjut ke Coding"
+              ) : (
+                "Lanjut"
+              )}
+            </span>
             <ArrowRight size={16} weight="bold" />
           </button>
         </div>
       </div>
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .learn-slide-card { padding: var(--space-4) !important; }
+          .nav-btn-text { display: none; }
+          .learn-heading { font-size: 1.125rem !important; }
+          .cli-output { font-size: 0.75rem !important; overflow-x: auto; }
+        }
+      `}</style>
     </div>
   );
 }

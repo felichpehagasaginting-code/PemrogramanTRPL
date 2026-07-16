@@ -817,7 +817,7 @@ export function GamificationSection() {
             <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-6)", fontSize: "1.125rem", fontWeight: 700 }}>
               🏅 Koleksi Badge (13 Badge)
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-3)" }}>
+            <div className="badge-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-3)" }}>
               {badges.map((badge, i) => (
                 <motion.div
                   key={badge.name}
@@ -851,6 +851,10 @@ export function GamificationSection() {
       <style jsx>{`
         @media (max-width: 768px) {
           .gamif-grid { grid-template-columns: 1fr !important; }
+          .badge-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .badge-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
     </AnimatedSection>

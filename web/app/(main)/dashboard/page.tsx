@@ -206,9 +206,9 @@ export default function DashboardPage() {
                       filter: isLocked ? "grayscale(100%) opacity(60%)" : "none",
                       transition: "transform var(--transition-base), box-shadow var(--transition-base)",
                     }}
-                    className={!isLocked ? "hover-scale-card" : ""}
+                    className={"module-card" + (!isLocked ? " hover-scale-card" : "")}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", minWidth: 0 }}>
+                    <div className="module-card-inner" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", minWidth: 0 }}>
                       {/* Icon container */}
                       <div
                         style={{
@@ -387,6 +387,11 @@ export default function DashboardPage() {
       <style jsx>{`
         @media (max-width: 768px) {
           .dashboard-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .module-card { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+          .module-card-inner { min-width: 0 !important; }
+          .module-card h4 { white-space: normal !important; }
         }
       `}</style>
     </div>

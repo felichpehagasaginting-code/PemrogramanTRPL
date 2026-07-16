@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Class Statistics Row */}
-      <div
+      <div className="lb-stats"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr 1fr",
@@ -264,6 +264,7 @@ export default function LeaderboardPage() {
       <style jsx>{`
         @media (max-width: 640px) {
           .podium-grid { display: none !important; }
+          .lb-stats { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
     </div>
