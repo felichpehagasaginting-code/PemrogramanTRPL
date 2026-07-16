@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
-import { doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 export const ADMIN_NAME = "Felich Pehagasa Ginting";
 export const isAdmin = (user: UserProfile | null): boolean => user?.name === ADMIN_NAME;
@@ -558,12 +558,15 @@ export const useUserStore = create<UserState>()(
       },
 
       deleteUser: async (uid) => {
-        const { allUsers } = get();
-        set({ allUsers: allUsers.filter((u) => u.uid !== uid) });
+        const { allUsers, leaderboard } = get();
+        set({
+          allUsers: allUsers.filter((u) => u.uid !== uid),
+          leaderboard: leaderboard.filter((u) => u.uid !== uid),
+        });
         if (!isMockFirebase) {
           try {
             const userRef = doc(db, "users", uid);
-            await updateDoc(userRef, { deleted: true });
+            await deleteDoc(userRef);
           } catch (e) {
             console.error("Firestore deleteUser failed", e);
           }
