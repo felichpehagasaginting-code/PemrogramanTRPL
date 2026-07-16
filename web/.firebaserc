@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "webpemrograman"
+  },
+  "targets": {
+    "webpemrograman": {
+      "hosting": {
+        "pemrograman-trpl": [
+          "pemrograman-trpl"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
