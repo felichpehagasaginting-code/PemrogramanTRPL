@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useUserStore, BADGES, LEVELS } from "@/lib/store/useUserStore";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import {
   ShieldCheck, Users, Trophy, WarningCircle, MagnifyingGlass,
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
   Student, ChartBar, CheckCircle, LockKey, SignOut, Code,
-  PencilSimpleLine, TrashSimple, UserPlus,
+  PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft,
 } from "@phosphor-icons/react";
 
 const MODULE_LABELS: Record<string, string> = {
@@ -35,8 +37,11 @@ export default function AdminPage() {
   const [formData, setFormData] = useState(INITIAL_FORM);
 
   useEffect(() => {
-    Promise.all([fetchLeaderboard(), fetchAllUsers()]).finally(() => setLoading(false));
-  }, [fetchLeaderboard, fetchAllUsers]);
+    if (localStorage.getItem("admin-auth") === "true") {
+      setAuthenticated(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
 
   useEffect(() => {
     if (authenticated) {
@@ -45,9 +50,14 @@ export default function AdminPage() {
     }
   }, [authenticated]);
 
+  useEffect(() => {
+    Promise.all([fetchLeaderboard(), fetchAllUsers()]).finally(() => setLoading(false));
+  }, [fetchLeaderboard, fetchAllUsers]);
+
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
       setAuthenticated(true);
+      localStorage.setItem("admin-auth", "true");
       setPasswordError(false);
     } else {
       setPasswordError(true);
@@ -197,8 +207,25 @@ export default function AdminPage() {
               Admin <span className="gradient-text">Panel</span>
             </span>
           </div>
-          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
-            {totalStudents} mahasiswa
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
+              {totalStudents} mahasiswa
+            </span>
+            <Link
+              href="/dashboard"
+              style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "6px 14px", borderRadius: "var(--radius-full)",
+                border: "1px solid var(--border-color)", background: "transparent",
+                color: "var(--text-primary)", fontWeight: 600, fontSize: "0.8rem",
+                textDecoration: "none", cursor: "pointer",
+                transition: "background var(--transition-fast)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,107,0,0.08)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <ArrowLeft size={14} weight="bold" /> Dashboard
+            </Link>
           </div>
         </div>
       </header>
