@@ -171,16 +171,102 @@ export default function VSCodeSandboxPage() {
     }
   };
 
+  // Reusable Python executor
+  const runPythonFile = (fileName: string) => {
+    let output = [...terminalOutput];
+    if (output[output.length - 1]?.endsWith("_")) {
+      output.pop();
+    }
+
+    output.push(`C:\\Users\\maba\\workspace> python ${fileName}`);
+
+    const fileToRun = files.find(f => f.name === fileName);
+    if (!fileToRun) {
+      output.push(`Error: Berkas '${fileName}' tidak ditemukan di workspace.`);
+    } else if (!fileName.endsWith(".py")) {
+      output.push(`Error: Berkas '${fileName}' bukan berkas script Python (.py).`);
+    } else {
+      try {
+        const lines = fileToRun.content.split("\n");
+        const vars: Record<string, any> = {};
+        let executionOutput: string[] = [];
+
+        for (let line of lines) {
+          line = line.trim();
+          if (!line || line.startsWith("#")) continue;
+
+          // Handle variable assignments: x = 5 or name = "TRPL"
+          if (line.includes("=") && !line.includes("==") && !line.startsWith("print")) {
+            const eqIdx = line.indexOf("=");
+            const varName = line.substring(0, eqIdx).trim();
+            let varValStr = line.substring(eqIdx + 1).trim();
+
+            if ((varValStr.startsWith('"') && varValStr.endsWith('"')) || (varValStr.startsWith("'") && varValStr.endsWith("'"))) {
+              vars[varName] = varValStr.substring(1, varValStr.length - 1);
+            } else if (varValStr === "True") {
+              vars[varName] = true;
+            } else if (varValStr === "False") {
+              vars[varName] = false;
+            } else {
+              try {
+                let tempValStr = varValStr;
+                Object.keys(vars).forEach(k => {
+                  tempValStr = tempValStr.replace(new RegExp(`\\b${k}\\b`, "g"), vars[k]);
+                });
+                const evaluated = new Function(`return (${tempValStr})`)();
+                vars[varName] = evaluated;
+              } catch (e) {
+                vars[varName] = NaN;
+              }
+            }
+            continue;
+          }
+
+          // Handle print statements
+          if (line.startsWith("print(") && line.endsWith(")")) {
+            let inner = line.substring(6, line.length - 1).trim();
+            let expression = inner;
+            Object.keys(vars).forEach(k => {
+              const val = typeof vars[k] === "string" ? `"${vars[k]}"` : vars[k];
+              expression = expression.replace(new RegExp(`\\b${k}\\b`, "g"), val);
+            });
+
+            try {
+              const result = new Function(`return (${expression})`)();
+              executionOutput.push(String(result));
+            } catch (err) {
+              executionOutput.push(`SyntaxError: print expression '${inner}' is invalid.`);
+            }
+          }
+        }
+
+        if (executionOutput.length === 0) {
+          executionOutput.push("(Script selesai dijalankan tanpa menghasilkan output)");
+        }
+
+        output = output.concat(executionOutput);
+
+        // Mission 3 check
+        if (fileName === "app.py") {
+          setMission3(true);
+        }
+      } catch (err) {
+        output.push("Python Execution Error: Ada kesalahan logika/sintaksis di dalam berkas.");
+      }
+    }
+
+    output.push("");
+    output.push("C:\\Users\\maba\\workspace> _");
+    setTerminalOutput(output);
+  };
+
   // Execute terminal command
   const handleTerminalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!terminalInput.trim()) return;
 
     let output = [...terminalOutput];
-    output.pop(); // Remove the line containing the input prompt cursor
-
     const command = terminalInput.trim();
-    output.push(`C:\\Users\\maba\\workspace> ${command}`);
 
     const parts = command.split(" ");
     const mainCommand = parts[0].toLowerCase();
@@ -188,142 +274,67 @@ export default function VSCodeSandboxPage() {
     if (mainCommand === "python") {
       const fileName = parts[1];
       if (!fileName) {
+        output.pop();
+        output.push(`C:\\Users\\maba\\workspace> ${command}`);
         output.push("Error: Silakan tentukan nama berkas. Contoh: python main.py");
+        output.push("");
+        output.push("C:\\Users\\maba\\workspace> _");
+        setTerminalOutput(output);
       } else {
-        const fileToRun = files.find(f => f.name === fileName);
-        if (!fileToRun) {
-          output.push(`Error: Berkas '${fileName}' tidak ditemukan di workspace.`);
-        } else if (!fileName.endsWith(".py")) {
-          output.push(`Error: Berkas '${fileName}' bukan berkas script Python (.py).`);
+        runPythonFile(fileName);
+      }
+    } else {
+      output.pop();
+      output.push(`C:\\Users\\maba\\workspace> ${command}`);
+
+      if (mainCommand === "ls" || mainCommand === "dir") {
+        output.push(" Direktori Workspace saat ini:");
+        files.forEach((f) => {
+          output.push(`  -  ${f.name}   (${f.content.length} bytes)`);
+        });
+      } else if (mainCommand === "clear" || mainCommand === "cls") {
+        output = [];
+      } else if (mainCommand === "cat") {
+        const fileName = parts[1];
+        if (!fileName) {
+          output.push("Error: Silakan ketik nama berkas. Contoh: cat readme.md");
         } else {
-          // Mock python interpreter!
-          // We look for simple expressions like:
-          // x = 5
-          // print("test") or print(x)
-          // print("halo " + x)
-          try {
-            const lines = fileToRun.content.split("\n");
-            const vars: Record<string, any> = {};
-            let executionOutput: string[] = [];
-
-            for (let line of lines) {
-              line = line.trim();
-              if (!line || line.startsWith("#")) continue;
-
-              // Handle variable assignments: x = 5 or name = "TRPL"
-              if (line.includes("=") && !line.includes("==") && !line.startsWith("print")) {
-                const eqIdx = line.indexOf("=");
-                const varName = line.substring(0, eqIdx).trim();
-                let varValStr = line.substring(eqIdx + 1).trim();
-
-                // Simple check for string, int, float, bool
-                if ((varValStr.startsWith('"') && varValStr.endsWith('"')) || (varValStr.startsWith("'") && varValStr.endsWith("'"))) {
-                  vars[varName] = varValStr.substring(1, varValStr.length - 1);
-                } else if (varValStr === "True") {
-                  vars[varName] = true;
-                } else if (varValStr === "False") {
-                  vars[varName] = false;
-                } else {
-                  // arithmetic or float
-                  try {
-                    // replace existing variables in assignment string before evaluating
-                    let tempValStr = varValStr;
-                    Object.keys(vars).forEach(k => {
-                      tempValStr = tempValStr.replace(new RegExp(`\\b${k}\\b`, "g"), vars[k]);
-                    });
-                    // safe arithmetic eval using function
-                    const evaluated = new Function(`return (${tempValStr})`)();
-                    vars[varName] = evaluated;
-                  } catch (e) {
-                    vars[varName] = NaN;
-                  }
-                }
-                continue;
-              }
-
-              // Handle print statements
-              if (line.startsWith("print(") && line.endsWith(")")) {
-                let inner = line.substring(6, line.length - 1).trim();
-                
-                // Parse inner
-                // e.g. "Halo " + nama + "!"
-                // We will evaluate it as standard JS expression substituting variable values
-                let expression = inner;
-                Object.keys(vars).forEach(k => {
-                  const val = typeof vars[k] === "string" ? `"${vars[k]}"` : vars[k];
-                  expression = expression.replace(new RegExp(`\\b${k}\\b`, "g"), val);
-                });
-
-                try {
-                  const result = new Function(`return (${expression})`)();
-                  executionOutput.push(String(result));
-                } catch (err) {
-                  executionOutput.push(`SyntaxError: print expression '${inner}' is invalid.`);
-                }
-              }
-            }
-
-            if (executionOutput.length === 0) {
-              executionOutput.push("(Script selesai dijalankan tanpa menghasilkan output)");
-            }
-
-            output = output.concat(executionOutput);
-
-            // Mission 3 check
-            if (fileName === "app.py") {
-              setMission3(true);
-            }
-          } catch (err) {
-            output.push("Python Execution Error: Ada kesalahan logika/sintaksis di dalam berkas.");
+          const file = files.find(f => f.name === fileName);
+          if (!file) {
+            output.push(`Error: Berkas '${fileName}' tidak ditemukan.`);
+          } else {
+            output = output.concat(file.content.split("\n"));
           }
         }
-      }
-    } else if (mainCommand === "ls" || mainCommand === "dir") {
-      output.push(" Direktori Workspace saat ini:");
-      files.forEach((f) => {
-        output.push(`  -  ${f.name}   (${f.content.length} bytes)`);
-      });
-    } else if (mainCommand === "clear" || mainCommand === "cls") {
-      output = [];
-    } else if (mainCommand === "cat") {
-      const fileName = parts[1];
-      if (!fileName) {
-        output.push("Error: Silakan ketik nama berkas. Contoh: cat readme.md");
-      } else {
-        const file = files.find(f => f.name === fileName);
-        if (!file) {
-          output.push(`Error: Berkas '${fileName}' tidak ditemukan.`);
+      } else if (mainCommand === "pip" && parts[1]?.toLowerCase() === "install") {
+        const pkg = parts[2];
+        if (!pkg) {
+          output.push("Error: Silakan tentukan package. Contoh: pip install pandas");
         } else {
-          output = output.concat(file.content.split("\n"));
+          output.push(`Collecting ${pkg}...`);
+          output.push(`  Downloading ${pkg}-2.1.4-py3-none-any.whl (12.4 MB)`);
+          output.push("  Installing collected packages...");
+          output.push(`Successfully installed ${pkg}`);
         }
-      }
-    } else if (mainCommand === "pip" && parts[1]?.toLowerCase() === "install") {
-      const pkg = parts[2];
-      if (!pkg) {
-        output.push("Error: Silakan tentukan package. Contoh: pip install pandas");
+      } else if (mainCommand === "help") {
+        output.push("Perintah simulator yang tersedia:");
+        output.push("  python [nama_file].py  - Menjalankan program Python");
+        output.push("  ls / dir              - Melihat berkas di workspace");
+        output.push("  cat [nama_file]       - Membaca isi berkas");
+        output.push("  pip install [package] - Simulasi install module python");
+        output.push("  clear / cls           - Membersihkan layar terminal");
+        output.push("  help                  - Bantuan");
       } else {
-        output.push(`Collecting ${pkg}...`);
-        output.push(`  Downloading ${pkg}-2.1.4-py3-none-any.whl (12.4 MB)`);
-        output.push("  Installing collected packages...");
-        output.push(`Successfully installed ${pkg}`);
+        output.push(`'${command}' is not recognized as an internal or external command,`);
+        output.push("operable program or batch file.");
+        output.push("Ketik 'help' untuk melihat perintah simulator yang didukung.");
       }
-    } else if (mainCommand === "help") {
-      output.push("Perintah simulator yang tersedia:");
-      output.push("  python [nama_file].py  - Menjalankan program Python");
-      output.push("  ls / dir              - Melihat berkas di workspace");
-      output.push("  cat [nama_file]       - Membaca isi berkas");
-      output.push("  pip install [package] - Simulasi install module python");
-      output.push("  clear / cls           - Membersihkan layar terminal");
-      output.push("  help                  - Bantuan");
-    } else {
-      output.push(`'${command}' is not recognized as an internal or external command,`);
-      output.push("operable program or batch file.");
-      output.push("Ketik 'help' untuk melihat perintah simulator yang didukung.");
+
+      output.push("");
+      output.push("C:\\Users\\maba\\workspace> _");
+      setTerminalOutput(output);
     }
 
-    output.push("");
-    output.push("C:\\Users\\maba\\workspace> _");
-    setTerminalOutput(output);
     setTerminalInput("");
   };
 
@@ -683,29 +694,86 @@ export default function VSCodeSandboxPage() {
                   background: "#2d2d2d",
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "space-between",
                   borderBottom: "1px solid #202020",
-                  overflowX: "auto",
+                  paddingRight: "12px",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    background: "#1e1e1e",
-                    height: "100%",
-                    padding: "0 12px",
-                    borderRight: "1px solid #252526",
-                    borderTop: "2px solid var(--color-primary-500)",
-                    fontSize: "0.8rem",
-                    color: "white",
-                    fontFamily: "var(--font-code)",
-                    cursor: "default",
-                  }}
-                >
-                  <FileCode size={15} color={activeFileName.endsWith(".py") ? "#38bdf8" : "#9ca3af"} />
-                  <span>{activeFileName}</span>
+                <div style={{ display: "flex", alignItems: "center", height: "100%", overflowX: "auto" }}>
+                  {files.map((file) => {
+                    const isActive = file.name === activeFileName;
+                    return (
+                      <div
+                        key={file.name}
+                        onClick={() => setActiveFileName(file.name)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          background: isActive ? "#1e1e1e" : "transparent",
+                          height: "100%",
+                          padding: "0 12px",
+                          borderRight: "1px solid #252526",
+                          borderTop: isActive ? "2px solid var(--color-primary-500)" : "2px solid transparent",
+                          fontSize: "0.8rem",
+                          color: isActive ? "white" : "#a5a5a5",
+                          fontFamily: "var(--font-code)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <FileCode size={15} color={file.name.endsWith(".py") ? "#38bdf8" : "#9ca3af"} />
+                        <span>{file.name}</span>
+                        {files.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteFile(file.name, e);
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#888888",
+                              cursor: "pointer",
+                              padding: "2px",
+                              display: "flex",
+                              alignItems: "center",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            <X size={10} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+
+                {/* Right side controls (Run Button) */}
+                {activeFileName.endsWith(".py") && (
+                  <button
+                    type="button"
+                    onClick={() => runPythonFile(activeFileName)}
+                    title="Jalankan Kode Python"
+                    style={{
+                      background: "rgba(34,197,94,0.15)",
+                      border: "1.5px solid #22c55e",
+                      borderRadius: "6px",
+                      padding: "4px 10px",
+                      color: "#22c55e",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      cursor: "pointer",
+                      transition: "all var(--transition-fast)",
+                    }}
+                  >
+                    <Play size={14} weight="fill" />
+                    <span>Run</span>
+                  </button>
+                )}
               </div>
 
               {/* Text Editor Area */}
