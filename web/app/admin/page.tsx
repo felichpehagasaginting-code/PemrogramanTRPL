@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useUserStore, BADGES, LEVELS } from "@/lib/store/useUserStore";
+import { useUserStore, BADGES, LEVELS, isAdmin } from "@/lib/store/useUserStore";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import {
-  ShieldCheck, Users, Trophy, WarningCircle, MagnifyingGlass,
+  ShieldCheck, Users, Trophy, MagnifyingGlass,
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
   Student, ChartBar, CheckCircle, LockKey, SignOut, Code,
   PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft,
@@ -18,51 +18,42 @@ const MODULE_LABELS: Record<string, string> = {
   M6: "Fungsi", M7: "Array", M8: "Mini Project",
 };
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123";
-
 const INITIAL_FORM = { name: "", email: "", xp: 0 };
 
 export default function AdminPage() {
-  const { leaderboard, allUsers, fetchLeaderboard, fetchAllUsers, resetUserProgress, awardXP, addUser, updateUser, deleteUser } = useUserStore();
+  const router = useRouter();
+  const user = useUserStore((s) => s.user);
+  const leaderboard = useUserStore((s) => s.leaderboard);
+  const allUsers = useUserStore((s) => s.allUsers);
+  const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
+  const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
+  const resetUserProgress = useUserStore((s) => s.resetUserProgress);
+  const awardXP = useUserStore((s) => s.awardXP);
+  const addUser = useUserStore((s) => s.addUser);
+  const updateUser = useUserStore((s) => s.updateUser);
+  const deleteUser = useUserStore((s) => s.deleteUser);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [awardModal, setAwardModal] = useState<string | null>(null);
   const [awardAmount, setAwardAmount] = useState(50);
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [editUser, setEditUser] = useState<string | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
 
   useEffect(() => {
-    if (localStorage.getItem("admin-auth") === "true") {
-      setAuthenticated(true);
-      document.documentElement.classList.add("dark");
-    }
+    const root = document.documentElement;
+    root.setAttribute("data-theme", "purple");
+    root.classList.add("dark");
+    return () => {
+      root.classList.remove("dark");
+      root.removeAttribute("data-theme");
+    };
   }, []);
-
-  useEffect(() => {
-    if (authenticated) {
-      document.documentElement.classList.add("dark");
-      return () => document.documentElement.classList.remove("dark");
-    }
-  }, [authenticated]);
 
   useEffect(() => {
     Promise.all([fetchLeaderboard(), fetchAllUsers()]).finally(() => setLoading(false));
   }, [fetchLeaderboard, fetchAllUsers]);
-
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      localStorage.setItem("admin-auth", "true");
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
-  };
 
   const resetForm = () => setFormData(INITIAL_FORM);
 
@@ -106,50 +97,35 @@ export default function AdminPage() {
     setEditUser(uid);
   };
 
-  if (!authenticated) {
+  if (!user) {
     return (
-      <div style={{
-        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-        background: "var(--bg-page)", padding: "20px",
-      }}>
-        <div style={{
-          background: "var(--bg-card)", border: "1px solid var(--border-color)",
-          borderRadius: "var(--radius-xl)", padding: "var(--space-8)",
-          maxWidth: "380px", width: "100%", textAlign: "center",
-        }}>
-          <div style={{
-            width: "56px", height: "56px", borderRadius: "16px",
-            background: "var(--gradient-hero)", display: "flex", alignItems: "center",
-            justifyContent: "center", margin: "0 auto 16px", boxShadow: "var(--shadow-glow-soft)",
-          }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-page)", padding: "20px" }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl)", padding: "var(--space-8)", maxWidth: "380px", width: "100%", textAlign: "center" }}>
+          <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "var(--gradient-hero)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", boxShadow: "var(--shadow-glow-soft)" }}>
             <ShieldCheck size={28} color="white" weight="fill" />
           </div>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>
-            Admin Panel
-          </h2>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>Admin Panel</h2>
           <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "var(--space-6)" }}>
-            Masukkan password admin untuk melanjutkan
+            Kamu harus login terlebih dahulu.
           </p>
-          <input
-            type="password" placeholder="Password admin..." value={password}
-            onChange={(e) => { setPassword(e.target.value); setPasswordError(false); }}
-            onKeyDown={(e) => { if (e.key === "Enter") handleLogin(); }}
-            autoFocus
-            style={{
-              width: "100%", padding: "12px 16px", borderRadius: "var(--radius-md)",
-              border: `1.5px solid ${passwordError ? "#EF4444" : "var(--border-color)"}`,
-              fontSize: "1rem", color: "var(--text-primary)", background: "var(--bg-page)",
-              outline: "none", marginBottom: "var(--space-4)", textAlign: "center",
-            }}
-          />
-          {passwordError && (
-            <p style={{ fontSize: "0.8rem", color: "#EF4444", fontWeight: 600, marginBottom: "var(--space-3)" }}>
-              Password salah!
-            </p>
-          )}
-          <button onClick={handleLogin} className="btn btn-primary" style={{ width: "100%" }}>
-            Masuk Admin Panel
-          </button>
+          <Link href="/login" className="btn btn-primary" style={{ width: "100%", display: "block" }}>Login</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin(user)) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-page)", padding: "20px" }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl)", padding: "var(--space-8)", maxWidth: "380px", width: "100%", textAlign: "center" }}>
+          <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <ShieldCheck size={28} color="white" weight="fill" />
+          </div>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>Akses Ditolak</h2>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "var(--space-6)" }}>
+            Hanya pemilik akun <strong>felich@mhs.cwe.ac.id</strong> dan <strong>felichpehagasa@gmail.com</strong> yang dapat mengakses halaman ini.
+          </p>
+          <Link href="/dashboard" className="btn btn-secondary" style={{ width: "100%", display: "block" }}>Kembali ke Dashboard</Link>
         </div>
       </div>
     );

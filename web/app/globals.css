@@ -4,53 +4,10 @@
    DESIGN TOKENS – Matrikulasi TRPL
    Sesuai design.md
    ===================================================== */
+/* ══════════════════════════════════════════
+   🎨 DESIGN TOKENS – Shared (theme-agnostic)
+   ══════════════════════════════════════════ */
 :root {
-  /* ══════════════════════════════════════════
-     🎨 TEMA: Putih + Orange
-     Primary: Orange (#FF6B00)
-     Background: Warm White (#FFFAF6)
-  ══════════════════════════════════════════ */
-
-  /* === Colors: Primary (Orange Hangat) === */
-  --color-primary-300: #FFAB76;
-  --color-primary-400: #FF8C42;
-  --color-primary-500: #FF6B00;
-  --color-primary-600: #D45900;
-  --color-primary-700: #A84500;
-
-  /* === Colors: Secondary (Amber Emas) === */
-  --color-secondary-300: #FFCC80;
-  --color-secondary-400: #FFB347;
-  --color-secondary-500: #FF9D00;
-  --color-secondary-600: #CC7D00;
-
-  /* === Colors: Accent === */
-  --color-accent-green:  #22C55E;
-  --color-accent-yellow: #FFC107;
-  --color-accent-cyan:   #06B6D4;
-  --color-accent-red:    #EF4444;
-
-  /* === Colors: Neutral (Warm White Scale) === */
-  --color-neutral-900: #1C0A00;
-  --color-neutral-800: #2D1500;
-  --color-neutral-700: #4A2800;
-  --color-neutral-600: #7A4A25;
-  --color-neutral-400: #A07050;
-  --color-neutral-300: #C4A882;
-  --color-neutral-200: #E0CBBF;
-  --color-neutral-150: #F0E8E0;
-  --color-neutral-100: #FFF8F2;
-  --color-neutral-50:  #FFFFFF;
-
-  /* === Gradients === */
-  --gradient-hero:       linear-gradient(135deg, #FF6B00 0%, #FF9D00 60%, #FFB347 100%);
-  --gradient-hero-soft:  linear-gradient(135deg, rgba(255,107,0,0.08) 0%, rgba(255,179,71,0.05) 100%);
-  --gradient-success:    linear-gradient(135deg, #22C55E 0%, #06D6A0 100%);
-  --gradient-card:       linear-gradient(145deg, #FFFFFF 0%, #FFF8F2 100%);
-  --gradient-warm-fade:  linear-gradient(180deg, rgba(255,107,0,0.08) 0%, transparent 100%);
-  --gradient-cta:        linear-gradient(135deg, #FF6B00 0%, #D45900 100%);
-  --gradient-orange-glow: radial-gradient(ellipse at center, rgba(255,107,0,0.15) 0%, transparent 70%);
-
   /* === Spacing === */
   --space-1:  4px;
   --space-2:  8px;
@@ -68,16 +25,6 @@
   --radius-xl:   24px;
   --radius-full: 9999px;
 
-  /* === Shadows (Orange-tinted) === */
-  --shadow-card:       0 4px 24px rgba(255, 107, 0, 0.10);
-  --shadow-hover:      0 8px 32px rgba(255, 107, 0, 0.22);
-  --shadow-glow:       0 0 24px rgba(255, 107, 0, 0.45);
-  --shadow-glow-soft:  0 0 40px rgba(255, 107, 0, 0.18);
-  --shadow-amber-glow: 0 0 20px rgba(255, 157, 0, 0.4);
-  --shadow-sm:         0 2px 8px rgba(28, 10, 0, 0.08);
-  --shadow-md:         0 4px 16px rgba(28, 10, 0, 0.10);
-  --shadow-lg:         0 8px 32px rgba(28, 10, 0, 0.12);
-
   /* === Transitions === */
   --transition-fast:   150ms ease;
   --transition-base:   250ms ease;
@@ -89,48 +36,171 @@
   --font-body:    "Inter", sans-serif;
   --font-code:    "Fira Code", monospace;
 
-  /* ─────────────────────────────────────────
-     SEMANTIC COLORS (default = white theme)
-  ───────────────────────────────────────── */
+  /* === Colors: Accent === */
+  --color-accent-green:  #22C55E;
+  --color-accent-yellow: #FFC107;
+  --color-accent-cyan:   #06B6D4;
+  --color-accent-red:    #EF4444;
+}
+
+/* ══════════════════════════════════════════
+   🎨 TEMA ORANGE (Putih + Orange)
+   Primary: #FF6B00
+   Background: #FFFAF6
+   ══════════════════════════════════════════ */
+:root, [data-theme="orange"] {
+  /* === Primary === */
+  --color-primary-300: #FFAB76;
+  --color-primary-400: #FF8C42;
+  --color-primary-500: #FF6B00;
+  --color-primary-600: #D45900;
+  --color-primary-700: #A84500;
+
+  /* === Secondary === */
+  --color-secondary-300: #FFCC80;
+  --color-secondary-400: #FFB347;
+  --color-secondary-500: #FF9D00;
+  --color-secondary-600: #CC7D00;
+
+  /* === Neutral === */
+  --color-neutral-900: #1C0A00;
+  --color-neutral-800: #2D1500;
+  --color-neutral-700: #4A2800;
+  --color-neutral-600: #7A4A25;
+  --color-neutral-400: #A07050;
+  --color-neutral-300: #C4A882;
+  --color-neutral-200: #E0CBBF;
+  --color-neutral-150: #F0E8E0;
+  --color-neutral-100: #FFF8F2;
+  --color-neutral-50:  #FFFFFF;
+
+  /* === Shadows === */
+  --shadow-card:       0 4px 24px rgba(255, 107, 0, 0.10);
+  --shadow-hover:      0 8px 32px rgba(255, 107, 0, 0.22);
+  --shadow-glow:       0 0 24px rgba(255, 107, 0, 0.45);
+  --shadow-glow-soft:  0 0 40px rgba(255, 107, 0, 0.18);
+  --shadow-amber-glow: 0 0 20px rgba(255, 157, 0, 0.4);
+  --shadow-sm:         0 2px 8px rgba(28, 10, 0, 0.08);
+  --shadow-md:         0 4px 16px rgba(28, 10, 0, 0.10);
+  --shadow-lg:         0 8px 32px rgba(28, 10, 0, 0.12);
+  --shadow-primary-btn: 0 4px 15px rgba(255, 107, 0, 0.35);
+
+  /* === Gradients === */
+  --gradient-hero:       linear-gradient(135deg, #FF6B00 0%, #FF9D00 60%, #FFB347 100%);
+  --gradient-hero-soft:  linear-gradient(135deg, rgba(255,107,0,0.08) 0%, rgba(255,179,71,0.05) 100%);
+  --gradient-success:    linear-gradient(135deg, #22C55E 0%, #06D6A0 100%);
+  --gradient-card:       linear-gradient(145deg, #FFFFFF 0%, #FFF8F2 100%);
+  --gradient-warm-fade:  linear-gradient(180deg, rgba(255,107,0,0.08) 0%, transparent 100%);
+  --gradient-cta:        linear-gradient(135deg, #FF6B00 0%, #D45900 100%);
+  --gradient-orange-glow: radial-gradient(ellipse at center, rgba(255,107,0,0.15) 0%, transparent 70%);
+
+  /* Light mode semantic */
   --bg-page:        #FFFAF6;
   --bg-page-alt:    #FFF4EC;
   --bg-card:        #FFFFFF;
   --bg-card-hover:  #FFF8F2;
   --bg-elevated:    #FFF4ED;
   --bg-hero:        #FFFAF6;
-
   --text-primary:   #1C0A00;
   --text-secondary: #7A4A25;
   --text-muted:     #A07050;
-
   --border-color:        rgba(255, 107, 0, 0.15);
   --border-color-strong: rgba(255, 107, 0, 0.30);
-
-  /* Dark section bg (used in hero/footer areas) */
   --bg-dark:        #1C0A00;
   --bg-dark-card:   #2D1500;
-
-  /* Navbar background */
   --bg-navbar:      rgba(255, 250, 246, 0.85);
 }
 
-/* Dark mode overrides */
-.dark {
+[data-theme="orange"].dark {
   --bg-page:        #1C0A00;
   --bg-page-alt:    #250E00;
   --bg-card:        #2D1500;
   --bg-card-hover:  #381B00;
   --bg-elevated:    #381B00;
   --bg-hero:        #1C0A00;
-  
   --text-primary:   #FFF8F2;
   --text-secondary: #E0CBBF;
   --text-muted:     #A07050;
-
   --border-color:        rgba(255, 107, 0, 0.22);
   --border-color-strong: rgba(255, 107, 0, 0.38);
-
   --bg-navbar:      rgba(28, 10, 0, 0.85);
+}
+
+/* ══════════════════════════════════════════
+   🎨 TEMA UNGU (Putih + Ungu Pekat)
+   Primary: #7B1FA2
+   Background: #F8F6FF
+   ══════════════════════════════════════════ */
+[data-theme="purple"] {
+  --color-primary-300: #CE93D8;
+  --color-primary-400: #AB47BC;
+  --color-primary-500: #7B1FA2;
+  --color-primary-600: #6A1B9A;
+  --color-primary-700: #4A148C;
+
+  --color-secondary-300: #B39DDB;
+  --color-secondary-400: #9575CD;
+  --color-secondary-500: #7E57C2;
+  --color-secondary-600: #5E35B1;
+
+  --color-neutral-900: #1A0033;
+  --color-neutral-800: #2D0050;
+  --color-neutral-700: #4A0072;
+  --color-neutral-600: #6A1B9A;
+  --color-neutral-400: #9C27B0;
+  --color-neutral-300: #CE93D8;
+  --color-neutral-200: #E1BEE7;
+  --color-neutral-150: #EDE7F6;
+  --color-neutral-100: #F3E5F5;
+  --color-neutral-50:  #FFFFFF;
+
+  --shadow-card:       0 4px 24px rgba(123, 31, 162, 0.10);
+  --shadow-hover:      0 8px 32px rgba(123, 31, 162, 0.20);
+  --shadow-glow:       0 0 24px rgba(123, 31, 162, 0.40);
+  --shadow-glow-soft:  0 0 40px rgba(123, 31, 162, 0.16);
+  --shadow-amber-glow: 0 0 20px rgba(126, 87, 194, 0.4);
+  --shadow-sm:         0 2px 8px rgba(26, 0, 51, 0.08);
+  --shadow-md:         0 4px 16px rgba(26, 0, 51, 0.10);
+  --shadow-lg:         0 8px 32px rgba(26, 0, 51, 0.12);
+  --shadow-primary-btn: 0 4px 15px rgba(123, 31, 162, 0.35);
+
+  --gradient-hero:       linear-gradient(135deg, #7B1FA2 0%, #AB47BC 60%, #CE93D8 100%);
+  --gradient-hero-soft:  linear-gradient(135deg, rgba(123,31,162,0.08) 0%, rgba(206,147,216,0.05) 100%);
+  --gradient-success:    linear-gradient(135deg, #22C55E 0%, #06D6A0 100%);
+  --gradient-card:       linear-gradient(145deg, #FFFFFF 0%, #F8F6FF 100%);
+  --gradient-warm-fade:  linear-gradient(180deg, rgba(123,31,162,0.08) 0%, transparent 100%);
+  --gradient-cta:        linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+  --gradient-orange-glow: radial-gradient(ellipse at center, rgba(123,31,162,0.15) 0%, transparent 70%);
+
+  --bg-page:        #F8F6FF;
+  --bg-page-alt:    #F0ECFF;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F8F6FF;
+  --bg-elevated:    #F3E5F5;
+  --bg-hero:        #F8F6FF;
+  --text-primary:   #1A0033;
+  --text-secondary: #4A148C;
+  --text-muted:     #7E57C2;
+  --border-color:        rgba(123, 31, 162, 0.15);
+  --border-color-strong: rgba(123, 31, 162, 0.28);
+  --bg-dark:        #1A0033;
+  --bg-dark-card:   #2D0050;
+  --bg-navbar:      rgba(248, 246, 255, 0.85);
+}
+
+[data-theme="purple"].dark {
+  --bg-page:        #1A0033;
+  --bg-page-alt:    #250040;
+  --bg-card:        #2D0050;
+  --bg-card-hover:  #38005E;
+  --bg-elevated:    #38005E;
+  --bg-hero:        #1A0033;
+  --text-primary:   #F3E5F5;
+  --text-secondary: #E1BEE7;
+  --text-muted:     #CE93D8;
+  --border-color:        rgba(123, 31, 162, 0.25);
+  --border-color-strong: rgba(123, 31, 162, 0.40);
+  --bg-navbar:      rgba(26, 0, 51, 0.85);
 }
 
 /* =====================================================
@@ -346,7 +416,7 @@ code, pre {
 .btn-primary {
   background: var(--gradient-hero);
   color: white;
-  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35);
+  box-shadow: var(--shadow-primary-btn);
 }
 .btn-primary:hover {
   transform: scale(1.03);
@@ -441,4 +511,143 @@ code, pre {
   border-radius: 50%;
   filter: blur(60px);
   pointer-events: none;
+}
+
+/* --- Hero page-load animations (replaces Framer Motion initial/animate) --- */
+.hero-fade-in-left {
+  animation: fadeInLeft 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+.hero-fade-in-right {
+  animation: fadeInRight 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s forwards;
+  opacity: 0;
+}
+.hero-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+.hero-fade-in-scale {
+  animation: fadeInScale 0.5s ease 0.1s forwards;
+  opacity: 0;
+}
+.hero-scroll-indicator {
+  animation: float 1.5s ease-in-out infinite;
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.pulse-opacity {
+  animation: pulseOpacity 4s ease-in-out infinite;
+}
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.6; }
+}
+
+.scale-in-x {
+  animation: scaleInX 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform-origin: center;
+}
+@keyframes scaleInX {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.social-icon {
+  transition: all 0.2s ease;
+}
+.social-icon:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary-400) !important;
+  background: rgba(255,107,0,0.08) !important;
+  color: var(--color-primary-500) !important;
+}
+
+/* Footer link hover */
+.footer-link {
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+.footer-link:hover {
+  color: var(--color-primary-300) !important;
+  transform: translateX(4px);
+}
+
+.footer-social-icon {
+  transition: all 0.2s ease;
+}
+.footer-social-icon:hover {
+  transform: scale(1.1);
+  color: var(--color-primary-300) !important;
+}
+
+/* Progress bar animation */
+.login-btn { transition: background 0.15s, transform 0.15s; }
+.login-btn:hover:not(:disabled) { background: rgba(255, 107, 0, 0.05); transform: scale(1.02); }
+.login-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.progress-bar-fill {
+  animation: progressFill 0.8s ease-out;
+}
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+/* Module card hover */
+.hover-scale-card {
+  transition: transform var(--transition-base, 0.2s), box-shadow var(--transition-base, 0.2s);
+}
+.hover-scale-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(108, 99, 255, 0.24);
+}
+
+/* --- Lightweight CSS animations (replaces Framer Motion on scroll) --- */
+.fade-in {
+  opacity: 0;
+  animation: fadeInUp 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+[data-visible] > .fade-in:nth-child(1) { animation-delay: 0s; }
+[data-visible] > .fade-in:nth-child(2) { animation-delay: 0.07s; }
+[data-visible] > .fade-in:nth-child(3) { animation-delay: 0.14s; }
+[data-visible] > .fade-in:nth-child(4) { animation-delay: 0.21s; }
+[data-visible] > .fade-in:nth-child(5) { animation-delay: 0.28s; }
+[data-visible] > .fade-in:nth-child(6) { animation-delay: 0.35s; }
+[data-visible] > .fade-in:nth-child(7) { animation-delay: 0.42s; }
+[data-visible] > .fade-in:nth-child(8) { animation-delay: 0.49s; }
+[data-visible] > .fade-in:nth-child(9) { animation-delay: 0.56s; }
+[data-visible] > .fade-in:nth-child(10) { animation-delay: 0.63s; }
+[data-visible] > .fade-in:nth-child(11) { animation-delay: 0.70s; }
+[data-visible] > .fade-in:nth-child(12) { animation-delay: 0.77s; }
+
+.stagger-delay-1 { animation-delay: 0.08s !important; }
+.stagger-delay-2 { animation-delay: 0.16s !important; }
+.stagger-delay-3 { animation-delay: 0.24s !important; }
+.stagger-delay-4 { animation-delay: 0.32s !important; }
+
+/* Replace framer-motion hover scale with CSS */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.hover-glow {
+  transition: all 0.2s ease;
+}
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow);
 }

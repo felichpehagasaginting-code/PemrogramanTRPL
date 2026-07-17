@@ -1,22 +1,28 @@
 "use client";
 
+"use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
-import { motion } from "framer-motion";
-import { Code, GoogleLogo } from "@phosphor-icons/react";
+import { isMockFirebase } from "@/lib/firebase";
+import { Code, GoogleLogo, User } from "@phosphor-icons/react";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { LOGIN_FEATURES } from "@/lib/features";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, loginWithGoogle, handleRedirectResult } = useUserStore();
+  const user = useUserStore((s) => s.user);
+  const loginWithGoogle = useUserStore((s) => s.loginWithGoogle);
+  const login = useUserStore((s) => s.login);
+  const handleRedirectResult = useUserStore((s) => s.handleRedirectResult);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [checkingRedirect, setCheckingRedirect] = useState(true);
 
   useEffect(() => {
     handleRedirectResult().then((signedIn) => {
-      if (signedIn) {
-        router.push("/dashboard");
-      }
+      if (signedIn) router.push("/dashboard");
       setCheckingRedirect(false);
     });
   }, [handleRedirectResult, router]);
@@ -29,7 +35,18 @@ export default function LoginPage() {
 
   const handleSSOLogin = async () => {
     setLoading(true);
-    await loginWithGoogle();
+    setError("");
+    try {
+      await loginWithGoogle();
+    } catch (e: any) {
+      setError(e?.message || "Gagal login. Coba lagi.");
+      setLoading(false);
+    }
+  };
+
+  const handleMockLogin = () => {
+    setLoading(true);
+    login("Demo User (Mock)", "demo@student.polsri.ac.id");
   };
 
   return (
@@ -68,10 +85,8 @@ export default function LoginPage() {
         }}
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      <div
+        className="fade-in"
         style={{
           width: "100%",
           maxWidth: "420px",
@@ -108,11 +123,16 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        {error && (
+          <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "var(--radius-md)", padding: "10px", marginBottom: "var(--space-4)", color: "#EF4444", fontSize: "0.85rem", textAlign: "center" }}>
+            {error}
+          </div>
+        )}
+
+        <button
           onClick={handleSSOLogin}
           disabled={loading || checkingRedirect}
+          className="login-btn"
           style={{
             width: "100%",
             padding: "var(--space-3) var(--space-4)",
@@ -126,20 +146,40 @@ export default function LoginPage() {
             alignItems: "center",
             justifyContent: "center",
             gap: "10px",
-            cursor: "pointer",
-            transition: "background var(--transition-fast)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 107, 0, 0.05)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.6 : 1,
           }}
         >
           <GoogleLogo size={20} weight="bold" color="#FF6B00" />
-          {loading ? "Mengarahkan ke Google..." : checkingRedirect ? "Memeriksa..." : "Login dengan Google"}
-        </motion.button>
-      </motion.div>
+          {loading ? "Memproses..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
+        </button>
+
+        {isMockFirebase && (
+          <button
+            onClick={handleMockLogin}
+            disabled={loading || checkingRedirect}
+            style={{
+              width: "100%",
+              padding: "var(--space-3) var(--space-4)",
+              borderRadius: "var(--radius-full)",
+              border: "1px dashed var(--border-color)",
+              background: "transparent",
+              color: "var(--text-secondary)",
+              fontWeight: 500,
+              fontSize: "0.875rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              cursor: "pointer",
+              marginTop: "12px",
+            }}
+          >
+            <User size={18} /> Login Mock (tanpa Firebase)
+          </button>
+        )}
+      </div>
+      <FeaturePopupQueue features={LOGIN_FEATURES} delay={3000} />
     </main>
   );
 }

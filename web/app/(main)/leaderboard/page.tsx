@@ -5,6 +5,8 @@ import { useUserStore } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
 import { AvatarIcon } from "@/components/ui";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { LEADERBOARD_FEATURES } from "@/lib/features";
 
 export default function LeaderboardPage() {
   const { user, leaderboard, fetchLeaderboard } = useUserStore();
@@ -268,6 +270,7 @@ export default function LeaderboardPage() {
           .lb-stats { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
+      <FeaturePopupQueue features={LEADERBOARD_FEATURES} delay={5000} />
     </div>
   );
 }

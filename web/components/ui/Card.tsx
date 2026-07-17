@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { memo, ReactNode } from "react";
 
 interface CardProps {
   children: ReactNode;
@@ -12,7 +11,7 @@ interface CardProps {
   onClick?: () => void;
 }
 
-export function Card({
+export const Card = memo(function Card({
   children,
   className = "",
   hover = true,
@@ -30,13 +29,8 @@ export function Card({
   }
 
   return (
-    <motion.div
-      className={classes}
-      whileHover={{ y: -4, boxShadow: "0 8px 32px rgba(108, 99, 255, 0.24)" }}
-      transition={{ duration: 0.25 }}
-      onClick={onClick}
-    >
+    <div className={`${classes} hover-lift`} onClick={onClick}>
       {children}
-    </motion.div>
+    </div>
   );
-}
+});

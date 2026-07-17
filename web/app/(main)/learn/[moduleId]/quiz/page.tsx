@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
+import { useGameStore } from "@/lib/store/useGameStore";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -13,7 +14,8 @@ import {
   Question,
   BookOpen,
 } from "@phosphor-icons/react";
-import confetti from "canvas-confetti";
+import { fireConfetti } from "@/lib/confetti";
+import { getRandomMemes } from "@/lib/content/memes";
 
 interface QuestionData {
   text: string;
@@ -28,6 +30,8 @@ export default function QuizPage() {
   const { user, completeModule, addXP, unlockBadge } = useUserStore();
 
   const [currentIdx, setCurrentIdx] = useState(0);
+  const gameApi = useGameStore.getState();
+  const quizMemes = getRandomMemes(moduleId as string, 2);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
@@ -792,15 +796,13 @@ export default function QuizPage() {
       setCurrentIdx(currentIdx + 1);
     } else {
       setQuizFinished(true);
+      const meme = getRandomMemes(moduleId as string, 1)[0];
+      if (meme) gameApi.triggerMeme(meme.emoji, meme.caption);
 
       const passRate = (score / questions.length) * 100;
       if (passRate >= 60) {
         // Confetti splash
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
+        fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
         // Save module completion
         completeModule(moduleId as string);
@@ -1015,6 +1017,17 @@ export default function QuizPage() {
                 Kamu menyelesaikan kuis dengan skor **{Math.round((score / questions.length) * 100)}%** ({score} dari {questions.length} benar).
               </p>
 
+              {quizMemes.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "var(--space-6)" }}>
+                  {quizMemes.map((meme) => (
+                    <div key={meme.id} style={{ border: "2px solid var(--text-primary)", borderRadius: "var(--radius-md)", background: "#000", padding: "12px 16px", color: "#fff", fontWeight: 700, fontSize: "0.85rem", textAlign: "center" }}>
+                      <div style={{ fontSize: "1.5rem", marginBottom: "2px" }}>{meme.emoji}</div>
+                      {meme.caption}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
                 <button onClick={() => router.push("/dashboard")} className="btn btn-primary">
                   Kembali ke Dashboard
@@ -1030,6 +1043,15 @@ export default function QuizPage() {
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "8px", marginBottom: "var(--space-6)" }}>
                 Nilai kamu **{Math.round((score / questions.length) * 100)}%** (passing grade kuis: 60%). Yuk ulangi sekali lagi biar paham!
               </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "var(--space-6)" }}>
+                {quizMemes.map((meme) => (
+                  <div key={meme.id} style={{ border: "2px solid var(--color-danger)", borderRadius: "var(--radius-md)", background: "#000", padding: "12px 16px", color: "#fff", fontWeight: 700, fontSize: "0.85rem", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.5rem", marginBottom: "2px" }}>{meme.emoji}</div>
+                    {meme.caption}
+                  </div>
+                ))}
+              </div>
 
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
                 <button onClick={handleRetry} className="btn btn-primary" style={{ background: "var(--color-primary-500)" }}>

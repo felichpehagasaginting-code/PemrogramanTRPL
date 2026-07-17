@@ -24,10 +24,10 @@ describe("useUserStore", () => {
     expect(LEVELS[LEVELS.length - 1].name).toBe("TRPL Legend");
   });
 
-  it("should have 13 badges defined", () => {
-    expect(BADGES).toHaveLength(13);
+  it("should have 16 badges defined", () => {
+    expect(BADGES).toHaveLength(16);
     expect(BADGES[0].id).toBe("langkah_pertama");
-    expect(BADGES[BADGES.length - 1].id).toBe("helping_hand");
+    expect(BADGES[BADGES.length - 1].id).toBe("perfect_streak_7");
   });
 
   it("should create mock user on login", async () => {

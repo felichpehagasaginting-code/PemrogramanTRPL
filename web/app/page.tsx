@@ -8,6 +8,9 @@ import {
   CTASection,
   EngineerSection,
 } from "@/components/landing/Sections";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { PointingPopup } from "@/components/ui/PointingPopup";
+import { LANDING_FEATURES, POINTING_FEATURES } from "@/lib/features";
 
 export default function HomePage() {
   return (
@@ -22,6 +25,8 @@ export default function HomePage() {
         <EngineerSection />
       </main>
       <Footer />
+      <FeaturePopupQueue features={LANDING_FEATURES} delay={5000} />
+      <PointingPopup {...POINTING_FEATURES.themeToggle} delay={8000} position="bottom" />
     </>
   );
 }

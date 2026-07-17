@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { memo } from "react";
 import Link from "next/link";
 import { Code, InstagramLogo, GithubLogo, Heart } from "@phosphor-icons/react";
 
-export function Footer() {
+export const Footer = memo(function Footer() {
   return (
     <footer
       style={{
@@ -47,10 +47,10 @@ export function Footer() {
             </p>
             <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-4)" }}>
               {[InstagramLogo, GithubLogo].map((Icon, i) => (
-                <motion.a
+                <a
                   key={i}
                   href="#"
-                  whileHover={{ scale: 1.1, color: "var(--color-primary-300)" }}
+                  className="footer-social-icon"
                   style={{
                     width: "36px",
                     height: "36px",
@@ -62,10 +62,11 @@ export function Footer() {
                     justifyContent: "center",
                     color: "rgba(255,250,246,0.7)",
                     textDecoration: "none",
+                    transition: "all 0.2s ease",
                   }}
                 >
                   <Icon size={18} />
-                </motion.a>
+                </a>
               ))}
             </div>
           </div>
@@ -76,21 +77,20 @@ export function Footer() {
               Platform
             </h4>
             {["Kurikulum", "Live Coding", "Gamifikasi", "Leaderboard"].map((item) => (
-              <motion.a
+              <a
                 key={item}
                 href="#"
-                whileHover={{ color: "var(--color-primary-300)", x: 4 }}
+                className="footer-link"
                 style={{
                   display: "block",
                   color: "rgba(255,250,246,0.65)",
                   textDecoration: "none",
                   fontSize: "0.9rem",
                   marginBottom: "var(--space-3)",
-                  transition: "color 0.2s",
                 }}
               >
                 {item}
-              </motion.a>
+              </a>
             ))}
           </div>
 
@@ -99,10 +99,10 @@ export function Footer() {
               Info
             </h4>
             {["Tentang TRPL", "Hubungi Kami", "FAQ", "Panduan"].map((item) => (
-              <motion.a
+              <a
                 key={item}
                 href="#"
-                whileHover={{ color: "var(--color-primary-300)", x: 4 }}
+                className="footer-link"
                 style={{
                   display: "block",
                   color: "rgba(255,250,246,0.65)",
@@ -112,13 +112,13 @@ export function Footer() {
                 }}
               >
                 {item}
-              </motion.a>
+              </a>
             ))}
-            <motion.a
+            <a
               href="https://himaprodi-trpl-cwe.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ color: "var(--color-primary-300)", x: 4 }}
+              className="footer-link"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -131,7 +131,7 @@ export function Footer() {
               }}
             >
               <Heart size={14} weight="fill" /> HIMA TRPL
-            </motion.a>
+            </a>
           </div>
         </div>
 
@@ -162,4 +162,4 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});

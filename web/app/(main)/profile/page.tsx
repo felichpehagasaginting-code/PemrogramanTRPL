@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
 import { AvatarIcon, BadgeIcon } from "@/components/ui";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { PROFILE_FEATURES } from "@/lib/features";
 
 const AVATARS = [
   { id: "avatar_default", emoji: "🤖", label: "Robot" },
@@ -190,6 +192,7 @@ export default function ProfilePage() {
           .badges-cabinet-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
+      <FeaturePopupQueue features={PROFILE_FEATURES} delay={5000} />
     </div>
   );
 }

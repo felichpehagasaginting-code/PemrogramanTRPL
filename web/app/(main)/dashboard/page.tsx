@@ -1,42 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore, BADGES, UserProgress } from "@/lib/store/useUserStore";
-import { motion } from "framer-motion";
+import { useUserStore, BADGES } from "@/lib/store/useUserStore";
+import { MODULES_META } from "@/lib/content/modules-data";
 import Link from "next/link";
-import {
-  Star,
-  FolderOpen,
-  Brain,
-  SquaresFour,
-  GitBranch,
-  ArrowsClockwise,
-  Function,
-  ListNumbers,
-  Rocket,
-  LockKey,
-  CheckCircle,
-  Lightning,
-  Trophy,
-  ChartBar,
-  Medal,
-} from "@phosphor-icons/react";
+import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket } from "@phosphor-icons/react";
 import { BadgeIcon } from "@/components/ui";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { PointingPopup } from "@/components/ui/PointingPopup";
+import { DASHBOARD_FEATURES, POINTING_FEATURES } from "@/lib/features";
 
-const MODULES_META = [
-  { id: "M0", code: "M0", title: "Pre-Test & Orientasi", duration: "30 mnt", icon: <Star size={22} weight="fill" />, color: "#FF9D00" },
-  { id: "M1", code: "M1", title: "Dasar Komputer & Workspace", duration: "90 mnt", icon: <FolderOpen size={22} weight="fill" />, color: "#FF8C42" },
-  { id: "M2", code: "M2", title: "Logika & Algoritma", duration: "2 jam", icon: <Brain size={22} weight="fill" />, color: "#FF6B00" },
-  { id: "M3", code: "M3", title: "Variabel & Tipe Data", duration: "2 jam", icon: <SquaresFour size={22} weight="fill" />, color: "#06B6D4" },
-  { id: "M4", code: "M4", title: "Percabangan", duration: "2.5 jam", icon: <GitBranch size={22} weight="fill" />, color: "#EF4444" },
-  { id: "M5", code: "M5", title: "Perulangan", duration: "2.5 jam", icon: <ArrowsClockwise size={22} weight="fill" />, color: "#22C55E" },
-  { id: "M6", code: "M6", title: "Fungsi & Prosedur", duration: "2.5 jam", icon: <Function size={22} weight="fill" />, color: "#D45900" },
-  { id: "M7", code: "M7", title: "Array & List", duration: "2 jam", icon: <ListNumbers size={22} weight="fill" />, color: "#FF8C42" },
-  { id: "M8", code: "M8", title: "Mini Project", duration: "3 jam", icon: <Rocket size={22} weight="fill" />, color: "#FF6B00" },
-];
+const moduleIconMap: Record<string, React.ReactNode> = {
+  M0: <Lightning size={22} weight="fill" />, M1: <Lightning size={22} weight="fill" />,
+  M2: <Lightning size={22} weight="fill" />, M3: <Lightning size={22} weight="fill" />,
+  M4: <Lightning size={22} weight="fill" />, M5: <Lightning size={22} weight="fill" />,
+  M6: <Lightning size={22} weight="fill" />, M7: <Lightning size={22} weight="fill" />,
+  M8: <Rocket size={22} weight="fill" />,
+};
 
 export default function DashboardPage() {
-  const { user, leaderboard, fetchLeaderboard } = useUserStore();
+  const user = useUserStore((s) => s.user);
+  const leaderboard = useUserStore((s) => s.leaderboard);
+  const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -69,10 +54,7 @@ export default function DashboardPage() {
         {/* Left: Main Progress and Modules */}
         <div>
           {/* Welcome Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
+          <div className="fade-in" style={{
               background: "var(--gradient-hero)",
               borderRadius: "var(--radius-xl)",
               padding: "var(--space-6)",
@@ -132,7 +114,7 @@ export default function DashboardPage() {
                 {user.level}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Overall Progress */}
           <div
@@ -155,11 +137,10 @@ export default function DashboardPage() {
             </div>
             {/* Bar */}
             <div style={{ width: "100%", height: "10px", background: "var(--color-neutral-150)", borderRadius: "var(--radius-full)", overflow: "hidden" }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${percentage}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+              <div
+                className="progress-bar-fill"
                 style={{
+                  width: `${percentage}%`,
                   height: "100%",
                   background: "var(--gradient-hero)",
                   borderRadius: "var(--radius-full)",
@@ -186,12 +167,7 @@ export default function DashboardPage() {
               const isCompleted = prog.status === "completed";
 
               return (
-                <motion.div
-                  key={mod.id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
+                <div key={mod.id} className="fade-in">
                   <div
                     style={{
                       background: "var(--bg-card)",
@@ -227,7 +203,7 @@ export default function DashboardPage() {
                           border: isLocked ? "none" : `1px solid ${mod.color}35`,
                         }}
                       >
-                        {mod.icon}
+                        {moduleIconMap[mod.id] || <Lightning size={22} weight="fill" />}
                       </div>
 
                       {/* Info */}
@@ -265,10 +241,10 @@ export default function DashboardPage() {
                         <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm">
                           Mulai Belajar <Lightning size={14} weight="fill" />
                         </Link>
-                      )}
-                    </div>
+                    )}
                   </div>
-                </motion.div>
+                </div>
+              </div>
               );
             })}
           </div>
@@ -393,6 +369,8 @@ export default function DashboardPage() {
           .module-card h4 { white-space: normal !important; }
         }
       `}</style>
+      <FeaturePopupQueue features={DASHBOARD_FEATURES} delay={6000} />
+      <PointingPopup {...POINTING_FEATURES.moduleStart} delay={9000} position="right" />
     </div>
   );
 }

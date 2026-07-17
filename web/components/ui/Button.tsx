@@ -30,7 +30,7 @@ export function Button({
 
   if (href) {
     return (
-      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex">
         <Link href={href} className={classes}>
           {children}
         </Link>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useInView, type Variants } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
   Code,
@@ -28,33 +27,38 @@ import {
   Sword,
 } from "@phosphor-icons/react";
 import { Button, BadgeIcon } from "@/components/ui";
+import { MODULES_META } from "@/lib/content/modules-data";
+import { BADGES } from "@/lib/store/useUserStore";
 
-/* ---- Animation variants ---- */
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } },
-};
+/* ---- Animated section wrapper using CSS + IntersectionObserver ---- */
+function useInViewOnce(ref: React.RefObject<HTMLElement | null>) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || visible) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { rootMargin: "-80px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref, visible]);
+  return visible;
+}
 
-const stagger: Variants = {
-  hidden: {},
-  show:   { transition: { staggerChildren: 0.12 } },
-};
-
-/* ---- Animated section wrapper ---- */
 function AnimatedSection({ children, id, style = {} }: { children: React.ReactNode; id?: string; style?: React.CSSProperties }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const ref = useRef<HTMLElement>(null);
+  const visible = useInViewOnce(ref);
   return (
-    <motion.section
+    <section
       id={id}
       ref={ref}
-      initial="hidden"
-      animate={inView ? "show" : "hidden"}
-      variants={stagger}
+      data-visible={visible || undefined}
       style={style}
+      className="animate-stagger"
     >
       {children}
-    </motion.section>
+    </section>
   );
 }
 
@@ -469,23 +473,14 @@ export function HeroSection() {
           className="hero-grid"
         >
           {/* Left: Text */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
+          <div className="hero-fade-in-left">
             {/* Top badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 }}
-              style={{ marginBottom: "var(--space-6)" }}
-            >
+            <div className="hero-fade-in-scale" style={{ marginBottom: "var(--space-6)" }}>
               <span className="badge badge-primary">
                 <Star size={12} weight="fill" />
                 Platform Matrikulasi TRPL 2026
               </span>
-            </motion.div>
+            </div>
 
             <h1
               style={{
@@ -530,11 +525,9 @@ export function HeroSection() {
             </div>
 
             {/* Trust chips */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+            <div className="hero-fade-in-up"
               style={{
+                animationDelay: "0.5s",
                 marginTop: "var(--space-8)",
                 display: "flex",
                 alignItems: "center",
@@ -562,26 +555,18 @@ export function HeroSection() {
                   {item.label}
                 </div>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Right: Interactive Showcase Playground */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
-            style={{ position: "relative" }}
-            className="hero-visual"
-          >
+          <div className="hero-fade-in-right hero-visual" style={{ position: "relative" }}>
             <InteractiveHeroShowcase />
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
+      <div className="hero-scroll-indicator"
         style={{
           position: "absolute",
           bottom: "32px",
@@ -597,7 +582,7 @@ export function HeroSection() {
       >
         <span>Scroll ke bawah</span>
         <div style={{ width: "1px", height: "32px", background: "linear-gradient(to bottom, var(--color-primary-500), transparent)" }} />
-      </motion.div>
+      </div>
 
       <style jsx>{`
         @media (max-width: 768px) {
@@ -691,23 +676,23 @@ export function FeaturesSection() {
       }} />
 
       <div className="section-container">
-        <motion.div variants={fadeUp} style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
-          <span className="badge badge-primary" style={{ marginBottom: "var(--space-4)" }}>
-            <Lightning size={12} weight="fill" />
-            Kenapa Platform Ini?
-          </span>
-          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
-            Bukan ceramah.{" "}
-            <span className="gradient-text">Ini pengalaman.</span>
-          </h2>
-          <p style={{ color: "var(--text-secondary)", maxWidth: "560px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
-            Matrikulasi TRPL dirancang ulang untuk Gen-Z. Interaktif, gamified, dan bikin ketagihan belajar coding.
-          </p>
-        </motion.div>
+          <div className="fade-in" style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
+            <span className="badge badge-primary" style={{ marginBottom: "var(--space-4)" }}>
+              <Code size={12} weight="fill" />
+              Fitur Interaktif
+            </span>
+            <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
+              Bukan sekedar{" "}
+              <span className="gradient-text">baca materi doang</span>
+            </h2>
+            <p style={{ color: "var(--text-secondary)", maxWidth: "560px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
+              Kamu bisa langsung praktek kode Python dan simulasi folder workspace di sini tanpa install apa-apa.
+            </p>
+          </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-6)" }}>
           {features.map((f, i) => (
-            <motion.div key={f.title} variants={fadeUp} transition={{ delay: i * 0.08 }}>
+            <div key={f.title} className="fade-in">
               <div
                 style={{
                   background: "var(--bg-card)",
@@ -752,7 +737,7 @@ export function FeaturesSection() {
                   {f.description}
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -764,17 +749,35 @@ export function FeaturesSection() {
    CURRICULUM SECTION
    ==================================================== */
 export function CurriculumSection() {
-  const modules = [
-    { code: "M0", title: "Pre-Test & Orientasi", duration: "30 mnt", icon: <Star size={20} />, color: "#FF9D00", bg: "rgba(255,157,0,0.1)", desc: "Kenalan sama platform dan test kemampuan awal" },
-    { code: "M1", title: "Dasar Komputer & Workspace", duration: "90 mnt", icon: <FolderOpen size={20} />, color: "#FF8C42", bg: "rgba(255,140,66,0.1)", desc: "Manajemen File System, path, setup Python & VS Code" },
-    { code: "M2", title: "Logika & Algoritma", duration: "2 jam", icon: <Brain size={20} />, color: "#FF6B00", bg: "rgba(255,107,0,0.1)", desc: "Berpikir kayak programmer dengan flowchart & pseudo-code" },
-    { code: "M3", title: "Variabel & Tipe Data", duration: "2 jam", icon: <SquaresFour size={20} />, color: "#06B6D4", bg: "rgba(6,182,212,0.1)", desc: "Variabel, integer, string, boolean di Python" },
-    { code: "M4", title: "Percabangan", duration: "2.5 jam", icon: <GitBranch size={20} />, color: "#EF4444", bg: "rgba(239,68,68,0.1)", desc: "if, elif, else – buat program yang bisa berpikir" },
-    { code: "M5", title: "Perulangan", duration: "2.5 jam", icon: <ArrowsClockwise size={20} />, color: "#22C55E", bg: "rgba(34,197,94,0.1)", desc: "for loop, while loop – otomasi yang mengubah segalanya" },
-    { code: "M6", title: "Fungsi & Prosedur", duration: "2.5 jam", icon: <Function size={20} />, color: "#D45900", bg: "rgba(212,89,0,0.1)", desc: "DRY principle – tulis sekali, pakai berkali-kali" },
-    { code: "M7", title: "Array & List", duration: "2 jam", icon: <ListNumbers size={20} />, color: "#FF8C42", bg: "rgba(255,140,66,0.1)", desc: "Simpan banyak data dalam satu variabel" },
-    { code: "M8", title: "Mini Project", duration: "3 jam", icon: <Rocket size={20} />, color: "#FF6B00", bg: "rgba(255,107,0,0.12)", desc: "Integrasikan semua yang dipelajari jadi program nyata!" },
-  ];
+  const iconMap: Record<string, React.ReactNode> = {
+    Star: <Star size={20} />, FolderOpen: <FolderOpen size={20} />, Brain: <Brain size={20} />,
+    SquaresFour: <SquaresFour size={20} />, GitBranch: <GitBranch size={20} />,
+    ArrowsClockwise: <ArrowsClockwise size={20} />, Function: <Function size={20} />,
+    ListNumbers: <ListNumbers size={20} />, Rocket: <Rocket size={20} />,
+  };
+
+  const modules = MODULES_META.map((m) => ({
+    code: m.code, title: m.title, duration: m.duration,
+    icon: iconMap[m.icon] || <Star size={20} />,
+    color: m.color, bg: `${m.color}18`,
+    desc: (m.id === "M0" ? "Kenalan sama platform dan test kemampuan awal" :
+           m.id === "M1" ? "Manajemen File System, path, setup Python & VS Code" :
+           m.id === "M2" ? "Berpikir kayak programmer dengan flowchart & pseudo-code" :
+           m.id === "M3" ? "Variabel, integer, string, boolean di Python" :
+           m.id === "M4" ? "if, elif, else – buat program yang bisa berpikir" :
+           m.id === "M5" ? "for loop, while loop – otomasi yang mengubah segalanya" :
+           m.id === "M6" ? "DRY principle – tulis sekali, pakai berkali-kali" :
+           m.id === "M7" ? "Simpan banyak data dalam satu variabel" :
+           "Integrasikan semua yang dipelajari jadi program nyata!"),
+  }));
+
+  const totalHours = MODULES_META.reduce((acc, m) => {
+    const d = m.duration;
+    if (d.includes("mnt")) return acc + parseInt(d) / 60;
+    if (d.includes("jam")) return acc + parseFloat(d);
+    return acc + 2;
+  }, 0);
+  const totalXP = MODULES_META.length * 130; // ~130 XP avg per module (quizzes + practice)
 
   return (
     <AnimatedSection
@@ -799,23 +802,23 @@ export function CurriculumSection() {
       />
 
       <div className="section-container" style={{ position: "relative", zIndex: 1 }}>
-        <motion.div variants={fadeUp} style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
+        <div className="fade-in" style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
           <span className="badge badge-primary" style={{ marginBottom: "var(--space-4)" }}>
             <Code size={12} weight="fill" />
-            Kurikulum 9 Modul
+            Kurikulum {MODULES_META.length} Modul
           </span>
           <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
             Dari nol hingga{" "}
             <span className="gradient-text">bikin program sendiri</span>
           </h2>
           <p style={{ color: "var(--text-secondary)", maxWidth: "520px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
-            9 modul terstruktur, ~18.5 jam belajar, 1170 poin tersedia. Dimulai dari dasar literasi komputer!
+            {MODULES_META.length} modul terstruktur, ~{totalHours.toFixed(1)} jam belajar, {totalXP} poin tersedia. Dimulai dari dasar literasi komputer!
           </p>
-        </motion.div>
+        </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "var(--space-4)" }}>
           {modules.map((mod, i) => (
-            <motion.div key={mod.code} variants={fadeUp} transition={{ delay: i * 0.07 }}>
+            <div key={mod.code} className="fade-in">
               <div
                 style={{
                   background: "var(--bg-card)",
@@ -870,14 +873,12 @@ export function CurriculumSection() {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Stats row */}
-        <motion.div
-          variants={fadeUp}
-          style={{
+        <div className="fade-in" style={{
             marginTop: "var(--space-12)",
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
@@ -885,10 +886,10 @@ export function CurriculumSection() {
           }}
         >
           {[
-            { label: "Total Modul", value: "9", suffix: "modul" },
-            { label: "Waktu Belajar", value: "~18.5", suffix: "jam" },
-            { label: "Poin Tersedia", value: "1170", suffix: "XP" },
-            { label: "Badge Eksklusif", value: "13", suffix: "badge" },
+            { label: "Total Modul", value: `${MODULES_META.length}`, suffix: "modul" },
+            { label: "Waktu Belajar", value: `~${totalHours.toFixed(1)}`, suffix: "jam" },
+            { label: "Poin Tersedia", value: `${totalXP}`, suffix: "XP" },
+            { label: "Badge Eksklusif", value: `${BADGES.length}`, suffix: "badge" },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -923,7 +924,7 @@ export function CurriculumSection() {
               </div>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </AnimatedSection>
   );
@@ -976,7 +977,7 @@ export function GamificationSection() {
       }} />
 
       <div className="section-container" style={{ position: "relative", zIndex: 1 }}>
-        <motion.div variants={fadeUp} style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
+        <div className="fade-in" style={{ textAlign: "center", marginBottom: "var(--space-12)" }}>
           <span className="badge badge-amber" style={{ marginBottom: "var(--space-4)" }}>
             <GameController size={12} weight="fill" />
             Sistem Gamifikasi
@@ -988,25 +989,22 @@ export function GamificationSection() {
           <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
             Setiap modul selesai = poin naik, badge unlock, level naik. Ada leaderboard buat kompetisi sehat antar maba.
           </p>
-        </motion.div>
+        </div>
 
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "start" }}
           className="gamif-grid"
         >
           {/* Level System */}
-          <motion.div variants={fadeUp}>
+          <div className="fade-in">
             <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-6)", fontSize: "1.125rem", fontWeight: 700 }}>
               🎮 Sistem Level
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
               {levels.map((lv, i) => (
-                <motion.div
+                <div
                   key={lv.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.07 }}
-                  viewport={{ once: true }}
+                  className="fade-in"
                   style={{
                     background: lv.active ? "linear-gradient(135deg, rgba(255,107,0,0.08), rgba(255,157,0,0.06))" : "var(--bg-card)",
                     borderRadius: "var(--radius-md)",
@@ -1030,25 +1028,21 @@ export function GamificationSection() {
                       AKTIF
                     </span>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Badge Grid */}
-          <motion.div variants={fadeUp}>
+          <div className="fade-in">
             <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-6)", fontSize: "1.125rem", fontWeight: 700 }}>
               🏅 Koleksi Badge (13 Badge)
             </h3>
             <div className="badge-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-3)" }}>
               {badges.map((badge, i) => (
-                <motion.div
+                <div
                   key={badge.name}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05, type: "spring", stiffness: 200 }}
-                  whileHover={{ scale: 1.08, y: -4 }}
-                  viewport={{ once: true }}
+                  className="fade-in hover-lift"
                   style={{
                     background: "var(--bg-card)",
                     borderRadius: "var(--radius-md)",
@@ -1057,7 +1051,6 @@ export function GamificationSection() {
                     textAlign: "center",
                     cursor: "default",
                     boxShadow: `0 2px 12px ${badge.color}12`,
-                    transition: "all 0.2s ease",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
@@ -1066,10 +1059,10 @@ export function GamificationSection() {
                   <div style={{ fontSize: "0.68rem", color: "var(--text-secondary)", lineHeight: 1.35, fontWeight: 500 }}>
                     {badge.name}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -1098,9 +1091,8 @@ export function EngineerSection() {
         overflow: "hidden",
       }}
     >
-      <motion.div
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 4, repeat: Infinity }}
+      <div
+        className="pulse-opacity"
         style={{
           position: "absolute",
           inset: 0,
@@ -1112,11 +1104,8 @@ export function EngineerSection() {
       <div className="section-container" style={{ position: "relative", zIndex: 1 }}>
         <div style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}>
           {/* Divider */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          <div
+            className="scale-in-x"
             style={{
               width: "60px",
               height: "1px",
@@ -1127,12 +1116,7 @@ export function EngineerSection() {
           />
 
           {/* "Dibuat Oleh" tag */}
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            style={{
+          <p className="fade-in" style={{
               color: "var(--text-muted)",
               fontSize: "0.7rem",
               fontWeight: 600,
@@ -1142,15 +1126,10 @@ export function EngineerSection() {
             }}
           >
             Dibuat Oleh
-          </motion.p>
+          </p>
 
           {/* Name */}
-          <motion.h3
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            style={{
+          <h3 className="fade-in" style={{
               fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)",
               fontWeight: 700,
               color: "var(--text-primary)",
@@ -1158,29 +1137,19 @@ export function EngineerSection() {
             }}
           >
             Felich Pehagasa Ginting
-          </motion.h3>
+          </h3>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            style={{
+          <p className="fade-in" style={{
               color: "var(--text-secondary)",
               fontSize: "0.8rem",
               marginTop: "2px",
             }}
           >
             Software Engineer · AI Enthusiast · D4 TRPL
-          </motion.p>
+          </p>
 
           {/* Social icons - SVG */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            style={{
+          <div className="fade-in" style={{
               display: "flex",
               justifyContent: "center",
               gap: "18px",
@@ -1209,12 +1178,12 @@ export function EngineerSection() {
                 path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
               },
             ].map(({ href, label, path }) => (
-              <motion.a
+              <a
                 key={label}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ y: -3 }}
+                className="social-icon"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1226,37 +1195,19 @@ export function EngineerSection() {
                   border: "1px solid var(--border-color)",
                   color: "var(--text-muted)",
                   textDecoration: "none",
-                  transition: "all 0.2s ease",
                   cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.borderColor = "var(--color-primary-400)";
-                  el.style.background = "rgba(255,107,0,0.08)";
-                  el.style.color = "var(--color-primary-500)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.borderColor = "var(--border-color)";
-                  el.style.background = "var(--bg-page-alt)";
-                  el.style.color = "var(--text-muted)";
                 }}
                 title={label}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                   <path d={path} />
                 </svg>
-              </motion.a>
+              </a>
             ))}
-          </motion.div>
+          </div>
 
           {/* Team Members */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.35, duration: 0.5 }}
-            style={{
+          <div className="fade-in" style={{
               display: "flex",
               justifyContent: "center",
               gap: "12px",
@@ -1300,18 +1251,12 @@ export function EngineerSection() {
                 </p>
               </div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Footer */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.45, duration: 0.5 }}
-            style={{ color: "var(--text-muted)", fontSize: "0.65rem", marginTop: "var(--space-5)", opacity: 0.45 }}
-          >
+<p className="fade-in" style={{ color: "var(--text-muted)", fontSize: "0.65rem", marginTop: "var(--space-5)", opacity: 0.45 }}>
             Projek Himpunan Mahasiswa TRPL
-          </motion.p>
+          </p>
         </div>
       </div>
     </section>
@@ -1342,7 +1287,7 @@ export function CTASection() {
       }} />
 
       <div className="section-container" style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
-        <motion.div variants={fadeUp}>
+        <div className="fade-in">
           <div style={{ fontSize: "3.5rem", marginBottom: "var(--space-4)" }}>🚀</div>
           <h2
             style={{
@@ -1370,9 +1315,9 @@ export function CTASection() {
             <Button href="/login" variant="primary" size="lg">
               Daftar Sekarang – Gratis! <ArrowRight size={18} weight="bold" />
             </Button>
-            <motion.a
+            <a
               href="#tentang"
-              whileHover={{ scale: 1.03 }}
+              className="hover-lift"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1396,13 +1341,13 @@ export function CTASection() {
               }}
             >
               Pelajari Lebih Lanjut
-            </motion.a>
+            </a>
           </div>
 
           <p style={{ marginTop: "var(--space-6)", color: "rgba(255,250,246,0.4)", fontSize: "0.875rem" }}>
             Login dengan SSO kampus · Tidak perlu buat akun baru · 100% gratis untuk maba TRPL
           </p>
-        </motion.div>
+        </div>
       </div>
     </AnimatedSection>
   );

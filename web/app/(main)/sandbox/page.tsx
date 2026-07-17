@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useUserStore } from "@/lib/store/useUserStore";
-import confetti from "canvas-confetti";
+import { fireConfetti } from "@/lib/confetti";
+import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
+import { SANDBOX_FEATURES } from "@/lib/features";
 import {
   Folder,
   MagnifyingGlass,
@@ -110,11 +112,7 @@ export default function VSCodeSandboxPage() {
   useEffect(() => {
     if (mission1 && mission2 && mission3 && mission4 && !xpAwarded) {
       setXpAwarded(true);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       // Award XP
       addXP(50);
     }
@@ -959,7 +957,8 @@ export default function VSCodeSandboxPage() {
             grid-template-columns: 1fr !important;
           }
         }
-      `}</style>
+        `}</style>
+      <FeaturePopupQueue features={SANDBOX_FEATURES} delay={7000} />
     </div>
   );
 }

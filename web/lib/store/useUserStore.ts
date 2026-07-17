@@ -3,8 +3,11 @@ import { persist } from "zustand/middleware";
 import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
-export const ADMIN_NAME = "Felich Pehagasa Ginting";
-export const isAdmin = (user: UserProfile | null): boolean => user?.name === ADMIN_NAME;
+const setAuthCookie = () => { document.cookie = "matrikulasi-auth=true; path=/; max-age=86400; SameSite=Lax"; };
+const clearAuthCookie = () => { document.cookie = "matrikulasi-auth=; path=/; max-age=0"; };
+
+const ADMIN_EMAILS = ["felich@mhs.cwe.ac.id", "felichpehagasa@gmail.com"];
+export const isAdmin = (user: UserProfile | null): boolean => user?.email ? ADMIN_EMAILS.includes(user.email.toLowerCase()) : false;
 
 export interface UserProgress {
   [moduleId: string]: {
@@ -64,6 +67,9 @@ export const BADGES: BadgeInfo[] = [
   { id: "perfectionist", name: "Perfectionist", emoji: "💎", color: "#06B6D4", description: "Mendapatkan nilai sempurna 100% pada semua kuis" },
   { id: "speed_runner", name: "Speed Runner", emoji: "🚀", color: "#EF4444", description: "Menyelesaikan seluruh modul dalam waktu kurang dari 3 hari" },
   { id: "helping_hand", name: "Helping Hand", emoji: "🤝", color: "#22C55E", description: "Membantu 3 teman di forum diskusi" },
+  { id: "early_bird", name: "Early Bird", emoji: "🐦", color: "#FF6B00", description: "Login sebelum jam 7 pagi" },
+  { id: "night_owl", name: "Night Owl", emoji: "🦉", color: "#06B6D4", description: "Belajar setelah jam 10 malam" },
+  { id: "perfect_streak_7", name: "7-Day Streak", emoji: "🔥", color: "#EF4444", description: "Belajar 7 hari berturut-turut" },
 ];
 
 const INITIAL_PROGRESS: UserProgress = {
@@ -88,6 +94,11 @@ const DEFAULT_MOCK_LEADERBOARD: LeaderboardUser[] = [
   { uid: "leader-5", name: "Amelia Putri", avatar: "avatar_5", xp: 310, level: "Developer Muda" },
 ];
 
+const getLevelName = (xp: number): string => {
+  const lv = LEVELS.find((l) => xp >= l.minXP && xp <= l.maxXP);
+  return lv ? lv.name : "Script Kiddie";
+};
+
 interface UserState {
   user: UserProfile | null;
   leaderboard: LeaderboardUser[];
@@ -95,7 +106,7 @@ interface UserState {
   badgePopup: { isOpen: boolean; badge: BadgeInfo | null };
   levelUpPopup: { isOpen: boolean; oldLevel: string; newLevel: string };
   memePopup: { isOpen: boolean; memeUrl: string; caption: string };
-  
+
   login: (name: string, email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   handleRedirectResult: () => Promise<boolean>;
@@ -119,11 +130,6 @@ interface UserState {
   deleteUser: (uid: string) => Promise<void>;
 }
 
-const getLevelName = (xp: number): string => {
-  const lv = LEVELS.find((l) => xp >= l.minXP && xp <= l.maxXP);
-  return lv ? lv.name : "Script Kiddie";
-};
-
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => {
@@ -131,36 +137,22 @@ export const useUserStore = create<UserState>()(
         const uid = fbUser.uid;
         const userRef = doc(db, "users", uid);
         const tempProfile: UserProfile = {
-          uid,
-          name: fbUser.displayName || "Maba TRPL",
-          email: fbUser.email || "",
-          avatar: "avatar_default",
-          xp: 0,
-          level: "Script Kiddie",
-          badges: ["langkah_pertama"],
-          streak: 1,
-          progress: INITIAL_PROGRESS,
+          uid, name: fbUser.displayName || "Maba TRPL", email: fbUser.email || "",
+          avatar: "avatar_default", xp: 0, level: "Script Kiddie",
+          badges: ["langkah_pertama"], streak: 1, progress: INITIAL_PROGRESS,
         };
-
         try {
-          const firestorePromise = getDoc(userRef).then(async (userDoc) => {
-            if (userDoc.exists()) {
-              set({ user: userDoc.data() as UserProfile });
-            } else {
-              await setDoc(userRef, tempProfile);
-              set({ user: tempProfile });
-            }
-          });
-
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error("Firestore timeout")), 2500)
-          );
-
-          await Promise.race([firestorePromise, timeoutPromise]);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            set({ user: userDoc.data() as UserProfile }); setAuthCookie();
+          } else {
+            await setDoc(userRef, tempProfile);
+            set({ user: tempProfile }); setAuthCookie();
+          }
           await get().fetchLeaderboard();
-        } catch (fsError) {
-          console.warn("Firestore sync failed or timed out, using local profile:", fsError);
-          set({ user: tempProfile });
+        } catch {
+          console.warn("Firestore sync failed");
+          set({ user: tempProfile }); setAuthCookie();
         }
       };
 
@@ -175,44 +167,24 @@ export const useUserStore = create<UserState>()(
       login: async (name, email) => {
         const uid = `user-${Date.now()}`;
         const mockProfile: UserProfile = {
-          uid,
-          name,
-          email,
-          avatar: "avatar_default",
-          xp: 0,
-          level: "Script Kiddie",
-          badges: ["langkah_pertama"],
-          streak: 1,
-          progress: INITIAL_PROGRESS,
+          uid, name, email, avatar: "avatar_default", xp: 0, level: "Script Kiddie",
+          badges: ["langkah_pertama"], streak: 1, progress: INITIAL_PROGRESS,
         };
-
-        // Sync with Firestore if active
         if (!isMockFirebase) {
           try {
             const userRef = doc(db, "users", uid);
-            
-            const firestorePromise = getDoc(userRef).then(async (userDoc) => {
-              if (userDoc.exists()) {
-                set({ user: userDoc.data() as UserProfile });
-              } else {
-                await setDoc(userRef, mockProfile);
-                set({ user: mockProfile });
-              }
-            });
-
-            const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error("Firestore timeout")), 2500)
-            );
-
-            await Promise.race([firestorePromise, timeoutPromise]);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+              set({ user: userDoc.data() as UserProfile }); setAuthCookie();
+            } else {
+              await setDoc(userRef, mockProfile);
+              set({ user: mockProfile }); setAuthCookie();
+            }
             await get().fetchLeaderboard();
             return;
-          } catch (e) {
-            console.error("Firebase write failed, using local mock storage", e);
-          }
+          } catch {}
         }
-
-        set({ user: mockProfile });
+        set({ user: mockProfile }); setAuthCookie();
         await get().fetchLeaderboard();
       },
 
@@ -222,62 +194,43 @@ export const useUserStore = create<UserState>()(
           return;
         }
         const result = await signInWithPopup(auth, googleProvider);
-        const fbUser = result.user;
-        if (!fbUser) return;
-        await processFirebaseUser(fbUser);
+        if (result.user) await processFirebaseUser(result.user);
       },
 
       handleRedirectResult: async () => {
         try {
           const result = await getRedirectResult(auth);
-          if (!result || !result.user) return false;
+          if (!result?.user) return false;
           await processFirebaseUser(result.user);
           return true;
-        } catch (e) {
-          console.error("Redirect result error:", e);
-          return false;
-        }
+        } catch { return false; }
       },
 
       fetchLeaderboard: async () => {
         if (isMockFirebase) return;
         try {
-          const usersColl = collection(db, "users");
-          const q = query(usersColl, orderBy("xp", "desc"), limit(20));
-          const querySnapshot = await getDocs(q);
-          const leaderboardList: LeaderboardUser[] = [];
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            leaderboardList.push({
-              uid: data.uid || doc.id,
-              name: data.name || "Anonymous",
-              avatar: data.avatar || "avatar_default",
-              xp: data.xp || 0,
-              level: data.level || "Script Kiddie",
-            });
+          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20));
+          const snapshot = await getDocs(q);
+          const list: LeaderboardUser[] = [];
+          snapshot.forEach((doc) => {
+            const d = doc.data();
+            list.push({ uid: d.uid || doc.id, name: d.name || "Anonymous", avatar: d.avatar || "avatar_default", xp: d.xp || 0, level: d.level || "Script Kiddie" });
           });
-          set({ leaderboard: leaderboardList });
-        } catch (e) {
-          console.error("Failed to fetch leaderboard from Firestore", e);
-        }
+          set({ leaderboard: list });
+        } catch {}
       },
 
       fetchAllUsers: async () => {
         if (isMockFirebase) {
           const mockUsers: UserProfile[] = DEFAULT_MOCK_LEADERBOARD.map((lb) => ({
-            uid: lb.uid,
-            name: lb.name,
+            uid: lb.uid, name: lb.name,
             email: `${lb.name.toLowerCase().replace(/\s/g, ".")}@student.polsri.ac.id`,
-            avatar: lb.avatar,
-            xp: lb.xp,
-            level: lb.level,
+            avatar: lb.avatar, xp: lb.xp, level: lb.level,
             badges: (lb.xp > 800 ? BADGES.slice(0, 5) : BADGES.slice(0, 3)).map((b) => b.id),
             streak: Math.floor(Math.random() * 10) + 1,
             progress: Object.keys(INITIAL_PROGRESS).reduce((acc, key, idx) => {
-              const moduleKeys = Object.keys(INITIAL_PROGRESS);
-              const completed = moduleKeys.filter((_, i) => i < idx && lb.xp > (i + 1) * 100);
               acc[key] = {
-                completedSubModules: completed.slice(0, 2).map((_, i) => `sub-${i}`),
+                completedSubModules: [],
                 status: idx === 0 ? "completed" : lb.xp > idx * 100 ? "completed" : lb.xp > (idx - 1) * 100 ? "active" : "locked",
               } as any;
               return acc;
@@ -287,209 +240,89 @@ export const useUserStore = create<UserState>()(
           return;
         }
         try {
-          const usersColl = collection(db, "users");
-          const querySnapshot = await getDocs(usersColl);
-          const userList: UserProfile[] = [];
-          querySnapshot.forEach((doc) => {
-            userList.push(doc.data() as UserProfile);
-          });
-          set({ allUsers: userList });
-        } catch (e) {
-          console.error("Failed to fetch all users", e);
-        }
+          const snapshot = await getDocs(collection(db, "users"));
+          const list: UserProfile[] = [];
+          snapshot.forEach((doc) => list.push(doc.data() as UserProfile));
+          set({ allUsers: list });
+        } catch {}
       },
 
       logout: () => {
-        if (!isMockFirebase) {
-          fbSignOut(auth).catch((e) => console.error("Firebase logout failed", e));
-        }
+        if (!isMockFirebase) fbSignOut(auth).catch(() => {});
+        clearAuthCookie();
         set({ user: null });
       },
 
       addXP: async (amount) => {
         const { user } = get();
         if (!user) return;
-
         const newXP = user.xp + amount;
         const oldLevel = user.level;
         const newLevel = getLevelName(newXP);
-        
-        const updatedUser: UserProfile = {
-          ...user,
-          xp: newXP,
-          level: newLevel,
-        };
-
-        set({ user: updatedUser });
-
-        // Trigger level up popup if level changed
-        if (oldLevel !== newLevel) {
-          set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
-        }
-
-        // Sync with Firestore if active
+        set({ user: { ...user, xp: newXP, level: newLevel } });
+        if (oldLevel !== newLevel) set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { xp: newXP, level: newLevel });
-            await get().fetchLeaderboard();
-          } catch (e) {
-            console.error("Firestore update failed", e);
-          }
+          try { await updateDoc(doc(db, "users", user.uid), { xp: newXP, level: newLevel }); } catch {}
         }
       },
 
       unlockBadge: async (badgeId) => {
         const { user } = get();
         if (!user || user.badges.includes(badgeId)) return;
-
-        const badge = BADGES.find((b) => b.id === badgeId) || null;
+        const badge = BADGES.find((b) => b.id === badgeId);
         if (!badge) return;
-
-        const updatedUser: UserProfile = {
-          ...user,
-          badges: [...user.badges, badgeId],
-        };
-
-        set({ 
-          user: updatedUser,
-          badgePopup: { isOpen: true, badge }
-        });
-
-        // Add bonus XP (e.g., 50 XP per badge)
+        set({ user: { ...user, badges: [...user.badges, badgeId] }, badgePopup: { isOpen: true, badge } });
         get().addXP(50);
-
-        // Sync with Firestore if active
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { badges: updatedUser.badges });
-          } catch (e) {
-            console.error("Firestore update failed", e);
-          }
+          try { await updateDoc(doc(db, "users", user.uid), { badges: [...user.badges, badgeId] }); } catch {}
         }
       },
 
       completeSubModule: async (moduleId, subModuleId) => {
         const { user } = get();
         if (!user) return;
-
-        const currentModule = user.progress[moduleId] || { completedSubModules: [], status: "locked" };
-        
+        const currentModule = user.progress[moduleId] || { completedSubModules: [], status: "locked" as const };
         if (currentModule.completedSubModules.includes(subModuleId)) return;
-
-        const updatedSubModules = [...currentModule.completedSubModules, subModuleId];
-        
-        const updatedProgress = {
-          ...user.progress,
-          [moduleId]: {
-            ...currentModule,
-            completedSubModules: updatedSubModules,
-          },
-        };
-
-        const updatedUser = {
-          ...user,
-          progress: updatedProgress,
-        };
-
-        set({ user: updatedUser });
-
-        // Award 15 XP for sub-module completion
-        get().addXP(15);
-
-        // Sync with Firestore if active
+        const updated = { ...user.progress, [moduleId]: { ...currentModule, completedSubModules: [...currentModule.completedSubModules, subModuleId] } };
+        set({ user: { ...user, progress: updated } });
+        await get().addXP(15);
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { progress: updatedProgress });
-          } catch (e) {
-            console.error("Firestore update failed", e);
-          }
+          try { await updateDoc(doc(db, "users", user.uid), { progress: updated }); } catch {}
         }
       },
 
       completeModule: async (moduleId) => {
         const { user } = get();
         if (!user) return;
-
         const currentModule = user.progress[moduleId];
         if (!currentModule || currentModule.status === "completed") return;
-
-        // Mark current as completed
         const updatedProgress = { ...user.progress };
-        updatedProgress[moduleId] = {
-          ...currentModule,
-          status: "completed",
-        };
-
-        // Unlock next module in the sequence (e.g., M0 -> M1 -> M2...)
-        const moduleKeys = Object.keys(INITIAL_PROGRESS);
-        const currentIndex = moduleKeys.indexOf(moduleId);
-        if (currentIndex !== -1 && currentIndex + 1 < moduleKeys.length) {
-          const nextModuleId = moduleKeys[currentIndex + 1];
-          const nextModule = updatedProgress[nextModuleId];
-          if (nextModule && nextModule.status === "locked") {
-            updatedProgress[nextModuleId] = {
-              ...nextModule,
-              status: "active",
-            };
-          }
+        updatedProgress[moduleId] = { ...currentModule, status: "completed" };
+        const idx = MODULE_KEYS.indexOf(moduleId);
+        if (idx !== -1 && idx + 1 < MODULE_KEYS.length) {
+          const nextId = MODULE_KEYS[idx + 1];
+          if (updatedProgress[nextId]?.status === "locked") updatedProgress[nextId] = { ...updatedProgress[nextId], status: "active" };
         }
-
-        const updatedUser = {
-          ...user,
-          progress: updatedProgress,
-        };
-
-        set({ user: updatedUser });
-
-        // Award 50 XP for module completion
+        set({ user: { ...user, progress: updatedProgress } });
         await get().addXP(50);
-
-        // Check for module-specific badge unlocks
-        if (moduleId === "M1") await get().unlockBadge("workspace_master");
-        if (moduleId === "M2") await get().unlockBadge("pemikir_logis");
-        if (moduleId === "M3") await get().unlockBadge("penampung_data");
-        if (moduleId === "M4") await get().unlockBadge("pembuat_keputusan");
-        if (moduleId === "M5") await get().unlockBadge("master_loop");
-        if (moduleId === "M6") await get().unlockBadge("function_wizard");
-        if (moduleId === "M7") await get().unlockBadge("data_collector");
-        if (moduleId === "M8") {
-          await get().unlockBadge("junior_developer");
-          await get().unlockBadge("graduated");
-        }
-
-        // Sync with Firestore if active
+        const badgeMap: Record<string, string> = { M1: "workspace_master", M2: "pemikir_logis", M3: "penampung_data", M4: "pembuat_keputusan", M5: "master_loop", M6: "function_wizard", M7: "data_collector" };
+        if (badgeMap[moduleId]) await get().unlockBadge(badgeMap[moduleId]);
+        if (moduleId === "M8") { await get().unlockBadge("junior_developer"); await get().unlockBadge("graduated"); }
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { progress: updatedProgress });
-          } catch (e) {
-            console.error("Firestore update failed", e);
-          }
+          try { await updateDoc(doc(db, "users", user.uid), { progress: updatedProgress }); } catch {}
         }
       },
 
       closeBadgePopup: () => set({ badgePopup: { isOpen: false, badge: null } }),
       closeLevelUpPopup: () => set({ levelUpPopup: { isOpen: false, oldLevel: "", newLevel: "" } }),
       closeMemePopup: () => set({ memePopup: { isOpen: false, memeUrl: "", caption: "" } }),
-      
       triggerMeme: (memeUrl, caption) => set({ memePopup: { isOpen: true, memeUrl, caption } }),
 
       resetUserProgress: async (uid) => {
         const { allUsers } = get();
-        const updated = allUsers.map((u) =>
-          u.uid === uid ? { ...u, xp: 0, level: "Script Kiddie", badges: ["langkah_pertama"], progress: INITIAL_PROGRESS } : u
-        );
-        set({ allUsers: updated });
+        set({ allUsers: allUsers.map((u) => u.uid === uid ? { ...u, xp: 0, level: "Script Kiddie", badges: ["langkah_pertama"], progress: INITIAL_PROGRESS } : u) });
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", uid);
-            await updateDoc(userRef, { xp: 0, level: "Script Kiddie", badges: ["langkah_pertama"], progress: INITIAL_PROGRESS });
-          } catch (e) {
-            console.error("Failed to reset user", e);
-          }
+          try { await updateDoc(doc(db, "users", uid), { xp: 0, level: "Script Kiddie", badges: ["langkah_pertama"], progress: INITIAL_PROGRESS }); } catch {}
         }
       },
 
@@ -498,78 +331,42 @@ export const useUserStore = create<UserState>()(
         const updated = allUsers.map((u) => {
           if (u.uid !== uid) return u;
           const newXP = u.xp + amount;
-          const newLevel = getLevelName(newXP);
-          return { ...u, xp: newXP, level: newLevel };
+          return { ...u, xp: newXP, level: getLevelName(newXP) };
         });
         set({ allUsers: updated });
         if (!isMockFirebase) {
           try {
-            const userRef = doc(db, "users", uid);
             const user = allUsers.find((u) => u.uid === uid);
-            if (user) {
-              const newXP = user.xp + amount;
-              await updateDoc(userRef, { xp: newXP, level: getLevelName(newXP) });
-            }
-          } catch (e) {
-            console.error("Failed to award XP", e);
-          }
+            if (user) await updateDoc(doc(db, "users", uid), { xp: user.xp + amount, level: getLevelName(user.xp + amount) });
+          } catch {}
         }
       },
 
       addUser: async (data) => {
         const uid = `user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
         const newUser: UserProfile = {
-          uid,
-          name: data.name,
-          email: data.email,
-          avatar: "avatar_default",
-          xp: data.xp ?? 0,
-          level: data.level ?? getLevelName(data.xp ?? 0),
-          badges: data.badges ?? ["langkah_pertama"],
-          streak: data.streak ?? 1,
-          progress: INITIAL_PROGRESS,
+          uid, name: data.name, email: data.email, avatar: "avatar_default",
+          xp: data.xp ?? 0, level: data.level ?? getLevelName(data.xp ?? 0),
+          badges: data.badges ?? ["langkah_pertama"], streak: data.streak ?? 1, progress: INITIAL_PROGRESS,
         };
-        const { allUsers } = get();
-        set({ allUsers: [...allUsers, newUser] });
+        set((s) => ({ allUsers: [...s.allUsers, newUser] }));
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", uid);
-            await setDoc(userRef, newUser);
-          } catch (e) {
-            console.error("Firestore addUser failed", e);
-          }
+          try { await setDoc(doc(db, "users", uid), newUser); } catch {}
         }
       },
 
       updateUser: async (uid, data) => {
-        const { allUsers } = get();
-        const updated = allUsers.map((u) =>
-          u.uid === uid ? { ...u, ...data } : u
-        );
-        set({ allUsers: updated });
+        set((s) => ({ allUsers: s.allUsers.map((u) => u.uid === uid ? { ...u, ...data } : u) }));
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", uid);
-            await updateDoc(userRef, data);
-          } catch (e) {
-            console.error("Firestore updateUser failed", e);
-          }
+          try { await updateDoc(doc(db, "users", uid), data); } catch {}
         }
       },
 
       deleteUser: async (uid) => {
         const { allUsers, leaderboard } = get();
-        set({
-          allUsers: allUsers.filter((u) => u.uid !== uid),
-          leaderboard: leaderboard.filter((u) => u.uid !== uid),
-        });
+        set({ allUsers: allUsers.filter((u) => u.uid !== uid), leaderboard: leaderboard.filter((u) => u.uid !== uid) });
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", uid);
-            await deleteDoc(userRef);
-          } catch (e) {
-            console.error("Firestore deleteUser failed", e);
-          }
+          try { await deleteDoc(doc(db, "users", uid)); } catch {}
         }
       },
 
@@ -578,29 +375,16 @@ export const useUserStore = create<UserState>()(
         if (!user) return;
         set({ user: { ...user, avatar: avatarId } });
         if (!isMockFirebase) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { avatar: avatarId });
-          } catch (e) {
-            console.error("Firestore avatar sync failed", e);
-          }
+          try { await updateDoc(doc(db, "users", user.uid), { avatar: avatarId }); } catch {}
         }
       },
 
       syncUserToFirestore: async () => {
         const { user } = get();
         if (!user || isMockFirebase) return;
-        try {
-          const userRef = doc(db, "users", user.uid);
-          await setDoc(userRef, user, { merge: true });
-        } catch (e) {
-          console.error("Firestore sync failed", e);
-        }
+        try { await setDoc(doc(db, "users", user.uid), user, { merge: true }); } catch {}
       },
-    };
-  },
-  {
-    name: "matrikulasi-user-storage",
-  }
+    }},
+    { name: "matrikulasi-user-storage" }
   )
 );

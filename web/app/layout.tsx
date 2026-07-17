@@ -29,15 +29,38 @@ const firaCode = Fira_Code({
 });
 
 export const metadata: Metadata = {
-  title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+  title: {
+    default: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+    template: "%s | Matrikulasi TRPL",
+  },
   description:
     "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL. Live coding, gamifikasi, kuis seru, dan meme relevan. Mulai coding sekarang!",
-  keywords: ["matrikulasi", "TRPL", "belajar coding", "pemrograman", "Python", "gamifikasi"],
+  keywords: ["matrikulasi", "TRPL", "belajar coding", "pemrograman", "Python", "gamifikasi", "kampus", "mahasiswa"],
   authors: [{ name: "Divisi Pemrograman Matrikulasi TRPL" }],
+  creator: "Felich Pehagasa Ginting",
+  publisher: "HIMA TRPL",
+  metadataBase: new URL("https://matrikulasi-trpl.vercel.app"),
   openGraph: {
     title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
-    description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL.",
+    description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL. Live coding, gamifikasi, kuis seru, dan meme relevan.",
     type: "website",
+    locale: "id_ID",
+    siteName: "Matrikulasi TRPL",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+    description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL.",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    shortcut: "/icons/icon-192x192.png",
+  },
+  manifest: "/manifest.json",
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
 };
 
