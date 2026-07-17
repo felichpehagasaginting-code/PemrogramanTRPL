@@ -23,6 +23,186 @@ interface Slide {
   content: React.ReactNode;
 }
 
+function FolderCreationSimulator() {
+  const [folderName, setFolderName] = useState("");
+  const [selectedPath, setSelectedPath] = useState("");
+  const [isCreated, setIsCreated] = useState(false);
+
+  // Validations
+  const hasSpace = /\s/.test(folderName);
+  const hasSpecialChar = /[^a-zA-Z0-9_\-]/.test(folderName);
+  const isNameValid = folderName.length > 0 && !hasSpace && !hasSpecialChar;
+
+  const isPathValid = selectedPath === "D:\\TRPL\\Pemrograman";
+  const isEverythingValid = isNameValid && isPathValid;
+
+  return (
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "var(--radius-lg)", marginTop: "12px" }}>
+      <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px", fontSize: "1rem" }}>
+        📁 Simulator Pembuatan Workspace
+      </h4>
+      
+      {!isCreated ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {/* Input Nama Folder */}
+          <div>
+            <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>
+              1. Nama Folder Proyek:
+            </label>
+            <input
+              type="text"
+              placeholder="Contoh: belajar_python atau matrikulasi-trpl"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              style={{
+                width: "100%",
+                background: "var(--bg-page-alt)",
+                border: "1.5px solid var(--border-color)",
+                padding: "8px 12px",
+                borderRadius: "var(--radius-md)",
+                outline: "none",
+                fontFamily: "var(--font-code)",
+                fontSize: "0.875rem",
+                color: "var(--text-primary)",
+              }}
+            />
+            {/* Feedback Nama */}
+            {folderName.length > 0 && (
+              <div style={{ fontSize: "0.75rem", marginTop: "6px" }}>
+                {hasSpace && (
+                  <span style={{ color: "#EF4444" }}>❌ Mengandung spasi! Terminal akan memperlakukan spasi sebagai pemisah perintah. Gunakan <code>_</code> atau <code>-</code>.</span>
+                )}
+                {hasSpecialChar && !hasSpace && (
+                  <span style={{ color: "#EF4444" }}>❌ Mengandung karakter spesial terlarang! Gunakan hanya huruf, angka, underscore, atau tanda hubung.</span>
+                )}
+                {isNameValid && (
+                  <span style={{ color: "#22C55E" }}>✅ Nama folder memenuhi standar profesional!</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Pilihan Lokasi */}
+          <div>
+            <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>
+              2. Pilih Lokasi Penyimpanan (Path):
+            </label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              {[
+                { path: "C:\\Users\\maba\\Desktop", label: "💻 Desktop", desc: "Folder Desktop sistem" },
+                { path: "C:\\Users\\maba\\Downloads", label: "📥 Downloads", desc: "Folder download sementara" },
+                { path: "C:\\Program Files", label: "⚙️ Program Files", desc: "Folder instalasi aplikasi" },
+                { path: "D:\\TRPL\\Pemrograman", label: "📁 Drive D:\\TRPL\\Pemrograman", desc: "Partisi data mandiri" },
+              ].map((loc) => {
+                const isSelected = selectedPath === loc.path;
+                const isProper = loc.path === "D:\\TRPL\\Pemrograman";
+                return (
+                  <button
+                    key={loc.path}
+                    type="button"
+                    onClick={() => setSelectedPath(loc.path)}
+                    style={{
+                      background: isSelected ? (isProper ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)") : "var(--bg-page-alt)",
+                      border: isSelected ? `2px solid ${isProper ? "#22C55E" : "#EF4444"}` : "1px solid var(--border-color)",
+                      padding: "10px",
+                      borderRadius: "var(--radius-md)",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      transition: "all var(--transition-fast)",
+                    }}
+                  >
+                    <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>{loc.label}</div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", marginTop: "2px" }}>{loc.path}</div>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Feedback Path */}
+            {selectedPath && (
+              <div style={{ fontSize: "0.75rem", marginTop: "8px" }}>
+                {selectedPath.includes("Desktop") && (
+                  <span style={{ color: "#EF4444" }}>❌ Desktop tersinkronisasi otomatis oleh cloud (OneDrive) yang sering mengunci file database/interpreter.</span>
+                )}
+                {selectedPath.includes("Downloads") && (
+                  <span style={{ color: "#EF4444" }}>❌ Downloads adalah folder temp bersih-bersih, bukan untuk menyimpan codebase.</span>
+                )}
+                {selectedPath.includes("Program Files") && (
+                  <span style={{ color: "#EF4444" }}>❌ Membutuhkan hak akses Administrator. Python akan ditolak saat menulis file kode baru.</span>
+                )}
+                {selectedPath === "D:\\TRPL\\Pemrograman" && (
+                  <span style={{ color: "#22C55E" }}>✅ Sempurna! Partisi non-sistem (D:) aman dari proteksi izin OS dan sinkronisasi otomatis.</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Button Buat */}
+          <button
+            type="button"
+            disabled={!isEverythingValid}
+            onClick={() => setIsCreated(true)}
+            style={{
+              background: isEverythingValid ? "var(--color-primary-500)" : "var(--bg-page-alt)",
+              color: isEverythingValid ? "white" : "var(--text-secondary)",
+              border: "none",
+              padding: "12px",
+              borderRadius: "var(--radius-md)",
+              fontWeight: 700,
+              cursor: isEverythingValid ? "pointer" : "not-allowed",
+              textAlign: "center",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            Buat Folder Proyek Baru 🚀
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", color: "#22C55E", fontSize: "0.9rem", fontWeight: 700 }}>
+            <CheckCircle size={20} weight="fill" />
+            <span>Folder Berhasil Dibuat di Lokasi yang Benar!</span>
+          </div>
+
+          <div style={{ background: "#111827", border: "1px solid var(--border-color)", padding: "14px", borderRadius: "var(--radius-md)", fontFamily: "var(--font-code)", fontSize: "0.85rem", color: "#E5E7EB", lineHeight: 1.6 }}>
+            <div>📁 {selectedPath}\{folderName}\</div>
+            <div style={{ color: "#9CA3AF" }}>├── 📁 .vscode\</div>
+            <div style={{ color: "#9CA3AF" }}>│   └── 📄 settings.json <span style={{ color: "#6B7280", fontSize: "0.75rem" }}>(konfigurasi workspace)</span></div>
+            <div style={{ color: "#D4D4D4" }}>├── 📄 main.py <span style={{ color: "#6B7280", fontSize: "0.75rem" }}>(file script Python utama)</span></div>
+            <div style={{ color: "#D4D4D4" }}>└── 📄 readme.md <span style={{ color: "#6B7280", fontSize: "0.75rem" }}>(dokumentasi proyek)</span></div>
+          </div>
+
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.825rem", margin: 0 }}>
+            Sekarang folder workspace kamu sudah bersih, terstruktur, aman dari OneDrive sync lock, dan tidak menggunakan spasi pada namanya. Ini adalah standar industri yang wajib dibiasakan sejak semester 1!
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsCreated(false);
+              setFolderName("");
+              setSelectedPath("");
+            }}
+            style={{
+              background: "transparent",
+              border: "1px solid var(--border-color)",
+              color: "var(--text-primary)",
+              padding: "8px",
+              borderRadius: "var(--radius-md)",
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              marginTop: "4px",
+            }}
+          >
+            Ulangi Simulasi 🔄
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 export default function LearnModulePage() {
   const router = useRouter();
   const { moduleId } = useParams();
@@ -253,6 +433,11 @@ export default function LearnModulePage() {
               </ul>
             </div>
           ),
+        },
+        {
+          title: "Simulasi Membuat Folder Workspace",
+          type: "text",
+          content: <FolderCreationSimulator />,
         },
         {
           title: "Game Simulasi: Susun Workspace yang Benar",
