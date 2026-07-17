@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
   HeroSection,
+  TrustBarSection,
   FeaturesSection,
   CurriculumSection,
   GamificationSection,
@@ -18,6 +19,7 @@ export default function HomePage() {
       <Navbar />
       <main style={{ flex: 1 }}>
         <HeroSection />
+        <TrustBarSection />
         <FeaturesSection />
         <CurriculumSection />
         <GamificationSection />

@@ -28,6 +28,10 @@
   /* === Transitions === */
   --transition-fast:   150ms ease;
   --transition-base:   250ms ease;
+  --transition-smooth: 450ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* === Scroll === */
+  scroll-behavior: smooth;
   --transition-slow:   400ms ease;
   --transition-spring: 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
@@ -203,9 +207,167 @@
   --bg-navbar:      rgba(26, 0, 51, 0.85);
 }
 
+/* ══════════════════════════════════════════
+   🎨 TEMA BIRU (Putih + Biru Pekat)
+   Primary: #1565C0
+   Background: #F0F8FF
+   ══════════════════════════════════════════ */
+[data-theme="blue"] {
+  --color-primary-300: #90CAF9;
+  --color-primary-400: #42A5F5;
+  --color-primary-500: #1565C0;
+  --color-primary-600: #0D47A1;
+  --color-primary-700: #0A2472;
+
+  --color-secondary-300: #80DEEA;
+  --color-secondary-400: #26C6DA;
+  --color-secondary-500: #0097A7;
+  --color-secondary-600: #00838F;
+
+  --color-neutral-900: #001529;
+  --color-neutral-800: #002244;
+  --color-neutral-700: #003366;
+  --color-neutral-600: #1565C0;
+  --color-neutral-400: #42A5F5;
+  --color-neutral-300: #90CAF9;
+  --color-neutral-200: #BBDEFB;
+  --color-neutral-150: #E3F2FD;
+  --color-neutral-100: #F0F8FF;
+  --color-neutral-50:  #FFFFFF;
+
+  --shadow-card:       0 4px 24px rgba(21, 101, 192, 0.10);
+  --shadow-hover:      0 8px 32px rgba(21, 101, 192, 0.20);
+  --shadow-glow:       0 0 24px rgba(21, 101, 192, 0.40);
+  --shadow-glow-soft:  0 0 40px rgba(21, 101, 192, 0.16);
+  --shadow-amber-glow: 0 0 20px rgba(0, 151, 167, 0.4);
+  --shadow-sm:         0 2px 8px rgba(0, 21, 41, 0.08);
+  --shadow-md:         0 4px 16px rgba(0, 21, 41, 0.10);
+  --shadow-lg:         0 8px 32px rgba(0, 21, 41, 0.12);
+  --shadow-primary-btn: 0 4px 15px rgba(21, 101, 192, 0.35);
+
+  --gradient-hero:       linear-gradient(135deg, #1565C0 0%, #42A5F5 60%, #90CAF9 100%);
+  --gradient-hero-soft:  linear-gradient(135deg, rgba(21,101,192,0.08) 0%, rgba(144,202,249,0.05) 100%);
+  --gradient-success:    linear-gradient(135deg, #22C55E 0%, #06D6A0 100%);
+  --gradient-card:       linear-gradient(145deg, #FFFFFF 0%, #F0F8FF 100%);
+  --gradient-warm-fade:  linear-gradient(180deg, rgba(21,101,192,0.08) 0%, transparent 100%);
+  --gradient-cta:        linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+  --gradient-orange-glow: radial-gradient(ellipse at center, rgba(21,101,192,0.15) 0%, transparent 70%);
+
+  --bg-page:        #F0F8FF;
+  --bg-page-alt:    #E3F2FD;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F0F8FF;
+  --bg-elevated:    #E3F2FD;
+  --bg-hero:        #F0F8FF;
+  --text-primary:   #001529;
+  --text-secondary: #1565C0;
+  --text-muted:     #42A5F5;
+  --border-color:        rgba(21, 101, 192, 0.15);
+  --border-color-strong: rgba(21, 101, 192, 0.28);
+  --bg-dark:        #001529;
+  --bg-dark-card:   #002244;
+  --bg-navbar:      rgba(240, 248, 255, 0.85);
+}
+
+[data-theme="blue"].dark {
+  --bg-page:        #001529;
+  --bg-page-alt:    #002244;
+  --bg-card:        #003366;
+  --bg-card-hover:  #004080;
+  --bg-elevated:    #004080;
+  --bg-hero:        #001529;
+  --text-primary:   #E3F2FD;
+  --text-secondary: #BBDEFB;
+  --text-muted:     #90CAF9;
+  --border-color:        rgba(21, 101, 192, 0.25);
+  --border-color-strong: rgba(21, 101, 192, 0.40);
+  --bg-navbar:      rgba(0, 21, 41, 0.85);
+}
+
+/* ══════════════════════════════════════════
+   🎨 TEMA ZAMRUD (Putih + Hijau Zamrud)
+   Primary: #2E7D32
+   Background: #F1F8E9
+   ══════════════════════════════════════════ */
+[data-theme="emerald"] {
+  --color-primary-300: #A5D6A7;
+  --color-primary-400: #66BB6A;
+  --color-primary-500: #2E7D32;
+  --color-primary-600: #1B5E20;
+  --color-primary-700: #0D3B12;
+
+  --color-secondary-300: #80CBC4;
+  --color-secondary-400: #26A69A;
+  --color-secondary-500: #00897B;
+  --color-secondary-600: #00695C;
+
+  --color-neutral-900: #002213;
+  --color-neutral-800: #003D24;
+  --color-neutral-700: #00633C;
+  --color-neutral-600: #2E7D32;
+  --color-neutral-400: #66BB6A;
+  --color-neutral-300: #A5D6A7;
+  --color-neutral-200: #C8E6C9;
+  --color-neutral-150: #E8F5E9;
+  --color-neutral-100: #F1F8E9;
+  --color-neutral-50:  #FFFFFF;
+
+  --shadow-card:       0 4px 24px rgba(46, 125, 50, 0.10);
+  --shadow-hover:      0 8px 32px rgba(46, 125, 50, 0.20);
+  --shadow-glow:       0 0 24px rgba(46, 125, 50, 0.40);
+  --shadow-glow-soft:  0 0 40px rgba(46, 125, 50, 0.16);
+  --shadow-amber-glow: 0 0 20px rgba(0, 137, 123, 0.4);
+  --shadow-sm:         0 2px 8px rgba(0, 34, 19, 0.08);
+  --shadow-md:         0 4px 16px rgba(0, 34, 19, 0.10);
+  --shadow-lg:         0 8px 32px rgba(0, 34, 19, 0.12);
+  --shadow-primary-btn: 0 4px 15px rgba(46, 125, 50, 0.35);
+
+  --gradient-hero:       linear-gradient(135deg, #2E7D32 0%, #66BB6A 60%, #A5D6A7 100%);
+  --gradient-hero-soft:  linear-gradient(135deg, rgba(46,125,50,0.08) 0%, rgba(165,214,167,0.05) 100%);
+  --gradient-success:    linear-gradient(135deg, #22C55E 0%, #06D6A0 100%);
+  --gradient-card:       linear-gradient(145deg, #FFFFFF 0%, #F1F8E9 100%);
+  --gradient-warm-fade:  linear-gradient(180deg, rgba(46,125,50,0.08) 0%, transparent 100%);
+  --gradient-cta:        linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+  --gradient-orange-glow: radial-gradient(ellipse at center, rgba(46,125,50,0.15) 0%, transparent 70%);
+
+  --bg-page:        #F1F8E9;
+  --bg-page-alt:    #E8F5E9;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F1F8E9;
+  --bg-elevated:    #E8F5E9;
+  --bg-hero:        #F1F8E9;
+  --text-primary:   #002213;
+  --text-secondary: #2E7D32;
+  --text-muted:     #66BB6A;
+  --border-color:        rgba(46, 125, 50, 0.15);
+  --border-color-strong: rgba(46, 125, 50, 0.28);
+  --bg-dark:        #002213;
+  --bg-dark-card:   #003D24;
+  --bg-navbar:      rgba(241, 248, 233, 0.85);
+}
+
+[data-theme="emerald"].dark {
+  --bg-page:        #002213;
+  --bg-page-alt:    #003D24;
+  --bg-card:        #00633C;
+  --bg-card-hover:  #00804E;
+  --bg-elevated:    #00804E;
+  --bg-hero:        #002213;
+  --text-primary:   #E8F5E9;
+  --text-secondary: #C8E6C9;
+  --text-muted:     #A5D6A7;
+  --border-color:        rgba(46, 125, 50, 0.25);
+  --border-color-strong: rgba(46, 125, 50, 0.40);
+  --bg-navbar:      rgba(0, 34, 19, 0.85);
+}
+
 /* =====================================================
    BASE STYLES
    ===================================================== */
+html {
+  touch-action: manipulation;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -505,6 +667,71 @@ code, pre {
   to { transform: rotate(360deg); }
 }
 
+@keyframes float-delicate {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%      { transform: translateY(-8px) rotate(1deg); }
+  66%      { transform: translateY(4px) rotate(-1deg); }
+}
+
+@keyframes aurora-drift {
+  0%   { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  50%  { transform: translate(-40%, -60%) scale(1.2) rotate(5deg); }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+}
+
+@keyframes card-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123,31,162,0.08); }
+  50%      { box-shadow: 0 0 40px rgba(123,31,162,0.18); }
+}
+
+@keyframes shimmer-border {
+  0%   { opacity: 0.3; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+.float-delicate {
+  animation: float-delicate 4s ease-in-out infinite;
+}
+
+.aurora-bg {
+  animation: aurora-drift 12s ease-in-out infinite;
+}
+
+.card-glow-pulse {
+  animation: card-glow 3s ease-in-out infinite;
+}
+
+.shimmer-border {
+  animation: shimmer-border 2.5s ease-in-out infinite;
+}
+
+@keyframes rgb-cycle {
+  0%   { color: #FF6B00; filter: hue-rotate(0deg); }
+  16%  { color: #FFD700; }
+  33%  { color: #22C55E; }
+  50%  { color: #06B6D4; }
+  66%  { color: #7B1FA2; }
+  83%  { color: #EF4444; }
+  100% { color: #FF6B00; filter: hue-rotate(360deg); }
+}
+
+@keyframes rgb-gradient {
+  0%   { background-position: 0% 50%; filter: hue-rotate(0deg); }
+  50%  { background-position: 100% 50%; filter: hue-rotate(180deg); }
+  100% { background-position: 0% 50%; filter: hue-rotate(360deg); }
+}
+
+.rgb-text {
+  animation: rgb-cycle 4s linear infinite;
+  background: linear-gradient(90deg, #FF6B00, #FFD700, #22C55E, #06B6D4, #7B1FA2, #EF4444);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rgb-gradient 4s linear infinite;
+}
+
 /* --- Glow dot decoration --- */
 .glow-dot {
   position: absolute;
@@ -650,4 +877,152 @@ code, pre {
 }
 .hover-glow:hover {
   box-shadow: var(--shadow-glow);
+}
+
+/* ══════════════════════════════════════════
+   🍎 APPLE-STYLE SCROLL EFFECTS
+   ══════════════════════════════════════════ */
+
+/* Smooth scroll reveal — applied as progressive enhancement */
+@keyframes apple-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.apple-reveal {
+  animation: apple-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Scroll-driven parallax background shift */
+
+/* ══════════════════════════════════════════
+   DECORATIVE PATTERNS
+   ══════════════════════════════════════════ */
+
+/* Subtle dot grid (Apple-like texture) */
+.dot-grid {
+  background-image: radial-gradient(circle, currentColor 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  opacity: 0.04;
+}
+
+/* Floating code-decoration bracket */
+@keyframes float-bracket {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.04; }
+  50%      { transform: translateY(-12px) rotate(1deg); opacity: 0.07; }
+}
+
+/* Slow gradient pulse for decorative orbs */
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.03; }
+  33%      { transform: scale(1.08) rotate(120deg); opacity: 0.05; }
+  66%      { transform: scale(0.95) rotate(240deg); opacity: 0.04; }
+}
+
+.orb-slow {
+  animation: orb-pulse 18s ease-in-out infinite;
+}
+.orb-slow:nth-child(2) { animation-delay: -6s; }
+.orb-slow:nth-child(3) { animation-delay: -12s; }
+
+/* Decorative floating element */
+.deco-float {
+  animation: float-bracket 6s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Floating text — a bit more visible, slow drift */
+@keyframes float-updown {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-16px); }
+}
+
+/* Elegant headline float — very subtle, compositor-only */
+@keyframes headline-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+.headline-float {
+  animation: headline-float 5s ease-in-out infinite;
+  animation-delay: 1.8s;
+}
+
+.float-text {
+  animation: float-updown 7s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+.float-text:nth-child(2n) { animation-duration: 9s; animation-delay: -2s; }
+.float-text:nth-child(3n) { animation-duration: 6s; animation-delay: -4s; }
+.float-text:nth-child(4n) { animation-duration: 11s; animation-delay: -1s; }
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* Hero */
+  .hero-grid { grid-template-columns: 1fr !important; }
+  .hero-visual { display: none !important; }
+  section > .section-container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  /* Trust bar — stack stats */
+  .trustbar-grid {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: center !important;
+  }
+  .trustbar-grid > div {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+
+  /* Features — single column */
+  .features-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Curriculum — single column */
+  .curriculum-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .curriculum-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Gamification — stack */
+  .gamification-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+  .badge-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* CTA — full width buttons */
+  .cta-buttons {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .cta-buttons > * {
+    width: 100% !important;
+    max-width: 320px !important;
+  }
+
+  /* Hide floating decorations on small screens */
+  .float-text { display: none !important; }
+
+  /* Reduce spacing */
+  .section-padding { padding: var(--space-12) 0 !important; }
+}
+
+@media (max-width: 480px) {
+  .badge-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .curriculum-stats { grid-template-columns: 1fr 1fr !important; }
 }

@@ -24,7 +24,7 @@ export default function LoginPage() {
     handleRedirectResult().then((signedIn) => {
       if (signedIn) router.push("/dashboard");
       setCheckingRedirect(false);
-    });
+    }).catch(() => setCheckingRedirect(false));
   }, [handleRedirectResult, router]);
 
   useEffect(() => {
@@ -38,8 +38,12 @@ export default function LoginPage() {
     setError("");
     try {
       await loginWithGoogle();
+      setLoading(false);
     } catch (e: any) {
-      setError(e?.message || "Gagal login. Coba lagi.");
+      const msg = e?.code === "auth/unauthorized-domain"
+        ? "Domain ini belum terdaftar. Akses via localhost atau tambahkan IP ini ke Firebase Console."
+        : e?.message || "Gagal login. Coba lagi.";
+      setError(msg);
       setLoading(false);
     }
   };
@@ -99,6 +103,9 @@ export default function LoginPage() {
           zIndex: 1,
         }}
       >
+        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "var(--text-muted)", fontSize: "0.8rem", textDecoration: "none", marginBottom: "var(--space-3)", fontFamily: "inherit" }}>
+          &#8592; Beranda
+        </a>
         <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
           <div
             style={{

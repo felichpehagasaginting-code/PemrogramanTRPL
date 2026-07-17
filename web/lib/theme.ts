@@ -1,4 +1,4 @@
-export type ThemeFamily = "orange" | "purple";
+export type ThemeFamily = "orange" | "purple" | "blue" | "emerald";
 export type ThemeMode = "light" | "dark";
 
 export interface Theme {
@@ -8,8 +8,8 @@ export interface Theme {
 
 const STORAGE_KEY = "matrikulasi-theme";
 
-const FAMILY_LABELS: Record<ThemeFamily, string> = { orange: "Orange", purple: "Ungu" };
-const FAMILY_ORDER: ThemeFamily[] = ["orange", "purple"];
+const FAMILY_LABELS: Record<ThemeFamily, string> = { orange: "Orange", purple: "Ungu", blue: "Biru", emerald: "Zamrud" };
+const FAMILY_ORDER: ThemeFamily[] = ["orange", "purple", "blue", "emerald"];
 const MODE_ORDER: ThemeMode[] = ["light", "dark"];
 
 export function getThemeLabel(family: ThemeFamily): string {

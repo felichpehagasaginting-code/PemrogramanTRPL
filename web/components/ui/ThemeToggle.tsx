@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getStoredTheme, applyTheme, getNextFamily, getNextMode, type Theme } from "@/lib/theme";
+import { getStoredTheme, applyTheme, getNextFamily, getNextMode, getThemeLabel, type Theme } from "@/lib/theme";
 import { Sun, Moon, Palette } from "@phosphor-icons/react";
 
 export function ThemeToggle() {
@@ -41,7 +41,7 @@ export function ThemeToggle() {
     }}>
       <button
         onClick={toggleFamily}
-        title={`Tema: ${theme.family === "orange" ? "Orange" : "Ungu"}`}
+        title={`Tema: ${getThemeLabel(theme.family)}`}
         style={{
           display: "flex",
           alignItems: "center",
@@ -61,7 +61,7 @@ export function ThemeToggle() {
         onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
       >
         <Palette size={14} weight="bold" />
-        {theme.family === "orange" ? "Orange" : "Ungu"}
+        {getThemeLabel(theme.family)}
       </button>
 
       <button

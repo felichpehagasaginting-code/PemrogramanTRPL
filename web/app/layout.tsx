@@ -28,6 +28,13 @@ const firaCode = Fira_Code({
   display: "swap",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: {
     default: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
