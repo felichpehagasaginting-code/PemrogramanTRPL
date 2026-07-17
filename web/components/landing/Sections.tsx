@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, type Variants } from "framer-motion";
-import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Code,
   GameController,
@@ -19,6 +19,10 @@ import {
   SquaresFour,
   Rocket,
   FolderOpen,
+  Play,
+  Folder,
+  Terminal,
+  Warning,
 } from "@phosphor-icons/react";
 import { Button, BadgeIcon } from "@/components/ui";
 
@@ -48,6 +52,355 @@ function AnimatedSection({ children, id, style = {} }: { children: React.ReactNo
     >
       {children}
     </motion.section>
+  );
+}
+
+function InteractiveHeroShowcase() {
+  const [activeTab, setActiveTab] = useState<"code" | "folder">("code");
+
+  // Code editor states
+  const [code, setCode] = useState(`# Coba jalankan kode pertamamu!\nnama = "Maba TRPL 2026"\nprint("Halo " + nama + "!")\nprint("Selamat datang di platform matrikulasi!")\n`);
+  const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  // Folder creator states
+  const [folderName, setFolderName] = useState("");
+  const [selectedPath, setSelectedPath] = useState("");
+  const [folderFeedback, setFolderFeedback] = useState("");
+  const [isCreated, setIsCreated] = useState(false);
+
+  const hasSpace = /\s/.test(folderName);
+  const hasSpecialChar = /[^a-zA-Z0-9_\-]/.test(folderName);
+  const isNameValid = folderName.length > 0 && !hasSpace && !hasSpecialChar;
+  const isPathValid = selectedPath === "D:\\TRPL\\Proyek";
+  const isEverythingValid = isNameValid && isPathValid;
+
+  const runCode = () => {
+    setIsExecuting(true);
+    setConsoleOutput(["Running python main.py..."]);
+
+    setTimeout(() => {
+      try {
+        const lines = code.split("\n");
+        const vars: Record<string, any> = {};
+        const logs: string[] = [];
+
+        for (let line of lines) {
+          line = line.trim();
+          if (!line || line.startsWith("#")) continue;
+
+          if (line.includes("=") && !line.includes("==") && !line.startsWith("print")) {
+            const eqIdx = line.indexOf("=");
+            const name = line.substring(0, eqIdx).trim();
+            const valStr = line.substring(eqIdx + 1).trim();
+
+            if ((valStr.startsWith('"') && valStr.endsWith('"')) || (valStr.startsWith("'") && valStr.endsWith("'"))) {
+              vars[name] = valStr.substring(1, valStr.length - 1);
+            } else {
+              try {
+                let temp = valStr;
+                Object.keys(vars).forEach(k => {
+                  temp = temp.replace(new RegExp(`\\b${k}\\b`, "g"), vars[k]);
+                });
+                vars[name] = (Function as any)(`return (${temp})`)();
+              } catch (e) {
+                vars[name] = NaN;
+              }
+            }
+            continue;
+          }
+
+          if (line.startsWith("print(") && line.endsWith(")")) {
+            const inner = line.substring(6, line.length - 1).trim();
+            let expr = inner;
+            Object.keys(vars).forEach(k => {
+              const val = typeof vars[k] === "string" ? `"${vars[k]}"` : vars[k];
+              expr = expr.replace(new RegExp(`\\b${k}\\b`, "g"), val);
+            });
+
+            try {
+              const res = (Function as any)(`return (${expr})`)();
+              logs.push(String(res));
+            } catch (e) {
+              logs.push(`SyntaxError: print expression '${inner}' is invalid.`);
+            }
+          }
+        }
+
+        if (logs.length === 0) {
+          logs.push("(Script selesai tanpa output)");
+        }
+        setConsoleOutput(logs);
+      } catch (err) {
+        setConsoleOutput(["SyntaxError: Gagal menjalankan script Python tiruan."]);
+      } finally {
+        setIsExecuting(false);
+      }
+    }, 600);
+  };
+
+  const handlePathSelect = (path: string) => {
+    setSelectedPath(path);
+    if (path.includes("Desktop")) {
+      setFolderFeedback("❌ Desktop rawan sync-lock OneDrive cloud!");
+    } else if (path.includes("Downloads")) {
+      setFolderFeedback("❌ Downloads adalah folder temp sampah sementara!");
+    } else if (path.includes("Program Files")) {
+      setFolderFeedback("❌ Butuh hak akses Administrator!");
+    } else {
+      setFolderFeedback("✅ Lokasi D: Drive partisi mandiri sangat aman!");
+    }
+  };
+
+  return (
+    <div
+      style={{
+        background: "#111827",
+        borderRadius: "var(--radius-xl)",
+        border: "1px solid rgba(255,107,0,0.25)",
+        boxShadow: "0 24px 64px rgba(28,10,0,0.25), var(--shadow-glow-soft)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "380px",
+        maxHeight: "440px",
+      }}
+    >
+      {/* Chrome window header with tabs */}
+      <div
+        style={{
+          background: "#1F2937",
+          borderBottom: "1px solid rgba(255,107,0,0.15)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 16px",
+          height: "44px",
+          userSelect: "none",
+        }}
+      >
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FF5F57" }}></span>
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FFBD2E" }}></span>
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28C840" }}></span>
+          
+          {/* Tab buttons */}
+          <div style={{ display: "flex", gap: "4px", marginLeft: "16px" }}>
+            <button
+              onClick={() => setActiveTab("code")}
+              style={{
+                background: activeTab === "code" ? "#111827" : "transparent",
+                color: activeTab === "code" ? "white" : "#9CA3AF",
+                border: "none",
+                borderRadius: "4px 4px 0 0",
+                padding: "6px 12px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "var(--font-heading)",
+              }}
+            >
+              💻 VS Code Sandbox
+            </button>
+            <button
+              onClick={() => setActiveTab("folder")}
+              style={{
+                background: activeTab === "folder" ? "#111827" : "transparent",
+                color: activeTab === "folder" ? "white" : "#9CA3AF",
+                border: "none",
+                borderRadius: "4px 4px 0 0",
+                padding: "6px 12px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "var(--font-heading)",
+              }}
+            >
+              📁 Folder Creator
+            </button>
+          </div>
+        </div>
+
+        {activeTab === "code" && (
+          <button
+            onClick={runCode}
+            disabled={isExecuting}
+            style={{
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid #22c55e",
+              color: "#22c55e",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              cursor: "pointer",
+            }}
+          >
+            <Play size={10} weight="fill" />
+            <span>Run Code</span>
+          </button>
+        )}
+      </div>
+
+      {/* Main Body */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", padding: "16px", background: "#111827" }}>
+        {activeTab === "code" ? (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflow: "hidden" }}>
+            {/* Editor Input */}
+            <div style={{ flex: 1, position: "relative", minHeight: "140px" }}>
+              <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "24px", color: "#4B5563", fontSize: "0.75rem", fontFamily: "var(--font-code)", textAlign: "right", paddingRight: "6px", userSelect: "none", lineHeight: "1.6" }}>
+                {code.split("\n").map((_, i) => <div key={i}>{i+1}</div>)}
+              </div>
+              <textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  resize: "none",
+                  paddingLeft: "30px",
+                  color: "#e5e7eb",
+                  fontFamily: "var(--font-code)",
+                  fontSize: "0.8rem",
+                  lineHeight: "1.6",
+                }}
+              />
+            </div>
+
+            {/* Output console */}
+            <div style={{ height: "100px", background: "#0b0f19", borderRadius: "8px", border: "1px solid #1e293b", padding: "8px 12px", display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "0.65rem", color: "#6b7280", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>▶ Console Terminal</span>
+              <div style={{ flex: 1, overflowY: "auto", fontFamily: "var(--font-code)", fontSize: "0.75rem", color: "#34D399", lineHeight: "1.4" }}>
+                {consoleOutput.length > 0 ? (
+                  consoleOutput.map((l, i) => <div key={i}>{l}</div>)
+                ) : (
+                  <span style={{ color: "#4b5563" }}>Klik 'Run Code' di atas untuk menjalankan program...</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px", overflowY: "auto", fontSize: "0.8rem" }}>
+            {!isCreated ? (
+              <>
+                <div>
+                  <label style={{ display: "block", color: "#9ca3af", fontWeight: 600, marginBottom: "4px" }}>Nama Folder Proyek:</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: belajar_python"
+                    value={folderName}
+                    onChange={(e) => setFolderName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      background: "#1f2937",
+                      border: "1px solid #374151",
+                      borderRadius: "6px",
+                      padding: "6px 10px",
+                      color: "white",
+                      outline: "none",
+                      fontFamily: "var(--font-code)",
+                    }}
+                  />
+                  {folderName && (
+                    <div style={{ fontSize: "0.7rem", marginTop: "4px" }}>
+                      {hasSpace && <span style={{ color: "#ef4444" }}>❌ Mengandung spasi! Gunakan _ atau -</span>}
+                      {hasSpecialChar && !hasSpace && <span style={{ color: "#ef4444" }}>❌ Karakter spesial ilegal!</span>}
+                      {isNameValid && <span style={{ color: "#22c55e" }}>✅ Nama folder profesional!</span>}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label style={{ display: "block", color: "#9ca3af", fontWeight: 600, marginBottom: "4px" }}>Pilih Path:</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                    {[
+                      "C:\\Desktop",
+                      "C:\\Downloads",
+                      "C:\\Program Files",
+                      "D:\\TRPL\\Proyek",
+                    ].map(p => (
+                      <button
+                        key={p}
+                        onClick={() => handlePathSelect(p)}
+                        style={{
+                          background: selectedPath === p ? "rgba(255,107,0,0.1)" : "#1f2937",
+                          border: selectedPath === p ? "1.5px solid var(--color-primary-500)" : "1px solid #374151",
+                          padding: "6px",
+                          borderRadius: "4px",
+                          color: "white",
+                          textAlign: "left",
+                          cursor: "pointer",
+                          fontSize: "0.7rem",
+                        }}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedPath && (
+                    <div style={{ fontSize: "0.7rem", color: selectedPath === "D:\\TRPL\\Proyek" ? "#22c55e" : "#ef4444", marginTop: "4px" }}>
+                      {folderFeedback}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  disabled={!isEverythingValid}
+                  onClick={() => setIsCreated(true)}
+                  style={{
+                    background: isEverythingValid ? "var(--color-primary-500)" : "#374151",
+                    color: isEverythingValid ? "white" : "#9ca3af",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "8px",
+                    fontWeight: 700,
+                    cursor: isEverythingValid ? "pointer" : "not-allowed",
+                    marginTop: "4px",
+                  }}
+                >
+                  Buat Folder Proyek Baru 📁
+                </button>
+              </>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <span style={{ color: "#22c55e", fontWeight: 700 }}>✅ Workspace Berhasil Dibuat!</span>
+                <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "10px", borderRadius: "6px", fontFamily: "var(--font-code)", fontSize: "0.75rem", color: "#e5e7eb", lineHeight: 1.5 }}>
+                  <div>📁 {selectedPath}\{folderName}\</div>
+                  <div style={{ color: "#9CA3AF" }}>├── 📁 .vscode\</div>
+                  <div style={{ color: "#D4D4D4" }}>├── 📄 main.py</div>
+                  <div style={{ color: "#D4D4D4" }}>└── 📄 readme.md</div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsCreated(false);
+                    setFolderName("");
+                    setSelectedPath("");
+                    setFolderFeedback("");
+                  }}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid #374151",
+                    color: "white",
+                    padding: "4px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "0.7rem",
+                  }}
+                >
+                  Reset Simulasi 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -209,7 +562,7 @@ export function HeroSection() {
             </motion.div>
           </motion.div>
 
-          {/* Right: Code editor mockup */}
+          {/* Right: Interactive Showcase Playground */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -217,140 +570,7 @@ export function HeroSection() {
             style={{ position: "relative" }}
             className="hero-visual"
           >
-            {/* Floating success badge */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              style={{
-                position: "absolute",
-                top: "-28px",
-                right: "8%",
-                zIndex: 2,
-              }}
-            >
-              <div
-                style={{
-                  background: "var(--gradient-success)",
-                  borderRadius: "var(--radius-full)",
-                  padding: "8px 18px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  color: "white",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 700,
-                  fontSize: "0.875rem",
-                  boxShadow: "0 4px 20px rgba(34,197,94,0.4)",
-                }}
-              >
-                <CheckCircle size={16} weight="fill" /> Kode berhasil jalan!
-              </div>
-            </motion.div>
-
-            {/* Editor window */}
-            <div
-              style={{
-                background: "#111827",
-                borderRadius: "var(--radius-xl)",
-                border: "1px solid rgba(255,107,0,0.2)",
-                boxShadow: "0 24px 64px rgba(28,10,0,0.15), var(--shadow-glow-soft)",
-                overflow: "hidden",
-              }}
-            >
-              {/* Window chrome */}
-              <div
-                style={{
-                  padding: "12px 16px",
-                  background: "#1F2937",
-                  borderBottom: "1px solid rgba(255,107,0,0.1)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#FF5F57" }} />
-                <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#FFBD2E" }} />
-                <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#28C840" }} />
-                <span style={{ marginLeft: "8px", color: "#9CA3AF", fontSize: "0.8rem", fontFamily: "var(--font-code)" }}>
-                  main.py
-                </span>
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "0.7rem",
-                    background: "rgba(255,107,0,0.2)",
-                    color: "#FF8C42",
-                    padding: "2px 10px",
-                    borderRadius: "var(--radius-full)",
-                    fontFamily: "var(--font-heading)",
-                    fontWeight: 600,
-                  }}
-                >
-                  Python 3
-                </span>
-              </div>
-
-              {/* Code content */}
-              <div style={{ padding: "var(--space-6)", fontFamily: "var(--font-code)", fontSize: "0.9rem", lineHeight: 1.8 }}>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.6 }}
-                >
-                  <CodeLine num={1} content={<><span style={{ color: "#60A5FA" }}>nama</span> <span style={{ color: "#F87171" }}>=</span> <span style={{ color: "#FCD34D" }}>&quot;Reza&quot;</span></>} />
-                  <CodeLine num={2} content={<><span style={{ color: "#60A5FA" }}>nilai</span> <span style={{ color: "#F87171" }}>=</span> <span style={{ color: "#A78BFA" }}>85</span></>} />
-                  <CodeLine num={3} content="" />
-                  <CodeLine num={4} content={<><span style={{ color: "#F87171" }}>if</span> <span style={{ color: "#60A5FA" }}>nilai</span> <span style={{ color: "#F87171" }}>&gt;=</span> <span style={{ color: "#A78BFA" }}>75</span><span style={{ color: "#E5E7EB" }}>:</span></>} />
-                  <CodeLine num={5} indent content={<><span style={{ color: "#34D399" }}>print</span><span style={{ color: "#E5E7EB" }}>(</span><span style={{ color: "#FCD34D" }}>&quot;Selamat, &quot;</span> <span style={{ color: "#F87171" }}>+</span> <span style={{ color: "#60A5FA" }}>nama</span> <span style={{ color: "#F87171" }}>+</span> <span style={{ color: "#FCD34D" }}>&quot;! Lulus!&quot;</span><span style={{ color: "#E5E7EB" }}>)</span></>} />
-                  <CodeLine num={6} content={<><span style={{ color: "#F87171" }}>else</span><span style={{ color: "#E5E7EB" }}>:</span></>} />
-                  <CodeLine num={7} indent content={<><span style={{ color: "#34D399" }}>print</span><span style={{ color: "#E5E7EB" }}>(</span><span style={{ color: "#FCD34D" }}>&quot;Semangat terus!&quot;</span><span style={{ color: "#E5E7EB" }}>)</span></>} />
-                </motion.div>
-
-                {/* Output */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.1, duration: 0.4 }}
-                  style={{
-                    marginTop: "var(--space-4)",
-                    padding: "var(--space-3) var(--space-4)",
-                    background: "rgba(34,197,94,0.08)",
-                    border: "1px solid rgba(34,197,94,0.2)",
-                    borderRadius: "var(--radius-md)",
-                  }}
-                >
-                  <div style={{ color: "#6B7280", fontSize: "0.75rem", marginBottom: "4px" }}>▶ Output</div>
-                  <div style={{ color: "#34D399", fontFamily: "var(--font-code)", fontSize: "0.875rem" }}>
-                    Selamat, Reza! Lulus! ✨
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Floating XP badge */}
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.5 }}
-              style={{
-                position: "absolute",
-                bottom: "-20px",
-                left: "5%",
-                background: "var(--gradient-hero)",
-                borderRadius: "var(--radius-lg)",
-                padding: "10px 18px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                boxShadow: "var(--shadow-glow)",
-                color: "white",
-                fontFamily: "var(--font-heading)",
-                fontWeight: 700,
-                fontSize: "0.875rem",
-              }}
-            >
-              <Trophy size={18} weight="fill" />
-              +50 XP · Badge Unlocked!
-            </motion.div>
+            <InteractiveHeroShowcase />
           </motion.div>
         </div>
       </div>
