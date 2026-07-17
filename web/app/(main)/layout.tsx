@@ -55,6 +55,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const menuLinks = [
     { label: "Dashboard", href: "/dashboard", icon: <BookOpen size={20} /> },
+    { label: "VS Code Sandbox", href: "/sandbox", icon: <Code size={20} /> },
     { label: "Leaderboard", href: "/leaderboard", icon: <Trophy size={20} /> },
     { label: "Profil", href: "/profile", icon: <User size={20} /> },
     { label: "Admin", href: "/admin", icon: <ShieldCheck size={20} /> },
