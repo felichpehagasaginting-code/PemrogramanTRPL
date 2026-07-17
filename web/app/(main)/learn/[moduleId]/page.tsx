@@ -112,10 +112,10 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Instruktur Pemrograman Dasar berpesan: **Jangan melompat langsung ke coding jika tidak mengerti sistem operasi laptop sendiri!**
+                Instruktur Pemrograman Dasar berpesan: <strong>Jangan melompat langsung ke coding jika tidak mengerti sistem operasi laptop sendiri!</strong>
               </p>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "12px" }}>
-                Banyak maba gagal menjalankan kodenya hanya karena salah menaruh folder proyek, salah variabel path, atau extensi file yang tersembunyi.
+                Banyak maba gagal menjalankan kodenya bukan karena salah logika matematika, melainkan karena salah menaruh folder proyek, salah variabel path, atau extensi file yang tersembunyi.
               </p>
               <div
                 style={{
@@ -130,10 +130,73 @@ export default function LearnModulePage() {
               >
                 <Warning size={24} color="var(--color-primary-500)" style={{ flexShrink: 0 }} />
                 <div style={{ fontSize: "0.875rem", color: "var(--text-primary)", lineHeight: 1.5 }}>
-                  <strong>Aturan Emas:</strong> Dilarang keras membuat folder project pemrograman di **Desktop** atau **Downloads**!
+                  <strong>Aturan Emas:</strong> Dilarang keras membuat folder project pemrograman di <strong>Desktop</strong> atau <strong>Downloads</strong>!
                   Hal ini memicu error path permission saat IDE/VS Code mencoba menjalankannya.
                 </div>
               </div>
+            </div>
+          ),
+        },
+        {
+          title: "Bagaimana Komputer Bekerja",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Sebelum menulis program, pahami 3 pilar perangkat keras utama komputer dalam menjalankan kode Anda:
+              </p>
+              <div style={{ display: "grid", gap: "12px", marginTop: "16px" }}>
+                {[
+                  { title: "🧠 Processor (CPU)", desc: "Otak komputer yang memproses kalkulasi logika dan mengeksekusi baris kode program." },
+                  { title: "⚡ RAM (Short-term Memory)", desc: "Tempat penampungan data program yang sedang berjalan. Super cepat, tapi bersifat volatile (data hilang saat mati lampu)." },
+                  { title: "📁 Storage (SSD/HDD)", desc: "Lemari arsip permanen tempat Anda menyimpan file script Python `.py` Anda agar tidak hilang." },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: "var(--bg-page-alt)", padding: "12px var(--space-4)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                    <strong style={{ color: "var(--text-primary)", fontSize: "0.9rem" }}>{item.title}</strong>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", margin: "4px 0 0" }}>{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Cara Komputer Membaca Kode",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Komputer adalah mesin digital yang sangat sederhana: ia hanya mengerti angka <strong>0</strong> dan <strong>1</strong> (Bahasa Biner).
+              </p>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "10px" }}>
+                Karena menulis biner secara langsung sangat sulit, dibuatlah <strong>Bahasa Pemrograman Tingkat Tinggi</strong> (seperti Python). Penerjemahannya dibagi dua cara:
+              </p>
+              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px", display: "grid", gap: "10px", fontSize: "0.85rem" }}>
+                <div>
+                  <strong style={{ color: "var(--color-primary-500)" }}>1. Compiler:</strong> Menerjemahkan seluruh isi file kode sekaligus menjadi file executable sebelum dijalankan (contoh: C++, Go).
+                </div>
+                <div>
+                  <strong style={{ color: "var(--color-primary-500)" }}>2. Interpreter:</strong> Menerjemahkan dan menjalankan kode baris-demi-baris secara langsung (contoh: Python).
+                </div>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Aturan Folder & Peta Harddisk",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Setiap file di komputer memiliki alamat unik yang disebut <strong>Path</strong> (contoh: <code>D:/TRPL/proyek/main.py</code>).
+              </p>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "10px" }}>
+                Menyimpan proyek pemrograman di folder Desktop atau Downloads sangat berbahaya karena:
+              </p>
+              <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "6px", marginTop: "10px", fontSize: "0.85rem" }}>
+                <li>Folder Desktop/Downloads sering tersinkronisasi otomatis oleh cloud storage seperti OneDrive/iCloud, yang dapat mengunci file dan membuat interpreter Python error.</li>
+                <li>Windows membatasi izin akses (*read-write permissions*) pada folder sistem, menyebabkan IDE gagal membuat berkas baru.</li>
+              </ul>
             </div>
           ),
         },
@@ -143,7 +206,7 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "var(--space-4)" }}>
-                Pindahkan file coding **`calculator.py`** ke lokasi folder penyimpanan yang paling tepat:
+                Pindahkan file coding <strong>`calculator.py`</strong> ke lokasi folder penyimpanan yang paling tepat:
               </p>
 
               {/* File element */}
@@ -225,12 +288,60 @@ export default function LearnModulePage() {
           ),
         },
         {
+          title: "File Extension & Karakter Terlarang",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Dalam pemrograman, ada dua detail teknis kecil yang sering memicu error besar:
+              </p>
+              <div style={{ display: "grid", gap: "10px", marginTop: "12px", fontSize: "0.85rem" }}>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  <strong style={{ color: "var(--text-primary)" }}>🔍 File Name Extension</strong>
+                  <p style={{ color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                    Secara default, Windows menyembunyikan ekstensi berkas. File bernama <code>main.py</code> mungkin saja aslinya adalah <code>main.py.txt</code> (file teks biasa). 
+                    Pastikan Anda mencentang opsi <strong>File name extensions</strong> pada tab <em>View</em> di File Explorer.
+                  </p>
+                </div>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  <strong style={{ color: "var(--text-primary)" }}>❌ Karakter Spasi pada Nama Folder</strong>
+                  <p style={{ color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                    Jangan pernah gunakan spasi untuk nama folder proyek (misalnya: <code>tugas 1</code>). Gunakan garis bawah (<code>tugas_1</code>). 
+                    Terminal memperlakukan spasi sebagai pemisah perintah, sehingga folder berspasi sering merusak jalur eksekusi compiler.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "GUI vs CLI (Command Line)",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Sebagai pengguna komputer biasa, Anda menggunakan <strong>GUI (Graphical User Interface)</strong> dengan mengklik ikon memakai mouse.
+              </p>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "10px" }}>
+                Namun, seorang programmer wajib menguasai <strong>CLI (Command Line Interface)</strong>—mengetikkan perintah langsung berupa teks di Terminal/Command Prompt karena jauh lebih cepat dan efisien.
+              </p>
+              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "12px" }}>
+                <strong>Dua Perintah CLI Dasar yang Wajib Diingat:</strong>
+                <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", margin: "6px 0 0", fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li><code>cd [path_folder]</code> : Digunakan untuk berpindah (Change Directory) ke folder lain.</li>
+                  <li><code>dir</code> (Windows) / <code>ls</code> (Mac/Linux) : Menampilkan daftar file di dalam folder aktif.</li>
+                </ul>
+              </div>
+            </div>
+          ),
+        },
+        {
           title: "Simulator CLI: Memeriksa Python & PATH",
           type: "interactive-cli",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "var(--space-4)" }}>
-                Ketikkan perintah **`python --version`** pada terminal di bawah untuk memeriksa konfigurasi PATH Python:
+                Ketikkan perintah <strong>`python --version`</strong> pada terminal di bawah untuk memeriksa konfigurasi PATH Python:
               </p>
 
               {/* Console simulator window */}
@@ -309,6 +420,34 @@ export default function LearnModulePage() {
                   Kirim
                 </button>
               </form>
+            </div>
+          ),
+        },
+        {
+          title: "Memilih Text Editor & IDE",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Untuk mengetik kode pemrograman, kita tidak menggunakan Microsoft Word karena Word menambahkan banyak format dokumen yang merusak script program.
+              </p>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "10px" }}>
+                Kita membutuhkan alat penyunting teks khusus:
+              </p>
+              <div style={{ display: "grid", gap: "10px", marginTop: "12px", fontSize: "0.85rem" }}>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  <strong style={{ color: "var(--text-primary)" }}>💻 VS Code (Visual Studio Code)</strong>
+                  <p style={{ color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                    Text editor modern, ringan, gratis, dan sangat fleksibel. Mendukung ribuan ekstensi yang mempermudah koding (seperti autocomplete dan penyorot sintaks).
+                  </p>
+                </div>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  <strong style={{ color: "var(--text-primary)" }}>⚙️ IDE (Integrated Development Environment)</strong>
+                  <p style={{ color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                    Aplikasi sangat lengkap berisi compiler, editor, debugger, dan penguji bawaan dalam satu paket besar (contoh: PyCharm, Visual Studio).
+                  </p>
+                </div>
+              </div>
             </div>
           ),
         },
