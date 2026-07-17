@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUserStore } from "@/lib/store/useUserStore";
-import { X, Trophy, Sparkle, Smiley } from "@phosphor-icons/react";
+import { X, Trophy, Sparkle, Smiley, Rocket } from "@phosphor-icons/react";
+import { BadgeIcon } from "@/components/ui";
 import confetti from "canvas-confetti";
 
 export function OverlayEffects() {
@@ -103,17 +104,12 @@ export function OverlayEffects() {
                   width: "80px",
                   height: "80px",
                   margin: "0 auto var(--space-4)",
-                  borderRadius: "50%",
-                  background: `rgba(255, 107, 0, 0.1)`,
-                  border: `2px solid ${badgePopup.badge.color}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "3rem",
-                  boxShadow: `0 0 20px ${badgePopup.badge.color}30`,
                 }}
               >
-                {badgePopup.badge.emoji}
+                <BadgeIcon id={badgePopup.badge.id} color={badgePopup.badge.color} size={80} />
               </div>
 
               <span className="badge badge-primary" style={{ marginBottom: "var(--space-2)" }}>
@@ -195,9 +191,9 @@ export function OverlayEffects() {
               <motion.div
                 animate={{ rotate: [0, 10, -10, 10, 0], scale: [1, 1.1, 1] }}
                 transition={{ duration: 1, repeat: Infinity, repeatType: "mirror" }}
-                style={{ fontSize: "4.5rem", marginBottom: "var(--space-3)" }}
+                style={{ display: "flex", justifyContent: "center", marginBottom: "var(--space-3)" }}
               >
-                🚀
+                <Rocket size={72} color="white" weight="fill" />
               </motion.div>
 
               <h2 style={{ fontSize: "1.75rem", fontFamily: "var(--font-heading)", fontWeight: 800, color: "#FFF8F2", marginBottom: "8px" }}>
@@ -309,7 +305,9 @@ export function OverlayEffects() {
                     fontSize: "1.1rem",
                   }}
                 >
-                  <div style={{ color: "#FF6B00", fontSize: "2.5rem", marginBottom: "8px" }}>😎</div>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                    <Smiley size={48} color="#FF6B00" weight="fill" />
+                  </div>
                   {memePopup.caption}
                 </div>
               </div>

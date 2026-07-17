@@ -20,7 +20,7 @@ import {
   Rocket,
   FolderOpen,
 } from "@phosphor-icons/react";
-import { Button } from "@/components/ui";
+import { Button, BadgeIcon } from "@/components/ui";
 
 /* ---- Animation variants ---- */
 const fadeUp: Variants = {
@@ -720,19 +720,19 @@ export function GamificationSection() {
   ];
 
   const badges = [
-    { name: "Langkah Pertama", emoji: "👟", color: "#FF9D00" },
-    { name: "Workspace Master", emoji: "📁", color: "#FF8C42" },
-    { name: "Pemikir Logis", emoji: "⭐", color: "#FF6B00" },
-    { name: "Si Penampung Data", emoji: "📦", color: "#06B6D4" },
-    { name: "Pembuat Keputusan", emoji: "🔀", color: "#EF4444" },
-    { name: "Master of Loop", emoji: "🔄", color: "#22C55E" },
-    { name: "Function Wizard", emoji: "🪄", color: "#D45900" },
-    { name: "Data Collector", emoji: "📊", color: "#FF8C42" },
-    { name: "Junior Developer", emoji: "⛑️", color: "#FF9D00" },
-    { name: "Matrikulasi Graduate", emoji: "🎓", color: "#FF6B00" },
-    { name: "Perfectionist", emoji: "💎", color: "#06B6D4" },
-    { name: "Speed Runner", emoji: "🚀", color: "#EF4444" },
-    { name: "Helping Hand", emoji: "🤝", color: "#22C55E" },
+    { id: "langkah_pertama", name: "Langkah Pertama", color: "#FF9D00" },
+    { id: "workspace_master", name: "Workspace Master", color: "#FF8C42" },
+    { id: "pemikir_logis", name: "Pemikir Logis", color: "#FF6B00" },
+    { id: "penampung_data", name: "Si Penampung Data", color: "#06B6D4" },
+    { id: "pembuat_keputusan", name: "Pembuat Keputusan", color: "#EF4444" },
+    { id: "master_loop", name: "Master of Loop", color: "#22C55E" },
+    { id: "function_wizard", name: "Function Wizard", color: "#D45900" },
+    { id: "data_collector", name: "Data Collector", color: "#FF8C42" },
+    { id: "junior_developer", name: "Junior Developer", color: "#FF9D00" },
+    { id: "graduated", name: "Matrikulasi Graduate", color: "#FF6B00" },
+    { id: "perfectionist", name: "Perfectionist", color: "#06B6D4" },
+    { id: "speed_runner", name: "Speed Runner", color: "#EF4444" },
+    { id: "helping_hand", name: "Helping Hand", color: "#22C55E" },
   ];
 
   return (
@@ -837,7 +837,9 @@ export function GamificationSection() {
                     transition: "all 0.2s ease",
                   }}
                 >
-                  <div style={{ fontSize: "1.75rem", marginBottom: "4px" }}>{badge.emoji}</div>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+                    <BadgeIcon id={badge.id} color={badge.color} size={42} />
+                  </div>
                   <div style={{ fontSize: "0.68rem", color: "var(--text-secondary)", lineHeight: 1.35, fontWeight: 500 }}>
                     {badge.name}
                   </div>

@@ -12,6 +12,7 @@ interface Props {
   taskDescription: string;
   expectedOutput?: string;
   onBack?: () => void;
+  onSubmit?: () => void;
 }
 
 export function CodeEditor({
@@ -20,6 +21,7 @@ export function CodeEditor({
   taskDescription,
   expectedOutput,
   onBack,
+  onSubmit,
 }: Props) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<string[]>([]);
@@ -114,7 +116,7 @@ export function CodeEditor({
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+      <div style={{ display: "flex", gap: "12px", alignItems: "flex-start", flexWrap: "wrap" }}>
         <button
           onClick={runCode}
           disabled={isRunning}
@@ -128,6 +130,28 @@ export function CodeEditor({
         >
           <Play size={16} weight="fill" /> {isRunning ? "Menjalankan..." : "Jalankan Kode"}
         </button>
+
+        {onSubmit && (
+          <button
+            onClick={onSubmit}
+            className="btn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px var(--space-6)",
+              background: "linear-gradient(135deg, #43E97B 0%, #38F9D7 100%)",
+              border: "none",
+              color: "#111827",
+              fontWeight: 700,
+              cursor: "pointer",
+              borderRadius: "var(--radius-full)",
+              boxShadow: "0 4px 12px rgba(34, 197, 94, 0.25)",
+            }}
+          >
+            Kirim Jawaban
+          </button>
+        )}
       </div>
 
       {output.length > 0 && (

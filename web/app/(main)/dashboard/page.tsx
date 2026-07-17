@@ -18,7 +18,10 @@ import {
   CheckCircle,
   Lightning,
   Trophy,
+  ChartBar,
+  Medal,
 } from "@phosphor-icons/react";
+import { BadgeIcon } from "@/components/ui";
 
 const MODULES_META = [
   { id: "M0", code: "M0", title: "Pre-Test & Orientasi", duration: "30 mnt", icon: <Star size={22} weight="fill" />, color: "#FF9D00" },
@@ -284,8 +287,8 @@ export default function DashboardPage() {
               marginBottom: "var(--space-6)",
             }}
           >
-            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)" }}>
-              📊 STATS KAMU
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)", display: "flex", alignItems: "center", gap: "6px" }}>
+              <ChartBar size={18} weight="fill" color="var(--color-primary-500)" /> STATS KAMU
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-4)" }}>
               <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", textAlign: "center" }}>
@@ -310,8 +313,8 @@ export default function DashboardPage() {
               marginBottom: "var(--space-6)",
             }}
           >
-            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)" }}>
-              🏆 TOP LEADERBOARD
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)", display: "flex", alignItems: "center", gap: "6px" }}>
+              <Trophy size={18} weight="fill" color="var(--color-primary-500)" /> TOP LEADERBOARD
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {sortedLeaderboard.map((item, idx) => (
@@ -354,8 +357,8 @@ export default function DashboardPage() {
               boxShadow: "var(--shadow-sm)",
             }}
           >
-            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)" }}>
-              🏅 BADGE KAMU
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)", display: "flex", alignItems: "center", gap: "6px" }}>
+              <Medal size={18} weight="fill" color="var(--color-primary-500)" /> BADGE KAMU
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
               {BADGES.map((badge) => {
@@ -365,18 +368,14 @@ export default function DashboardPage() {
                     key={badge.id}
                     title={badge.name + ": " + badge.description}
                     style={{
-                      background: isEarned ? "var(--bg-page-alt)" : "var(--color-neutral-100)",
-                      borderRadius: "var(--radius-md)",
-                      aspectRatio: "1/1",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "1.5rem",
                       filter: isEarned ? "none" : "grayscale(100%) opacity(30%)",
-                      border: isEarned ? `1px solid ${badge.color}35` : "1px dashed var(--border-color)",
+                      aspectRatio: "1/1",
                     }}
                   >
-                    {badge.emoji}
+                    <BadgeIcon id={badge.id} color={badge.color} size={48} />
                   </div>
                 );
               })}

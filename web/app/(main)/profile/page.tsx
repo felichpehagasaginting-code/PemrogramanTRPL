@@ -4,6 +4,7 @@ import { useUserStore, BADGES } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
+import { AvatarIcon, BadgeIcon } from "@/components/ui";
 
 const AVATARS = [
   { id: "avatar_default", emoji: "🤖", label: "Robot" },
@@ -53,12 +54,11 @@ export default function ProfilePage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "3.2rem",
             boxShadow: "var(--shadow-md)",
             zIndex: 2,
           }}
         >
-          {currentAvatarInfo.emoji}
+          <AvatarIcon id={selectedAvatar} size={64} />
         </div>
       </div>
 
@@ -112,7 +112,6 @@ export default function ProfilePage() {
                   width: "48px",
                   height: "48px",
                   borderRadius: "50%",
-                  fontSize: "1.6rem",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -121,7 +120,7 @@ export default function ProfilePage() {
                 }}
                 title={av.label}
               >
-                {av.emoji}
+                <AvatarIcon id={av.id} size={32} />
               </button>
             ))}
           </div>
@@ -163,18 +162,15 @@ export default function ProfilePage() {
               >
                 <div
                   style={{
-                    fontSize: "2.25rem",
                     width: "50px",
                     height: "50px",
-                    borderRadius: "50%",
-                    background: isEarned ? `${badge.color}10` : "var(--color-neutral-150)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: isEarned ? `1px solid ${badge.color}30` : "none",
+                    flexShrink: 0,
                   }}
                 >
-                  {badge.emoji}
+                  <BadgeIcon id={badge.id} color={badge.color} size={48} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h4 style={{ fontSize: "0.875rem", fontWeight: 700, color: isEarned ? "var(--text-primary)" : "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

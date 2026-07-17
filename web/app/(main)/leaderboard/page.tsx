@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
+import { AvatarIcon } from "@/components/ui";
 
 export default function LeaderboardPage() {
   const { user, leaderboard, fetchLeaderboard } = useUserStore();
@@ -233,14 +234,14 @@ export default function LeaderboardPage() {
                       width: "36px",
                       height: "36px",
                       borderRadius: "50%",
-                      background: "var(--color-neutral-150)",
+                      background: "var(--bg-page-alt)",
+                      border: "1.5px solid var(--border-color)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: "var(--text-muted)",
                     }}
                   >
-                    <User size={18} />
+                    <AvatarIcon id={item.avatar} size={26} />
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "0.9375rem" }}>

@@ -112,7 +112,7 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Dosen Pemrograman Dasar berpesan: **Jangan melompat langsung ke coding jika tidak mengerti sistem operasi laptop sendiri!**
+                Instruktur Pemrograman Dasar berpesan: **Jangan melompat langsung ke coding jika tidak mengerti sistem operasi laptop sendiri!**
               </p>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "12px" }}>
                 Banyak maba gagal menjalankan kodenya hanya karena salah menaruh folder proyek, salah variabel path, atau extensi file yang tersembunyi.
@@ -370,31 +370,76 @@ export default function LearnModulePage() {
       title: "Logika & Algoritma",
       slides: [
         {
-          title: "Dasar Berpikir Logis",
+          title: "Apa itu Algoritma?",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Algoritma adalah deretan langkah logis terstruktur untuk memecahkan suatu masalah.
-                Komputer hanya melakukan apa yang diperintahkan, jadi langkah kita harus tepat.
+                <strong>Algoritma</strong> adalah deretan langkah logis terstruktur yang disusun secara sistematis untuk memecahkan suatu masalah. 
+                Komputer hanyalah alat yang patuh; ia hanya melakukan apa yang diperintahkan. Oleh karena itu, logika langkah kita harus tepat.
               </p>
               <div style={{ background: "var(--bg-page-alt)", padding: "16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "16px" }}>
-                <strong>Analogi Sederhana:</strong> Resep membuat mie instan adalah algoritma!
-                Jika langkah menuang air panas ditaruh setelah menyajikan mie kering di piring, mie tidak akan matang. Urutan itu penting!
+                <strong>Analogi Sederhana: Resep Mie Instan</strong>
+                <p style={{ color: "var(--text-secondary)", marginTop: "4px", fontSize: "0.875rem", margin: 0 }}>
+                  Resep mie instan adalah bentuk nyata algoritma. Jika langkah 'tuangkan bumbu' ditaruh sebelum 'rebus mie', rasa bumbu mungkin kurang meresap. 
+                  Jika langkah 'rebus air' ditaruh di akhir, mie tidak akan pernah matang. Urutan dan kejelasan langkah sangat menentukan hasil!
+                </p>
+              </div>
+              <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "6px", fontSize: "0.875rem" }}>
+                <li><strong>Terbatas (Finiteness)</strong>: Harus berhenti setelah menyelesaikan sejumlah langkah.</li>
+                <li><strong>Jelas (Definiteness)</strong>: Setiap instruksi harus bermakna tunggal (tidak ambigu).</li>
+                <li><strong>Input & Output</strong>: Menerima input data dan menghasilkan solusi (output).</li>
+              </ul>
+            </div>
+          ),
+        },
+        {
+          title: "Bagan Alir (Flowchart) Secara Visual",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                <strong>Flowchart</strong> adalah representasi grafis dari langkah-langkah logika dalam memecahkan masalah. 
+                Dengan flowchart, kita dapat dengan mudah membaca percabangan dan perulangan secara visual.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "10px", marginTop: "12px" }}>
+                {[
+                  { symbol: "Oval (Terminal)", desc: "Menandai titik awal (Start) dan akhir (End) dari suatu program." },
+                  { symbol: "Persegi Panjang (Process)", desc: "Menunjukkan aktivitas perhitungan matematika atau penugasan variabel." },
+                  { symbol: "Belah Ketupat (Decision)", desc: "Menunjukkan logika percabangan (syarat) dengan jalur keluar bercabang Ya/Tidak." },
+                  { symbol: "Jajar Genjang (Input/Output)", desc: "Digunakan untuk membaca data input dari keyboard atau mencetak hasil output ke layar." },
+                ].map((item, idx) => (
+                  <div key={idx} style={{ background: "var(--bg-page-alt)", padding: "10px var(--space-4)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                    <strong>{item.symbol}</strong>: <span style={{ color: "var(--text-secondary)" }}>{item.desc}</span>
+                  </div>
+                ))}
               </div>
             </div>
           ),
         },
         {
-          title: "Orientasi Coding Praktek",
+          title: "Menulis Logika dengan Pseudocode",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Sekarang saatnya kamu mencoba melatih logika coding pertama kamu menggunakan console editor di modul latihan berikutnya.
+                <strong>Pseudocode</strong> adalah cara menulis algoritma menggunakan deskripsi bahasa manusia terstruktur yang menyerupai bahasa pemrograman asli (tanpa sintaksis kaku).
               </p>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginTop: "10px" }}>
-                Mari kita beralih ke editor untuk mempraktekkan sintaksis Python paling dasar.
+              <div style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-color)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "12px" }}>
+                <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--color-primary-500)", textTransform: "uppercase" }}>
+                  Contoh Pseudocode: Menghitung Luas Persegi Panjang
+                </span>
+                <code style={{ display: "block", fontFamily: "var(--font-code)", fontSize: "0.875rem", color: "var(--text-primary)", marginTop: "8px", whiteSpace: "pre", lineHeight: 1.6 }}>
+                  START<br />
+                  &nbsp;&nbsp;BACA panjang<br />
+                  &nbsp;&nbsp;BACA lebar<br />
+                  &nbsp;&nbsp;HITUNG luas = panjang * lebar<br />
+                  &nbsp;&nbsp;TAMPILKAN luas<br />
+                  END
+                </code>
+              </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
+                Menulis pseudocode membantu programmer fokus pada jalan pikiran logika pemecahan masalah tanpa terganggu oleh detail error kompilasi kode.
               </p>
             </div>
           ),
@@ -405,47 +450,101 @@ export default function LearnModulePage() {
       title: "Variabel & Tipe Data",
       slides: [
         {
-          title: "Apa Itu Variabel?",
+          title: "Variabel: Loker Penyimpan Data",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Variabel adalah tempat penyimpanan data di memori komputer. Bayangkan variabel seperti 
-                kotak penyimpanan yang bisa kamu beri label dan diisi dengan nilai tertentu.
+                <strong>Variabel</strong> adalah wadah/tempat penyimpanan data di dalam memori komputer. 
+                Bayangkan variabel seperti loker di kampus yang kamu beri label nama dan diisi dengan data tertentu.
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "var(--bg-page-alt)", padding: "16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "16px" }}>
-                <span style={{ color: "#569CD6" }}>nama</span> <span style={{ color: "#D4D4D4" }}>= </span>
-                <span style={{ color: "#CE9178" }}>"Budi"</span>
-                <br />
-                <span style={{ color: "#569CD6" }}>umur</span> <span style={{ color: "#D4D4D4" }}>= </span>
-                <span style={{ color: "#B5CEA8" }}>18</span>
+                <span style={{ color: "#6A9955" }}># Pendeklarasian variabel di Python menggunakan '='</span><br />
+                nama = <span style={{ color: "#CE9178" }}>"Reza"</span><br />
+                umur = <span style={{ color: "#B5CEA8" }}>18</span><br />
+                ipk = <span style={{ color: "#B5CEA8" }}>3.85</span>
+              </div>
+              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "16px", fontSize: "0.85rem" }}>
+                <strong>Aturan Penamaan Variabel (Naming Convention):</strong>
+                <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li>Tidak boleh diawali oleh angka (contoh salah: <code style={{ color: "#EF4444" }}>1nama</code>).</li>
+                  <li>Tidak boleh menggunakan spasi (contoh salah: <code style={{ color: "#EF4444" }}>nama lengkap</code>).</li>
+                  <li>Sangat direkomendasikan menggunakan format <strong>snake_case</strong> di Python (huruf kecil semua dipisah underscore, contoh: <code style={{ color: "#22C55E" }}>nama_lengkap</code>).</li>
+                </ul>
               </div>
             </div>
           ),
         },
         {
-          title: "Tipe Data Dasar Python",
+          title: "Mengenal Tipe Data Dasar",
           type: "text",
           content: (
             <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "16px" }}>
-                Python memiliki beberapa tipe data dasar yang perlu kamu kenali:
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "12px" }}>
+                Di Python, variabel secara dinamis menentukan tipe datanya berdasarkan nilai yang diberikan. Empat tipe data dasar yang wajib dipahami:
               </p>
-              <div style={{ display: "grid", gap: "12px" }}>
+              <div style={{ display: "grid", gap: "10px" }}>
                 {[
-                  { type: "string (str)", contoh: '"Halo"', desc: "Teks atau karakter" },
-                  { type: "integer (int)", contoh: "42", desc: "Bilangan bulat" },
-                  { type: "float", contoh: "3.14", desc: "Bilangan desimal" },
-                  { type: "boolean (bool)", contoh: "True/False", desc: "Nilai kebenaran" },
+                  { type: "String (str)", contoh: '"Halo TRPL"', desc: "Teks alfabet, angka, atau simbol yang diapit tanda kutip." },
+                  { type: "Integer (int)", contoh: "26", desc: "Bilangan bulat positif, negatif, atau nol." },
+                  { type: "Float (float)", contoh: "3.14", desc: "Bilangan pecahan/desimal yang dipisahkan tanda titik." },
+                  { type: "Boolean (bool)", contoh: "True atau False", desc: "Menyatakan kondisi logika benar atau salah." },
                 ].map((t, i) => (
-                  <div key={i} style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.875rem" }}>
-                    <strong style={{ color: "var(--text-primary)" }}>{t.type}</strong>
-                    <span style={{ color: "var(--text-muted)", margin: "0 8px" }}>—</span>
-                    <code style={{ color: "#CE9178" }}>{t.contoh}</code>
-                    <div style={{ color: "var(--text-secondary)", marginTop: "4px" }}>{t.desc}</div>
+                  <div key={i} style={{ background: "var(--bg-page-alt)", padding: "10px var(--space-4)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.875rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+                      <span style={{ color: "var(--text-primary)" }}>{t.type}</span>
+                      <code style={{ color: "#CE9178" }}>{t.contoh}</code>
+                    </div>
+                    <div style={{ color: "var(--text-secondary)", marginTop: "4px", fontSize: "0.8rem" }}>{t.desc}</div>
                   </div>
                 ))}
               </div>
+            </div>
+          ),
+        },
+        {
+          title: "Operator Aritmatika di Python",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Python mendukung berbagai operator matematika standar untuk manipulasi angka:
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "12px", fontFamily: "var(--font-code)", fontSize: "0.825rem" }}>
+                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  Penjumlahan: <code style={{ color: "#CE9178" }}>+</code> (contoh: 5 + 3 = 8)<br />
+                  Pengurangan: <code style={{ color: "#CE9178" }}>-</code> (contoh: 5 - 3 = 2)<br />
+                  Perkalian: <code style={{ color: "#CE9178" }}>*</code> (contoh: 5 * 3 = 15)<br />
+                  Pembagian: <code style={{ color: "#CE9178" }}>/</code> (contoh: 5 / 2 = 2.5)
+                </div>
+                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  Bagi Bulat: <code style={{ color: "#CE9178" }}>//</code> (contoh: 5 // 2 = 2)<br />
+                  Sisa Bagi: <code style={{ color: "#CE9178" }}>%</code> (contoh: 5 % 2 = 1)<br />
+                  Perpangkatan: <code style={{ color: "#CE9178" }}>**</code> (contoh: 2 ** 3 = 8)
+                </div>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Operator Perbandingan & Logika",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Operator perbandingan digunakan untuk membandingkan dua nilai, menghasilkan tipe data Boolean (`True`/`False`):
+              </p>
+              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem", marginBottom: "12px" }}>
+                <code>==</code> (sama dengan), <code>!=</code> (tidak sama dengan), <code>&gt;</code> (lebih besar), <code>&lt;</code> (lebih kecil)
+              </div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Operator logika digunakan untuk menggabungkan kondisi:
+              </p>
+              <ul style={{ color: "var(--text-secondary)", fontSize: "0.85rem", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                <li><strong>and</strong>: Bernilai True hanya jika KEDUA kondisi bernilai True (contoh: `True and False` &rarr; `False`).</li>
+                <li><strong>or</strong>: Bernilai True jika SALAH SATU kondisi bernilai True (contoh: `True or False` &rarr; `True`).</li>
+                <li><strong>not</strong>: Membalikkan nilai boolean (contoh: `not True` &rarr; `False`).</li>
+              </ul>
             </div>
           ),
         },
@@ -455,24 +554,71 @@ export default function LearnModulePage() {
       title: "Percabangan",
       slides: [
         {
-          title: "If, Elif, Else",
+          title: "Logika Percabangan & Struktur if",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Percabangan memungkinkan program mengambil keputusan berdasarkan kondisi tertentu. 
-                Struktur dasarnya: <strong style={{ color: "var(--text-primary)" }}>if</strong>, 
-                <strong style={{ color: "var(--text-primary)" }}> elif</strong>, dan 
-                <strong style={{ color: "var(--text-primary)" }}> else</strong>.
+                <strong>Percabangan</strong> memungkinkan alur program bercabang ke jalur yang berbeda berdasarkan suatu kondisi bersyarat (bernilai boolean `True`/`False`).
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
-                <span style={{ color: "#569CD6" }}>nilai</span> = <span style={{ color: "#B5CEA8" }}>85</span>
-                <br />
-                <span style={{ color: "#C586C0" }}>if</span> nilai &gt;= <span style={{ color: "#B5CEA8" }}>75</span>:<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Lulus"</span>)<br />
-                <span style={{ color: "#C586C0" }}>else</span>:<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Remidi"</span>)
+                umur = <span style={{ color: "#B5CEA8" }}>18</span><br />
+                <span style={{ color: "#C586C0" }}>if</span> umur &gt;= <span style={{ color: "#B5CEA8" }}>17</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Sudah punya KTP"</span>)
               </div>
+              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "16px", fontSize: "0.85rem" }}>
+                <strong>⚠️ Aturan Emas Indentasi Python:</strong>
+                <p style={{ color: "var(--text-secondary)", marginTop: "4px", margin: 0 }}>
+                  Python tidak menggunakan kurung kurawal `{}` untuk menandai blok kode. Python mendeteksinya melalui <strong>indentasi</strong> (jarak spasi/tab masuk). 
+                  Seluruh kode di dalam perintah `if` wajib menjorok masuk ke dalam. Jika tidak, akan terjadi error <code style={{ color: "#EF4444" }}>IndentationError</code>.
+                </p>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Percabangan Dua Arah (if-else)",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Ketika kita ingin menjalankan tindakan alternatif apabila kondisi awal bernilai `False`, kita bisa menambahkan kata kunci `else`.
+              </p>
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
+                nilai = <span style={{ color: "#B5CEA8" }}>65</span><br />
+                <span style={{ color: "#C586C0" }}>if</span> nilai &gt;= <span style={{ color: "#B5CEA8" }}>75</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Selamat, Lulus!"</span>)<br />
+                <span style={{ color: "#C586C0" }}>else</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Silakan ikuti remedial."</span>)
+              </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
+                Sama seperti block `if`, block di dalam `else` juga memerlukan identasi spasi yang sejajar dan konsisten.
+              </p>
+            </div>
+          ),
+        },
+        {
+          title: "Percabangan Bertingkat: elif",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Bagaimana jika ada lebih dari dua kemungkinan kondisi? Kita bisa menggunakan struktur lengkap `if-elif-else`:
+              </p>
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px" }}>
+                nilai = <span style={{ color: "#B5CEA8" }}>80</span><br />
+                <span style={{ color: "#C586C0" }}>if</span> nilai &gt;= <span style={{ color: "#B5CEA8" }}>85</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Predikat: A"</span>)<br />
+                <span style={{ color: "#C586C0" }}>elif</span> nilai &gt;= <span style={{ color: "#B5CEA8" }}>75</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Predikat: B"</span>)<br />
+                <span style={{ color: "#C586C0" }}>else</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Predikat: C"</span>)
+              </div>
+              <ul style={{ color: "var(--text-secondary)", fontSize: "0.85rem", paddingLeft: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                <li><code>if</code> menguji kondisi pertama.</li>
+                <li><code>elif</code> (else-if) menguji kondisi berikutnya secara berurutan jika kondisi sebelumnya bernilai salah.</li>
+                <li><code>else</code> mengeksekusi blok kode terakhir jika semua kondisi di atas salah.</li>
+              </ul>
             </div>
           ),
         },
@@ -482,27 +628,71 @@ export default function LearnModulePage() {
       title: "Perulangan",
       slides: [
         {
-          title: "For Loop & While",
+          title: "Perulangan Terukur dengan for Loop",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Perulangan (loop) digunakan untuk mengulang blok kode beberapa kali. 
-                Python memiliki dua jenis perulangan: <strong style={{ color: "var(--text-primary)" }}>for</strong> dan 
-                <strong style={{ color: "var(--text-primary)" }}>while</strong>.
+                <strong>Perulangan (loop)</strong> digunakan untuk mengeksekusi blok kode secara berulang selama memenuhi kondisi tertentu, menghemat waktu dan baris kode.
               </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "16px" }}>
-                <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)" }}>
-                  <div style={{ color: "#9CA3AF", fontSize: "0.75rem", marginBottom: "8px" }}>FOR LOOP</div>
-                  <span style={{ color: "#C586C0" }}>for</span> i <span style={{ color: "#C586C0" }}>in</span> range(<span style={{ color: "#B5CEA8" }}>5</span>):<br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;print(i)
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
+                <span style={{ color: "#C586C0" }}>for</span> i <span style={{ color: "#C586C0" }}>in</span> range(<span style={{ color: "#B5CEA8" }}>1</span>, <span style={{ color: "#B5CEA8" }}>6</span>):<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>f"Perulangan ke-{'{i}'}"</span>)
+              </div>
+              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "16px", fontSize: "0.85rem" }}>
+                <strong>Fungsi `range(start, stop)`:</strong>
+                <p style={{ color: "var(--text-secondary)", marginTop: "4px", margin: 0 }}>
+                  Fungsi `range` menghasilkan deret angka. Perhatikan bahwa parameter `stop` bersifat eksklusif (tidak diikutkan). 
+                  Maka `range(1, 6)` akan menghasilkan deret angka `1, 2, 3, 4, 5`.
+                </p>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Perulangan Bersyarat dengan while Loop",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Jika `for` digunakan untuk perulangan yang jumlahnya sudah pasti, **`while`** loop digunakan untuk mengulang kode selama suatu syarat bernilai `True`.
+              </p>
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px" }}>
+                jumlah = <span style={{ color: "#B5CEA8" }}>0</span><br />
+                <span style={{ color: "#C586C0" }}>while</span> jumlah &lt; <span style={{ color: "#B5CEA8" }}>3</span>:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>"Belajar Coding"</span>)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;jumlah += <span style={{ color: "#B5CEA8" }}>1</span>
+              </div>
+              <div style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "14px", fontSize: "0.85rem" }}>
+                <strong>🚨 Waspada: Infinite Loop!</strong>
+                <p style={{ color: "var(--text-secondary)", marginTop: "4px", margin: 0 }}>
+                  Pastikan kondisi di dalam `while` akan bernilai `False` pada titik tertentu (misalnya dengan menaikkan nilai `jumlah += 1`). 
+                  Jika kondisi bernilai `True` selamanya, program akan berjalan tanpa henti dan dapat membuat browser/komputer hang.
+                </p>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Kontrol Perulangan: break & continue",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Kadang kita perlu memodifikasi alur jalannya perulangan di tengah jalan:
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "10px", marginTop: "12px" }}>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                  <strong>🔴 break:</strong> Berfungsi menghentikan paksa seluruh jalannya perulangan dan keluar dari block perulangan seketika. Contoh:
+                  <code style={{ display: "block", fontFamily: "var(--font-code)", color: "#CE9178", marginTop: "4px" }}>
+                    if i == 5: break
+                  </code>
                 </div>
-                <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)" }}>
-                  <div style={{ color: "#9CA3AF", fontSize: "0.75rem", marginBottom: "8px" }}>WHILE LOOP</div>
-                  i = <span style={{ color: "#B5CEA8" }}>0</span><br />
-                  <span style={{ color: "#C586C0" }}>while</span> i &lt; <span style={{ color: "#B5CEA8" }}>5</span>:<br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;print(i)<br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;i += <span style={{ color: "#B5CEA8" }}>1</span>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                  <strong>🔵 continue:</strong> Berfungsi menghentikan iterasi saat ini saja, melompati sisa baris kode di bawahnya, and langsung melompat ke iterasi berikutnya. Contoh:
+                  <code style={{ display: "block", fontFamily: "var(--font-code)", color: "#CE9178", marginTop: "4px" }}>
+                    if i % 2 == 0: continue # Skip angka genap
+                  </code>
                 </div>
               </div>
             </div>
@@ -514,22 +704,71 @@ export default function LearnModulePage() {
       title: "Fungsi & Prosedur",
       slides: [
         {
-          title: "Membuat Fungsi dengan def",
+          title: "Fungsi: Blok Kode Modular",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Fungsi adalah blok kode yang bisa dipanggil berulang kali. Gunakan kata kunci 
-                <strong style={{ color: "var(--text-primary)" }}> def</strong> untuk mendefinisikan fungsi.
+                <strong>Fungsi</strong> adalah sekumpulan instruksi terisolasi yang diberi nama, dirancang untuk melakukan tugas spesifik secara berulang.
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
-                <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>sapa</span>(nama):<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#C586C0" }}>return</span> <span style={{ color: "#CE9178" }}>f"Halo, {'{nama}'}!"</span><br />
+                <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>sapa_maba</span>(nama):<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>f"Halo, {'{nama}'}! Selamat datang di TRPL!"</span>)<br />
                 <br />
-                print(sapa(<span style={{ color: "#CE9178" }}>"Budi"</span>))
+                <span style={{ color: "#6A9955" }}># Memanggil fungsi</span><br />
+                sapa_maba(<span style={{ color: "#CE9178" }}>"Adit"</span>)
               </div>
-              <div style={{ background: "rgba(255,107,0,0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "16px", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                <strong>💡 Tips:</strong> Fungsi membantu kamu menulis kode yang lebih rapi dan tidak mengulang-ulang kode yang sama (DRY Principle).
+              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "16px", fontSize: "0.85rem" }}>
+                <strong>Istilah Penting:</strong>
+                <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", marginTop: "4px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li><strong>def</strong>: Kata kunci wajib untuk mendefinisikan fungsi di Python.</li>
+                  <li><strong>Parameter</strong>: Variabel penampung input di tanda kurung fungsi (contoh: `nama`).</li>
+                  <li><strong>Argumen</strong>: Nilai aktual yang dilewatkan ke fungsi saat dipanggil (contoh: `"Adit"`).</li>
+                </ul>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Pengembalian Nilai (Return Value) & DRY",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Ada perbedaan besar antara fungsi yang hanya mencetak nilai (`print`) dengan fungsi yang mengembalikan nilai menggunakan kata kunci **`return`**:
+              </p>
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px" }}>
+                <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>tambah</span>(a, b):<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#C586C0" }}>return</span> a + b<br />
+                <br />
+                hasil = tambah(<span style={{ color: "#B5CEA8" }}>10</span>, <span style={{ color: "#B5CEA8" }}>5</span>)<br />
+                print(hasil) <span style={{ color: "#6A9955" }}># Output: 15</span>
+              </div>
+              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "14px", fontSize: "0.85rem" }}>
+                <strong>💡 Prinsip DRY (Don't Repeat Yourself):</strong>
+                <p style={{ color: "var(--text-secondary)", marginTop: "4px", margin: 0 }}>
+                  Jangan mengulang baris kode yang sama di berbagai tempat. Jika ada logika perhitungan atau format data yang terus berulang, 
+                  bungkus logika tersebut ke dalam sebuah fungsi agar kode kamu rapi, modular, dan mudah di-maintain.
+                </p>
+              </div>
+            </div>
+          ),
+        },
+        {
+          title: "Scope Variabel: Scope Lokal vs Scope Global",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Variabel memiliki batas wilayah di mana ia dapat dibaca atau dimodifikasi:
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "10px", marginTop: "12px" }}>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                  <strong>🔒 Variabel Lokal:</strong> Variabel yang dideklarasikan di dalam suatu fungsi. Variabel ini hanya hidup dan dikenali di dalam fungsi tersebut, serta tidak bisa diakses dari luar fungsi.
+                </div>
+                <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                  <strong>🌐 Variabel Global:</strong> Variabel yang dideklarasikan di luar fungsi mana pun. Variabel ini dapat dibaca oleh fungsi lain di seluruh dokumen kode tersebut.
+                </div>
               </div>
             </div>
           ),
@@ -540,28 +779,64 @@ export default function LearnModulePage() {
       title: "Array & List",
       slides: [
         {
-          title: "List di Python",
+          title: "Struktur Data List di Python",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                List adalah struktur data yang bisa menyimpan banyak nilai dalam satu variabel. 
-                List menggunakan kurung siku <strong style={{ color: "var(--text-primary)" }}>[]</strong>.
+                Bagaimana jika kita ingin menyimpan data berkelompok seperti daftar nilai mahasiswa? Kita bisa menggunakan <strong>List</strong> (struktur data mirip Array).
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
-                buah = [<span style={{ color: "#CE9178" }}>"apel"</span>, <span style={{ color: "#CE9178" }}>"mangga"</span>, <span style={{ color: "#CE9178" }}>"pisang"</span>]<br />
-                print(buah[<span style={{ color: "#B5CEA8" }}>0</span>]) <span style={{ color: "#6A9955" }}># apel</span><br />
-                print(len(buah)) <span style={{ color: "#6A9955" }}># 3</span><br />
-                buah.append(<span style={{ color: "#CE9178" }}>"anggur"</span>)
+                nilai_ujian = [<span style={{ color: "#B5CEA8" }}>80</span>, <span style={{ color: "#B5CEA8" }}>75</span>, <span style={{ color: "#B5CEA8" }}>90</span>]<br />
+                <span style={{ color: "#6A9955" }}># Indeks elemen dimulai dari 0</span><br />
+                print(nilai_ujian[<span style={{ color: "#B5CEA8" }}>0</span>]) <span style={{ color: "#6A9955" }}># Output: 80</span><br />
+                print(nilai_ujian[-<span style={{ color: "#B5CEA8" }}>1</span>]) <span style={{ color: "#6A9955" }}># Indeks negatif, output: 90 (terakhir)</span>
               </div>
-              <div style={{ marginTop: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "0.85rem" }}>
-                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  <strong>Indexing:</strong> dimulai dari 0
-                </div>
-                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  <strong>Slicing:</strong> list[1:3]
-                </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
+                List di Python sangat fleksibel: dapat memuat tipe data yang berbeda, ukurannya dinamis, dan kodenya mudah dibaca.
+              </p>
+            </div>
+          ),
+        },
+        {
+          title: "Operasi Element List Bawaan",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "12px" }}>
+                Berikut adalah beberapa operasi bawaan Python yang paling sering digunakan untuk mengolah data di dalam list:
+              </p>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {[
+                  { op: "nilai.append(95)", desc: "Menambahkan elemen baru '95' ke bagian paling akhir dari list." },
+                  { op: "nilai.remove(75)", desc: "Mencari dan menghapus elemen pertama bernilai '75' dari list." },
+                  { op: "len(nilai)", desc: "Fungsi bawaan untuk mengembalikan jumlah total elemen di dalam list." },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: "var(--bg-page-alt)", padding: "10px var(--space-4)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.875rem" }}>
+                    <code style={{ color: "#CE9178", fontWeight: 700 }}>{item.op}</code>
+                    <div style={{ color: "var(--text-secondary)", marginTop: "4px", fontSize: "0.8rem" }}>{item.desc}</div>
+                  </div>
+                ))}
               </div>
+            </div>
+          ),
+        },
+        {
+          title: "Slicing (Pemotongan) List",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Python menyediakan cara mudah memotong list dan mengambil sub-koleksi menggunakan format indeks <code>list[start:stop]</code>:
+              </p>
+              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
+                abjad = [<span style={{ color: "#CE9178" }}>"A"</span>, <span style={{ color: "#CE9178" }}>"B"</span>, <span style={{ color: "#CE9178" }}>"C"</span>, <span style={{ color: "#CE9178" }}>"D"</span>]<br />
+                sub_abjad = abjad[<span style={{ color: "#B5CEA8" }}>1</span>:<span style={{ color: "#B5CEA8" }}>3</span>]<br />
+                print(sub_abjad) <span style={{ color: "#6A9955" }}># Output: ['B', 'C']</span>
+              </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
+                Ingat bahwa angka batas <code>stop</code> bersifat eksklusif, artinya data pada indeks batas stop tidak akan diikutsertakan ke dalam hasil pemotongan.
+              </p>
             </div>
           ),
         },
@@ -571,26 +846,37 @@ export default function LearnModulePage() {
       title: "Mini Project",
       slides: [
         {
-          title: "Project Akhir Matrikulasi",
+          title: "Latihan Integratif Akhir",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Selamat! Kamu sudah sampai di modul terakhir matrikulasi. 
-                Sekarang saatnya membuat project akhir: <strong style={{ color: "var(--text-primary)" }}>Program Kalkulator Sederhana</strong>.
+                Selamat! Kamu telah membaca seluruh konsep dasar pemrograman. Sekarang saatnya menguji pemahaman kamu secara integratif dengan menyelesaikan **Mini Project: Kalkulator Sederhana**.
               </p>
               <div style={{ background: "var(--bg-card)", border: "2px solid var(--color-primary-400)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "16px" }}>
-                <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>📋 Spesifikasi Project:</h4>
+                <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>📋 Spesifikasi Proyek Kalkulator:</h4>
                 <ul style={{ color: "var(--text-secondary)", fontSize: "0.875rem", display: "flex", flexDirection: "column", gap: "6px", paddingLeft: "20px" }}>
-                  <li>Menerima input 2 angka dari user</li>
-                  <li>Menyediakan operasi: tambah, kurang, kali, bagi</li>
-                  <li>Menampilkan hasil perhitungan</li>
-                  <li>Menggunakan fungsi untuk setiap operasi</li>
+                  <li>Meminta input angka pertama dari user.</li>
+                  <li>Meminta input angka kedua dari user.</li>
+                  <li>Mencetak hasil penjumlahan kedua angka tersebut ke konsol output.</li>
                 </ul>
               </div>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginTop: "16px" }}>
-                Klik tombol "Lanjut ke Coding" untuk mulai mengerjakan project di editor interaktif!
+            </div>
+          ),
+        },
+        {
+          title: "Tips Debugging & Alur Kerja",
+          type: "text",
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Sebelum mulai menulis kode di editor praktek, perhatikan tips berikut agar proses pengerjaan berjalan mulus:
               </p>
+              <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
+                <li>💡 <strong>Rancang logika</strong>: Tuliskan pseudocode sederhana terlebih dahulu di kertas atau komentar kode.</li>
+                <li>🛠️ <strong>Ketik bertahap</strong>: Tulis variabel input terlebih dahulu, jalankan kode untuk memastikan tidak ada error sintaksis.</li>
+                <li>🎯 <strong>Jalankan sebelum kirim</strong>: Klik tombol <em>Jalankan Kode</em> untuk memvalidasi output sebelum mengeklik tombol <em>Kirim Jawaban</em>.</li>
+              </ul>
             </div>
           ),
         },
@@ -623,10 +909,8 @@ export default function LearnModulePage() {
     if (currentSlideIndex < slides.length - 1) {
       setCurrentSlideIndex(currentSlideIndex + 1);
     } else {
-      // Complete the module slides
-      completeModule(moduleId as string);
-      // If it is M0, direct to quiz
-      if (moduleId === "M0") {
+      // Go to quiz or practice depending on module
+      if (moduleId === "M0" || moduleId === "M1") {
         router.push(`/learn/${moduleId}/quiz`);
       } else {
         // Go to coding practice
@@ -776,7 +1060,7 @@ export default function LearnModulePage() {
           >
             <span className="nav-btn-text">
               {isLastSlide ? (
-                moduleId === "M0" ? "Mulai Pre-Test" : "Lanjut ke Coding"
+                (moduleId === "M0" || moduleId === "M1") ? "Mulai Kuis" : "Lanjut ke Latihan"
               ) : (
                 "Lanjut"
               )}
