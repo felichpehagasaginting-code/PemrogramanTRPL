@@ -23,6 +23,9 @@ import {
   Folder,
   Terminal,
   Warning,
+  EggCrack,
+  Laptop,
+  Sword,
 } from "@phosphor-icons/react";
 import { Button, BadgeIcon } from "@/components/ui";
 
@@ -931,12 +934,12 @@ export function CurriculumSection() {
    ==================================================== */
 export function GamificationSection() {
   const levels = [
-    { name: "Script Kiddie", range: "0–99 XP", icon: "🐣", active: false },
-    { name: "Code Padawan", range: "100–249 XP", icon: "⚡", active: false },
-    { name: "Developer Muda", range: "250–499 XP", icon: "💻", active: true },
-    { name: "Code Warrior", range: "500–799 XP", icon: "⚔️", active: false },
-    { name: "Algorithm Master", range: "800–1099 XP", icon: "🧠", active: false },
-    { name: "TRPL Legend", range: "1100+ XP", icon: "🏆", active: false },
+    { name: "Script Kiddie", range: "0–99 XP", icon: <EggCrack size={22} weight="fill" color="#FF9D00" />, active: false },
+    { name: "Code Padawan", range: "100–249 XP", icon: <Lightning size={22} weight="fill" color="#FF8C42" />, active: false },
+    { name: "Developer Muda", range: "250–499 XP", icon: <Laptop size={22} weight="fill" color="#06B6D4" />, active: true },
+    { name: "Code Warrior", range: "500–799 XP", icon: <Sword size={22} weight="fill" color="#EF4444" />, active: false },
+    { name: "Algorithm Master", range: "800–1099 XP", icon: <Brain size={22} weight="fill" color="#D45900" />, active: false },
+    { name: "TRPL Legend", range: "1100+ XP", icon: <Trophy size={22} weight="fill" color="#FF6B00" />, active: false },
   ];
 
   const badges = [
@@ -1015,7 +1018,7 @@ export function GamificationSection() {
                     boxShadow: lv.active ? "var(--shadow-card)" : "none",
                   }}
                 >
-                  <span style={{ fontSize: "1.25rem" }}>{lv.icon}</span>
+                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "24px", height: "24px", flexShrink: 0 }}>{lv.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: lv.active ? "var(--color-primary-600)" : "var(--text-primary)", fontSize: "0.9rem" }}>
                       {lv.name}
