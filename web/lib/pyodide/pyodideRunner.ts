@@ -69,32 +69,20 @@ export async function runPythonCodeClient(
   try {
     const pyodide = await getPyodide();
 
+    // Default mock inputs if non provided (e.g. 5, 10 for interactive calculation)
+    const effectiveInputs = inputs.length > 0 ? inputs : ["5", "10", "15", "20"];
+
     // Setup stdout and stderr capture
     const setupPyCode = `
 import sys
 import io
-
-class OutputCapture(io.StringIO):
-    def __init__(self):
-        super().__init__()
-        self.output_lines = []
-    
-    def write(self, string):
-        super().write(string)
-        if string:
-            lines = string.split('\\n')
-            if len(self.output_lines) > 0 and not self.output_lines[-1].endswith('\\n'):
-                self.output_lines[-1] += lines[0]
-                self.output_lines.extend(lines[1:])
-            else:
-                self.output_lines.extend(lines)
 
 _captured_stdout = io.StringIO()
 _captured_stderr = io.StringIO()
 sys.stdout = _captured_stdout
 sys.stderr = _captured_stderr
 
-_mock_inputs = ${JSON.stringify(inputs)};
+_mock_inputs = ${JSON.stringify(effectiveInputs)};
 _input_idx = 0
 
 def input(prompt=""):
@@ -106,7 +94,7 @@ def input(prompt=""):
         _input_idx += 1
         print(val)
         return val
-    return ""
+    return "5"
 `;
 
     await pyodide.runPythonAsync(setupPyCode);
