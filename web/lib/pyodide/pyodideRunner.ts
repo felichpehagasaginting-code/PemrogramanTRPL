@@ -69,32 +69,41 @@ export async function runPythonCodeClient(
   try {
     const pyodide = await getPyodide();
 
-    // Default mock inputs if non provided (e.g. 5, 10 for interactive calculation)
-    const effectiveInputs = inputs.length > 0 ? inputs : ["5", "10", "15", "20"];
-
-    // Setup stdout and stderr capture
+    // Setup stdout and stderr capture with interactive JS input prompt fallback
     const setupPyCode = `
 import sys
 import io
+import js
 
 _captured_stdout = io.StringIO()
 _captured_stderr = io.StringIO()
 sys.stdout = _captured_stdout
 sys.stderr = _captured_stderr
 
-_mock_inputs = ${JSON.stringify(effectiveInputs)};
+_mock_inputs = ${JSON.stringify(inputs)};
 _input_idx = 0
 
-def input(prompt=""):
+def input(prompt_text=""):
     global _input_idx
-    if prompt:
-        print(prompt, end="")
+    prompt_str = str(prompt_text)
+    if prompt_str:
+        print(prompt_str, end="")
+    
     if _input_idx < len(_mock_inputs):
         val = str(_mock_inputs[_input_idx])
         _input_idx += 1
         print(val)
         return val
-    return "5"
+    
+    # Interactive browser prompt (Scanner-style interactive input)
+    try:
+        user_val = js.prompt(prompt_str or "Masukkan nilai input:")
+        if user_val is None:
+            user_val = "0"
+        print(user_val)
+        return user_val
+    except Exception:
+        return "0"
 `;
 
     await pyodide.runPythonAsync(setupPyCode);
