@@ -12,6 +12,8 @@ import {
   PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft,
 } from "@phosphor-icons/react";
 
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+
 const MODULE_LABELS: Record<string, string> = {
   M0: "Pre-Test", M1: "Workspace", M2: "Logika",
   M3: "Variabel", M4: "Percabangan", M5: "Perulangan",
@@ -34,6 +36,7 @@ export default function AdminPage() {
   const deleteUser = useUserStore((s) => s.deleteUser);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"users" | "analytics">("users");
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [awardModal, setAwardModal] = useState<string | null>(null);
   const [awardAmount, setAwardAmount] = useState(50);
@@ -207,7 +210,51 @@ export default function AdminPage() {
       </header>
 
       <div className="section-container" style={{ paddingTop: "var(--space-4)" }}>
-        {/* Header */}
+        {/* Navigation Mode Tabs */}
+        <div style={{ display: "flex", gap: "12px", borderBottom: "1px solid var(--border-color)", marginBottom: "var(--space-6)" }}>
+          <button
+            onClick={() => setViewMode("users")}
+            style={{
+              padding: "10px 20px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "users" ? "3px solid var(--primary-color)" : "none",
+              color: viewMode === "users" ? "var(--primary-color)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <Users size={18} /> Manajemen Mahasiswa
+          </button>
+          <button
+            onClick={() => setViewMode("analytics")}
+            style={{
+              padding: "10px 20px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "analytics" ? "3px solid var(--primary-color)" : "none",
+              color: viewMode === "analytics" ? "var(--primary-color)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <ChartBar size={18} /> Analytics & Laporan Dosen
+          </button>
+        </div>
+
+        {viewMode === "analytics" ? (
+          <AnalyticsDashboard users={allUsers} />
+        ) : (
+          <>
+            {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "var(--space-6)" }}>
           <div>
             <span className="badge badge-primary"><ShieldCheck size={12} weight="fill" /> MONITORING</span>
@@ -539,6 +586,8 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

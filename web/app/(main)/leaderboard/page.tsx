@@ -7,6 +7,7 @@ import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
 import { AvatarIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { LEADERBOARD_FEATURES } from "@/lib/features";
+import { soundFX } from "@/lib/audio";
 
 export default function LeaderboardPage() {
   const { user, leaderboard, fetchLeaderboard } = useUserStore();

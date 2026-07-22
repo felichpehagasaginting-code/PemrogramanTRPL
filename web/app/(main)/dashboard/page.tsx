@@ -9,6 +9,8 @@ import { BadgeIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PointingPopup } from "@/components/ui/PointingPopup";
 import { DASHBOARD_FEATURES, POINTING_FEATURES } from "@/lib/features";
+import { SkillTree } from "@/components/learning/SkillTree";
+import { DailyStreakWidget } from "@/components/dashboard/DailyStreakWidget";
 
 const moduleIconMap: Record<string, React.ReactNode> = {
   M0: <Lightning size={22} weight="fill" />, M1: <Lightning size={22} weight="fill" />,
@@ -154,6 +156,11 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Interactive 3D/SVG Skill Tree */}
+          <div style={{ marginBottom: "var(--space-8)" }}>
+            <SkillTree progress={user.progress} />
+          </div>
+
           {/* Module list heading */}
           <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "var(--space-4)" }}>
             Daftar Modul Matrikulasi
@@ -252,6 +259,11 @@ export default function DashboardPage() {
 
         {/* Right Sidebar: Leaderboard, Stats, & Badges */}
         <div>
+          {/* Daily Streak & Meme Widget */}
+          <div style={{ marginBottom: "var(--space-6)" }}>
+            <DailyStreakWidget streak={user.streak || 1} />
+          </div>
+
           {/* Stats card */}
           <div
             style={{

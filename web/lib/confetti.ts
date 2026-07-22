@@ -1,7 +1,7 @@
 const isLowEndDevice = () =>
   typeof navigator !== "undefined" &&
-  ((navigator as any).deviceMemory && (navigator as any).deviceMemory < 4) ||
-  (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 6);
+  (((navigator as any).deviceMemory && (navigator as any).deviceMemory < 4) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 6));
 
 const THROTTLE_MS = isLowEndDevice() ? 66 : 16; // ~15fps on low-end, ~60fps on high-end
 
@@ -15,6 +15,8 @@ export async function fireConfetti(options?: Record<string, unknown>) {
   const confetti = (await import("canvas-confetti")).default;
   confetti(options || { particleCount: 80, spread: 60, origin: { y: 0.6 } });
 }
+
+export const triggerConfetti = fireConfetti;
 
 export async function fireConfettiBurst(duration = 2000) {
   const now = Date.now();

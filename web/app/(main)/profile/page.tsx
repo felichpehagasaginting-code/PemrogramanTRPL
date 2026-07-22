@@ -7,6 +7,7 @@ import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosp
 import { AvatarIcon, BadgeIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PROFILE_FEATURES } from "@/lib/features";
+import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
 
 const AVATARS = [
   { id: "avatar_default", emoji: "🤖", label: "Robot" },
@@ -20,6 +21,7 @@ const AVATARS = [
 export default function ProfilePage() {
   const { user, updateAvatar } = useUserStore();
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || "avatar_default");
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
 
   if (!user) return null;
 
@@ -86,7 +88,19 @@ export default function ProfilePage() {
             <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: "4px" }}>
               {user.email}
             </p>
+            <button
+              onClick={() => setIsCustomizerOpen(true)}
+              className="btn btn-sm btn-primary"
+              style={{ marginTop: "10px" }}
+            >
+              🎨 Kustomisasi Avatar Hero
+            </button>
           </div>
+
+          <AvatarCustomizer
+            isOpen={isCustomizerOpen}
+            onClose={() => setIsCustomizerOpen(false)}
+          />
 
           <div style={{ textAlign: "right" }}>
             <span className="badge badge-primary">
