@@ -4,7 +4,18 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { UserProgress } from "@/lib/store/useUserStore";
-import { CheckCircle, LockKey, Lightning, Sparkle, Rocket } from "@phosphor-icons/react";
+import {
+  LockKey,
+  EggCrack,
+  Folder,
+  Brain,
+  Package,
+  GitFork,
+  ArrowsClockwise,
+  MagicWand,
+  ListBullets,
+  Trophy,
+} from "@phosphor-icons/react";
 import { soundFX } from "@/lib/audio";
 
 interface SkillTreeProps {
@@ -17,19 +28,19 @@ interface NodeMeta {
   x: number; // percentage
   y: number; // px
   xp: number;
-  icon: string;
+  icon: React.ReactNode;
 }
 
 const NODES: NodeMeta[] = [
-  { id: "M0", title: "Pre-Test & Orientasi", x: 50, y: 30, xp: 50, icon: "🐣" },
-  { id: "M1", title: "Dasar Komputer & Workspace", x: 25, y: 120, xp: 100, icon: "📁" },
-  { id: "M2", title: "Logika & Algoritma", x: 75, y: 120, xp: 100, icon: "🧠" },
-  { id: "M3", title: "Variabel & Tipe Data", x: 50, y: 210, xp: 120, icon: "📦" },
-  { id: "M4", title: "Percabangan Logic", x: 20, y: 300, xp: 150, icon: "🔀" },
-  { id: "M5", title: "Perulangan (Loop)", x: 80, y: 300, xp: 150, icon: "🔄" },
-  { id: "M6", title: "Fungsi & Prosedur", x: 35, y: 390, xp: 180, icon: "🪄" },
-  { id: "M7", title: "Array & List Data", x: 65, y: 390, xp: 200, icon: "📊" },
-  { id: "M8", title: "Mini Project Akhir", x: 50, y: 480, xp: 300, icon: "🏆" },
+  { id: "M0", title: "Pre-Test & Orientasi", x: 50, y: 30, xp: 50, icon: <EggCrack size={26} weight="duotone" /> },
+  { id: "M1", title: "Dasar Komputer & Workspace", x: 25, y: 120, xp: 100, icon: <Folder size={26} weight="duotone" /> },
+  { id: "M2", title: "Logika & Algoritma", x: 75, y: 120, xp: 100, icon: <Brain size={26} weight="duotone" /> },
+  { id: "M3", title: "Variabel & Tipe Data", x: 50, y: 210, xp: 120, icon: <Package size={26} weight="duotone" /> },
+  { id: "M4", title: "Percabangan Logic", x: 20, y: 300, xp: 150, icon: <GitFork size={26} weight="duotone" /> },
+  { id: "M5", title: "Perulangan (Loop)", x: 80, y: 300, xp: 150, icon: <ArrowsClockwise size={26} weight="duotone" /> },
+  { id: "M6", title: "Fungsi & Prosedur", x: 35, y: 390, xp: 180, icon: <MagicWand size={26} weight="duotone" /> },
+  { id: "M7", title: "Array & List Data", x: 65, y: 390, xp: 200, icon: <ListBullets size={26} weight="duotone" /> },
+  { id: "M8", title: "Mini Project Akhir", x: 50, y: 480, xp: 300, icon: <Trophy size={26} weight="duotone" /> },
 ];
 
 const CONNECTIONS = [
@@ -205,7 +216,7 @@ export function SkillTree({ progress }: SkillTreeProps) {
                       cursor: "pointer",
                     }}
                   >
-                    <span style={{ fontSize: "1.25rem" }}>{node.icon}</span>
+                    {node.icon}
                   </div>
                 </Link>
               )}
