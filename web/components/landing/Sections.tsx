@@ -26,6 +26,8 @@ import { MODULES_META } from "@/lib/content/modules-data";
 import { BADGES } from "@/lib/store/useUserStore";
 import { getRandomMemes } from "@/lib/content/memes";
 import { ColorSwitcher } from "./ColorSwitcher";
+import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
+import { ModulePreviewModal } from "./ModulePreviewModal";
 
 /* ============================================================
    VARIANTS + SCROLL UTILITIES
@@ -55,34 +57,17 @@ function HeroSandbox() {
   const pathOk = spath === "D:\\TRPL\\Proyek";
   const allOk = nameOk && pathOk;
 
-  const run = () => {
+  const run = async () => {
     setRunning(true);
-    setOut(["Running python main.py..."]);
-    setTimeout(() => {
-      try {
-        const lines = code.split("\n");
-        const v: Record<string, any> = {};
-        const logs: string[] = [];
-        for (const line of lines) {
-          const l = line.trim();
-          if (!l || l.startsWith("#")) continue;
-          if (l.includes("=") && !l.includes("==") && !l.startsWith("print")) {
-            const i = l.indexOf("="); const n = l.slice(0, i).trim(); const vs = l.slice(i + 1).trim();
-            if ((vs.startsWith('"') && vs.endsWith('"')) || (vs.startsWith("'") && vs.endsWith("'"))) v[n] = vs.slice(1, -1);
-            else { try { let t = vs; Object.keys(v).forEach(k => { t = t.replace(new RegExp(`\\b${k}\\b`, "g"), v[k]); }); v[n] = (Function as any)(`return (${t})`)(); } catch { v[n] = NaN; } }
-            continue;
-          }
-          if (l.startsWith("print(") && l.endsWith(")")) {
-            const inner = l.slice(6, -1).trim(); let e = inner;
-            Object.keys(v).forEach(k => { const val = typeof v[k] === "string" ? `"${v[k]}"` : v[k]; e = e.replace(new RegExp(`\\b${k}\\b`, "g"), val); });
-            try { logs.push(String((Function as any)(`return (${e})`)())); } catch { logs.push(`SyntaxError: '${inner}'`); }
-          }
-        }
-        if (!logs.length) logs.push("(done, no output)");
-        setOut(logs);
-      } catch { setOut(["SyntaxError: failed to execute"]); }
-      finally { setRunning(false); }
-    }, 600);
+    setOut(["⚡ Executing Python code via WebAssembly (Pyodide)..."]);
+    try {
+      const res = await runPythonCodeClient(code);
+      setOut(res.output);
+    } catch {
+      setOut(["SyntaxError: Gagal menjalankan kode"]);
+    } finally {
+      setRunning(false);
+    }
   };
 
   const selectPath = (p: string) => {
@@ -501,6 +486,8 @@ export function FeaturesSection() {
    CURRICULUM — Module grid + stats
    ============================================================ */
 export function CurriculumSection() {
+  const [previewModuleId, setPreviewModuleId] = useState<string | null>(null);
+
   const mods = MODULES_META.map((m, i) => ({
     ...m, num: parseInt(m.code.replace("M", "")),
     desc: m.id === "M0" ? "Kenalan sama platform dan test kemampuan awal" :
@@ -531,6 +518,11 @@ export function CurriculumSection() {
       viewport={{ once: false }}
       style={{ padding: "var(--space-20) 0", background: "var(--bg-page-alt)", position: "relative", overflow: "hidden" }}
     >
+      <ModulePreviewModal
+        moduleId={previewModuleId}
+        onClose={() => setPreviewModuleId(null)}
+      />
+
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.025 }} />
 
       <div className="float-text" style={{ position: "absolute", bottom: "6%", right: "5%", fontSize: "1rem", fontWeight: 700, color: "var(--color-primary-500)", opacity: 0.06, fontFamily: "var(--font-code)", lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>MODULES = 9</div>
@@ -548,7 +540,7 @@ export function CurriculumSection() {
             Dari nol hingga <span className="gradient-text">bikin program sendiri</span>
           </h2>
           <p style={{ color: "var(--text-muted)", maxWidth: "480px", margin: "var(--space-3) auto 0", fontSize: "0.9rem", lineHeight: 1.6 }}>
-            {MODULES_META.length} modul &middot; ~{totalHours.toFixed(1)} jam &middot; {totalXP} XP tersedia
+            {MODULES_META.length} modul &middot; ~{totalHours.toFixed(1)} jam &middot; {totalXP} XP tersedia (Klik modul untuk preview!)
           </p>
         </motion.div>
 
@@ -559,8 +551,9 @@ export function CurriculumSection() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
+              onClick={() => setPreviewModuleId(m.id)}
               transition={{ duration: 0.35, delay: i * 0.04 }}
-              style={{ display: "flex", gap: "var(--space-5)", padding: "var(--space-4) 0", borderBottom: i < mods.length - 1 ? "1px solid var(--border-color)" : "none" }}
+              style={{ display: "flex", gap: "var(--space-5)", padding: "var(--space-4) 0", borderBottom: i < mods.length - 1 ? "1px solid var(--border-color)" : "none", cursor: "pointer" }}
             >
               <div style={{ width: "48px", flexShrink: 0, paddingTop: "2px" }}>
                 <div style={{ fontFamily: "var(--font-code)", fontSize: "1.15rem", fontWeight: 700, color: m.color, lineHeight: 1 }}>{String(m.num).padStart(2, "0")}</div>
