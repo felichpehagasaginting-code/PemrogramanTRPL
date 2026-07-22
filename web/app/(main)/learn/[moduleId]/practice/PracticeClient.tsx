@@ -202,6 +202,12 @@ export default function PracticeClient() {
   const [aiHint, setAiHint] = useState<string | null>(null);
   const editorRef = useRef(null);
 
+  // Interactive Terminal Input States
+  const [interactivePrompts, setInteractivePrompts] = useState<string[]>([]);
+  const [promptIndex, setPromptIndex] = useState<number | null>(null);
+  const [collectedInputs, setCollectedInputs] = useState<string[]>([]);
+  const [currentInputValue, setCurrentInputValue] = useState("");
+
   const content = PRACTICE_CONTENT[moduleId as string];
 
   useEffect(() => {
@@ -223,10 +229,36 @@ export default function PracticeClient() {
     );
   }
 
+  function extractPrompts(codeStr: string): string[] {
+    const results: string[] = [];
+    const regex = /input\s*\(\s*(?:["'](.*?)["'])?\s*\)/g;
+    let match;
+    while ((match = regex.exec(codeStr)) !== null) {
+      results.push(match[1] || "Masukkan nilai input:");
+    }
+    return results;
+  }
+
   const runCode = async () => {
-    setIsRunning(true);
-    setOutput(["⚡ Menjalankan kode via Python WASM..."]);
     setExplainedError(null);
+    setActiveTab("terminal");
+
+    const prompts = extractPrompts(code);
+    if (prompts.length > 0) {
+      setInteractivePrompts(prompts);
+      setPromptIndex(0);
+      setCollectedInputs([]);
+      setCurrentInputValue("");
+      setOutput([
+        "⚡ Program interaktif dimulai...",
+        `👉 Masukkan input ke-1 dari ${prompts.length}: ${prompts[0]}`,
+      ]);
+      return;
+    }
+
+    setIsRunning(true);
+    setPromptIndex(null);
+    setOutput(["⚡ Menjalankan kode via Python WASM..."]);
 
     try {
       const res = await runPythonCodeClient(code);
@@ -240,6 +272,47 @@ export default function PracticeClient() {
       setOutput(["Gagal menjalankan kode. Periksa koneksi atau syntax."]);
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  const handleSendInput = async (val: string) => {
+    if (promptIndex === null) return;
+    const inputValueToUse = val.trim() || "0";
+    const nextInputs = [...collectedInputs, inputValueToUse];
+    setCollectedInputs(nextInputs);
+    setCurrentInputValue("");
+
+    if (promptIndex + 1 < interactivePrompts.length) {
+      const nextIdx = promptIndex + 1;
+      setPromptIndex(nextIdx);
+      setOutput((prev) => [
+        ...prev,
+        `✓ [Input ${promptIndex + 1}]: ${inputValueToUse}`,
+        `👉 Masukkan input ke-${nextIdx + 1} dari ${interactivePrompts.length}: ${interactivePrompts[nextIdx]}`,
+      ]);
+    } else {
+      // All inputs gathered! Execute Python code via Pyodide WASM!
+      setPromptIndex(null);
+      setIsRunning(true);
+      setOutput((prev) => [
+        ...prev,
+        `✓ [Input ${promptIndex + 1}]: ${inputValueToUse}`,
+        "⚡ Mengkalkulasi hasil program...",
+      ]);
+
+      try {
+        const res = await runPythonCodeClient(code, nextInputs);
+        setOutput(res.output);
+
+        if (res.error) {
+          const explained = explainPythonError(res.error);
+          setExplainedError(explained);
+        }
+      } catch {
+        setOutput(["Gagal mengeksekusi program."]);
+      } finally {
+        setIsRunning(false);
+      }
     }
   };
 
@@ -547,6 +620,58 @@ export default function PracticeClient() {
                 <span style={{ opacity: 0.5 }}>Klik 'Jalankan Kode' untuk melihat output...</span>
               ) : (
                 output.map((line, idx) => <div key={idx}>{line}</div>)
+              )}
+
+              {/* Interactive Terminal Input Prompt Bar */}
+              {promptIndex !== null && promptIndex < interactivePrompts.length && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    padding: "10px 12px",
+                    background: "rgba(255, 157, 0, 0.12)",
+                    border: "1.5px solid var(--primary-color)",
+                    borderRadius: "var(--radius-md)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    boxShadow: "0 0 12px rgba(255, 157, 0, 0.2)",
+                  }}
+                >
+                  <span style={{ color: "var(--primary-color)", fontWeight: 700, whiteSpace: "nowrap" }}>
+                    ⌨️ {interactivePrompts[promptIndex]}
+                  </span>
+                  <input
+                    type="text"
+                    autoFocus
+                    value={currentInputValue}
+                    onChange={(e) => setCurrentInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSendInput(currentInputValue);
+                      }
+                    }}
+                    placeholder="Ketik angka / teks lalu tekan Enter..."
+                    style={{
+                      flex: 1,
+                      background: "#000",
+                      border: "1px solid var(--border-color)",
+                      color: "#4ADE80",
+                      padding: "6px 12px",
+                      borderRadius: "var(--radius-sm)",
+                      fontFamily: "monospace",
+                      fontSize: "0.875rem",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSendInput(currentInputValue)}
+                    className="btn btn-primary btn-sm"
+                    style={{ fontWeight: 700 }}
+                  >
+                    Kirim ↵
+                  </button>
+                </div>
               )}
 
               {/* AI Error Explainer Notification */}
