@@ -21,15 +21,16 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function safeEval(expr: string, vars: VarStore): string {
+function safeEval(expr: string, vars: VarStore): string | number {
   let resolved = expr;
+  // Replace variables with numeric or boolean values
   for (const [key, val] of Object.entries(vars)) {
     const strVal = typeof val === "string" ? `"${val}"` : String(val);
     resolved = resolved.replace(new RegExp(`\\b${key}\\b`, "g"), strVal);
   }
   try {
     const result = new Function(`"use strict"; return (${resolved})`)();
-    return String(result);
+    return typeof result === "number" ? result : String(result);
   } catch {
     return expr;
   }
@@ -39,6 +40,8 @@ function simulatePython(code: string): string[] {
   const lines = code.split("\n");
   const output: string[] = [];
   const vars: VarStore = {};
+  const mockInputs = [5, 10, 15, 20, 25];
+  let inputIdx = 0;
 
   const getVarValue = (name: string): string | number | boolean | undefined => vars[name];
 
@@ -59,7 +62,8 @@ function simulatePython(code: string): string[] {
           if (/^\d+(\.\d+)?$/.test(p)) return p;
           const v = getVarValue(p);
           if (v !== undefined) return String(v);
-          return safeEval(p, vars);
+          const evalRes = safeEval(p, vars);
+          return String(evalRes);
         });
         output.push(resolved.join(" "));
         continue;
@@ -67,9 +71,9 @@ function simulatePython(code: string): string[] {
 
       if (/^input\s*\(/.test(line)) {
         const prompt = line.match(/input\s*\(\s*["'](.+?)["']\s*\)/);
-        const varName = lines[lines.indexOf(raw) - 1]?.match(/^(\w+)\s*=\s*/)?.[1];
-        if (varName) vars[varName] = 0;
-        output.push(`[INPUT REQUIRED: ${prompt ? prompt[1] : ""}]`);
+        if (prompt && prompt[1]) {
+          output.push(prompt[1]);
+        }
         continue;
       }
 
@@ -77,6 +81,14 @@ function simulatePython(code: string): string[] {
       if (assignMatch) {
         const [, name, valExpr] = assignMatch;
         const trimmed = valExpr.trim();
+
+        // Check if value expression includes input(...)
+        if (/input\s*\(/.test(trimmed)) {
+          const val = mockInputs[inputIdx] ?? 5;
+          inputIdx++;
+          vars[name] = val;
+          continue;
+        }
 
         if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
           vars[name] = trimmed.slice(1, -1);
@@ -87,7 +99,7 @@ function simulatePython(code: string): string[] {
         else if (/^\d+\.\d+$/.test(trimmed)) vars[name] = parseFloat(trimmed);
         else {
           const evaled = safeEval(trimmed, vars);
-          vars[name] = /^\d+$/.test(evaled) ? parseInt(evaled, 10) : evaled;
+          vars[name] = typeof evaled === "number" ? evaled : (/^\d+$/.test(String(evaled)) ? parseInt(String(evaled), 10) : evaled);
         }
         continue;
       }
@@ -107,20 +119,30 @@ function simulatePython(code: string): string[] {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ output: ["Error: Terlalu banyak permintaan. Tunggu beberapa saat."] }, { status: 429 });
+  }
+
+  let code = "";
+  let language = "python";
+
   try {
-    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json({ output: ["Error: Terlalu banyak permintaan. Tunggu beberapa saat."] }, { status: 429 });
-    }
+    const body = await req.json();
+    code = body.code || "";
+    language = body.language || "python";
+  } catch {
+    return NextResponse.json({ output: ["Error: Invalid JSON body"] }, { status: 400 });
+  }
 
-    const { code, language = "python" } = await req.json();
-    if (!code || typeof code !== "string") {
-      return NextResponse.json({ output: ["Error: No code provided"] }, { status: 400 });
-    }
-    if (code.length > 10000) {
-      return NextResponse.json({ output: ["Error: Kode terlalu panjang (maks 10.000 karakter)"] }, { status: 400 });
-    }
+  if (!code || typeof code !== "string") {
+    return NextResponse.json({ output: ["Error: No code provided"] }, { status: 400 });
+  }
+  if (code.length > 10000) {
+    return NextResponse.json({ output: ["Error: Kode terlalu panjang (maks 10.000 karakter)"] }, { status: 400 });
+  }
 
+  try {
     const pistonResponse = await fetch(PISTON_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -128,27 +150,28 @@ export async function POST(req: NextRequest) {
         language,
         version: "*",
         files: [{ content: code }],
-        stdin: "",
-        args: [],
-        compile_timeout: 10000,
-        run_timeout: 5000,
-        compile_memory_limit: -1,
-        run_memory_limit: 128,
       }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (pistonResponse.ok) {
       const data = await pistonResponse.json();
-      const runOutput = data.run?.output || "";
-      const splitOutput = runOutput.split("\n").filter(Boolean);
-      return NextResponse.json({ output: splitOutput.length > 0 ? splitOutput : ["(Tidak ada output)"] });
+      const runRes = data.run;
+      if (runRes) {
+        const stdout = runRes.stdout || "";
+        const stderr = runRes.stderr || "";
+        const outputLines = (stdout + stderr)
+          .split("\n")
+          .filter((l: string, i: number, arr: string[]) => i < arr.length - 1 || l !== "");
+        return NextResponse.json({
+          output: outputLines.length > 0 ? outputLines : ["(Kode berjalan tanpa output cetakan)"],
+        });
+      }
     }
-
-    const simulated = simulatePython(code);
-    return NextResponse.json({ output: simulated.length > 0 ? simulated : ["(Tidak ada output)"] });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ output: [`Error: Gagal menjalankan kode (${message})`] }, { status: 500 });
+  } catch {
+    // Fallback to internal simulation engine if Piston is unreachable/offline
   }
+
+  const simulatedOutput = simulatePython(code);
+  return NextResponse.json({ output: simulatedOutput });
 }
