@@ -245,11 +245,13 @@ export function PowerShellTerminal({ code, onExplainedError }: PowerShellTermina
         onClick={() => inputRef.current?.focus()}
         style={{
           padding: "14px 16px",
-          minHeight: "220px",
-          maxHeight: "380px",
+          minHeight: "180px",
+          maxHeight: "360px",
           overflowY: "auto",
+          overflowX: "hidden",
           lineHeight: 1.6,
           cursor: "text",
+          wordBreak: "break-word",
         }}
       >
         {history.map((item) => {
