@@ -28,6 +28,7 @@ import { getRandomMemes } from "@/lib/content/memes";
 import { ColorSwitcher } from "./ColorSwitcher";
 import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
 import { ModulePreviewModal } from "./ModulePreviewModal";
+import { PowerShellTerminal } from "../editor/PowerShellTerminal";
 
 /* ============================================================
    VARIANTS + SCROLL UTILITIES
@@ -142,12 +143,9 @@ function HeroSandbox() {
                 </div>
                 <textarea value={code} onChange={e => setCode(e.target.value)} style={{ width: "100%", height: "100%", background: "transparent", border: "none", outline: "none", resize: "none", paddingLeft: "30px", color: "#e5e7eb", fontFamily: "var(--font-code)", fontSize: "0.78rem", lineHeight: "1.6" }} />
               </div>
-              <motion.div layout style={{ height: "100px", background: "#0B1121", borderRadius: "8px", border: "1px solid #1E293B", padding: "8px 12px", display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: "0.62rem", color: "#6B7280", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px", display: "flex", alignItems: "center", gap: "4px" }}><Terminal size={10} /> Console</span>
-                <div style={{ flex: 1, overflowY: "auto", fontFamily: "var(--font-code)", fontSize: "0.72rem", color: "#34D399", lineHeight: "1.4" }}>
-                  {out.length ? out.map((l, i) => <div key={i}>{l}</div>) : <span style={{ color: "#4B5563" }}>Run code above</span>}
-                </div>
-              </motion.div>
+              <div style={{ marginTop: "10px" }}>
+                <PowerShellTerminal code={code} />
+              </div>
             </div>
           )}
 

@@ -22,6 +22,7 @@ import {
   Info,
   Sparkle,
 } from "@phosphor-icons/react";
+import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
 
 interface VirtualFile {
   name: string;
@@ -825,55 +826,9 @@ export default function VSCodeSandboxPage() {
                 />
               </div>
 
-              {/* Bottom Integrated Terminal */}
-              <div style={{ height: "220px", background: "#181818", borderTop: "1px solid #2d2d2d", display: "flex", flexDirection: "column" }}>
-                {/* Terminal Tabs */}
-                <div style={{ height: "30px", background: "#252526", display: "flex", alignItems: "center", padding: "0 16px", gap: "16px", fontSize: "0.75rem", color: "#bbbbbb", borderBottom: "1px solid #1e1e1e" }}>
-                  <span style={{ color: "white", fontWeight: 700, borderBottom: "2px solid var(--color-primary-500)", height: "100%", display: "flex", alignItems: "center" }}>
-                    Terminal
-                  </span>
-                  <span style={{ cursor: "default" }}>Output</span>
-                  <span style={{ cursor: "default" }}>Problems</span>
-                </div>
-
-                {/* Terminal Log Console */}
-                <div style={{ flex: 1, padding: "12px 16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-code)",
-                      fontSize: "0.825rem",
-                      color: "#34D399",
-                      whiteSpace: "pre-wrap",
-                      lineHeight: "1.5",
-                    }}
-                  >
-                    {terminalOutput.map((line, idx) => (
-                      <div key={idx}>{line}</div>
-                    ))}
-                  </div>
-
-                  {/* Terminal CLI Command Input Form */}
-                  <form onSubmit={handleTerminalSubmit} style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", color: "#34D399", marginRight: "6px" }}>
-                      C:\Users\maba\workspace&gt;
-                    </span>
-                    <input
-                      type="text"
-                      value={terminalInput}
-                      onChange={(e) => setTerminalInput(e.target.value)}
-                      placeholder="Ketik perintah di sini... (contoh: python main.py)"
-                      style={{
-                        flex: 1,
-                        background: "transparent",
-                        border: "none",
-                        outline: "none",
-                        color: "#ffffff",
-                        fontFamily: "var(--font-code)",
-                        fontSize: "0.825rem",
-                      }}
-                    />
-                  </form>
-                </div>
+              {/* Bottom Integrated PowerShell Terminal */}
+              <div style={{ borderTop: "1px solid #2d2d2d" }}>
+                <PowerShellTerminal code={activeFile.content} />
               </div>
             </div>
           </div>
