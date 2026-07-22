@@ -1014,7 +1014,7 @@ export default function QuizPage() {
                 Selamat! Kamu Lulus Kuis!
               </h2>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "8px", marginBottom: "var(--space-6)" }}>
-                Kamu menyelesaikan kuis dengan skor **{Math.round((score / questions.length) * 100)}%** ({score} dari {questions.length} benar).
+                Kamu menyelesaikan kuis dengan skor <strong>{Math.round((score / questions.length) * 100)}%</strong> ({score} dari {questions.length} benar).
               </p>
 
               {quizMemes.length > 0 && (
@@ -1041,7 +1041,7 @@ export default function QuizPage() {
                 Kamu Belum Lulus, Jangan Menyerah!
               </h2>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "8px", marginBottom: "var(--space-6)" }}>
-                Nilai kamu **{Math.round((score / questions.length) * 100)}%** (passing grade kuis: 60%). Yuk ulangi sekali lagi biar paham!
+                Nilai kamu <strong>{Math.round((score / questions.length) * 100)}%</strong> (passing grade kuis: 60%). Yuk ulangi sekali lagi biar paham!
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "var(--space-6)" }}>

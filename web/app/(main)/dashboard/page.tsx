@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 Halo, {user.name}!
               </h2>
               <p style={{ color: "rgba(255, 250, 246, 0.8)", fontSize: "0.9375rem" }}>
-                Saatnya melanjutkan petualangan kodingmu hari ini. Kamu ada di rank **#{userRank}**.
+                Saatnya melanjutkan petualangan kodingmu hari ini. Kamu ada di rank <strong>#{userRank}</strong>.
               </p>
             </div>
             {/* Level badge */}

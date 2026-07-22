@@ -1263,7 +1263,7 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Jika `for` digunakan untuk perulangan yang jumlahnya sudah pasti, **`while`** loop digunakan untuk mengulang kode selama suatu syarat bernilai `True`.
+                Jika <code>for</code> digunakan untuk perulangan yang jumlahnya sudah pasti, <strong>while</strong> loop digunakan untuk mengulang kode selama suatu syarat bernilai <code>True</code>.
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px" }}>
                 jumlah = <span style={{ color: "#B5CEA8" }}>0</span><br />
@@ -1416,7 +1416,7 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Ada perbedaan besar antara fungsi yang hanya mencetak nilai (`print`) dengan fungsi yang mengembalikan nilai menggunakan kata kunci **`return`**:
+                Ada perbedaan besar antara fungsi yang hanya mencetak nilai (<code>print</code>) dengan fungsi yang mengembalikan nilai menggunakan kata kunci <strong>return</strong>:
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px" }}>
                 <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>tambah</span>(a, b):<br />
@@ -1716,7 +1716,7 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Selamat! Kamu telah membaca seluruh konsep dasar pemrograman. Sekarang saatnya menguji pemahaman kamu secara integratif dengan menyelesaikan **Mini Project: Kalkulator Sederhana**.
+                Selamat! Kamu telah membaca seluruh konsep dasar pemrograman. Sekarang saatnya menguji pemahaman kamu secara integratif dengan menyelesaikan <strong>Mini Project: Kalkulator Sederhana</strong>.
               </p>
               <div style={{ background: "var(--bg-card)", border: "2px solid var(--color-primary-400)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "16px" }}>
                 <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>📋 Spesifikasi Proyek Kalkulator:</h4>
