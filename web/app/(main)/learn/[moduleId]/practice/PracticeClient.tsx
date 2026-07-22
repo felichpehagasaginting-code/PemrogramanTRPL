@@ -23,6 +23,7 @@ import { gradeSubmission, GradingResult } from "@/lib/grader/autoGrader";
 import { VisualDebugger } from "@/components/editor/VisualDebugger";
 import { explainPythonError, generateHint, ExplainedError } from "@/lib/ai/errorExplainer";
 import { ParsonsProblem, ParsonsBlock } from "@/components/learning/ParsonsProblem";
+import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -604,75 +605,8 @@ export default function PracticeClient() {
 
           {/* Tab Content */}
           {activeTab === "terminal" && (
-            <div
-              style={{
-                background: "#1E1E1E",
-                border: "1px solid var(--border-color)",
-                borderRadius: "var(--radius-lg)",
-                padding: "var(--space-4)",
-                fontFamily: "monospace",
-                fontSize: "0.875rem",
-                minHeight: "120px",
-                color: "#D4D4D4",
-              }}
-            >
-              {output.length === 0 ? (
-                <span style={{ opacity: 0.5 }}>Klik 'Jalankan Kode' untuk melihat output...</span>
-              ) : (
-                output.map((line, idx) => <div key={idx}>{line}</div>)
-              )}
-
-              {/* Interactive Terminal Input Prompt Bar */}
-              {promptIndex !== null && promptIndex < interactivePrompts.length && (
-                <div
-                  style={{
-                    marginTop: "12px",
-                    padding: "10px 12px",
-                    background: "rgba(255, 157, 0, 0.12)",
-                    border: "1.5px solid var(--primary-color)",
-                    borderRadius: "var(--radius-md)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    boxShadow: "0 0 12px rgba(255, 157, 0, 0.2)",
-                  }}
-                >
-                  <span style={{ color: "var(--primary-color)", fontWeight: 700, whiteSpace: "nowrap" }}>
-                    ⌨️ {interactivePrompts[promptIndex]}
-                  </span>
-                  <input
-                    type="text"
-                    autoFocus
-                    value={currentInputValue}
-                    onChange={(e) => setCurrentInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleSendInput(currentInputValue);
-                      }
-                    }}
-                    placeholder="Ketik angka / teks lalu tekan Enter..."
-                    style={{
-                      flex: 1,
-                      background: "#000",
-                      border: "1px solid var(--border-color)",
-                      color: "#4ADE80",
-                      padding: "6px 12px",
-                      borderRadius: "var(--radius-sm)",
-                      fontFamily: "monospace",
-                      fontSize: "0.875rem",
-                      outline: "none",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleSendInput(currentInputValue)}
-                    className="btn btn-primary btn-sm"
-                    style={{ fontWeight: 700 }}
-                  >
-                    Kirim ↵
-                  </button>
-                </div>
-              )}
+            <div>
+              <PowerShellTerminal code={code} onExplainedError={setExplainedError} />
 
               {/* AI Error Explainer Notification */}
               {explainedError && (
