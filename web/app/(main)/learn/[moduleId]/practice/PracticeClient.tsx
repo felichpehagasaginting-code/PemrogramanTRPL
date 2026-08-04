@@ -418,6 +418,7 @@ export default function PracticeClient() {
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <button
             onClick={() => router.push(`/learn/${moduleId}`)}
+            className="nav-link no-underline focus-ring"
             style={{
               background: "none",
               border: "none",
@@ -443,6 +444,8 @@ export default function PracticeClient() {
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <button
             onClick={() => router.push(`/learn/${moduleId}`)}
+            className="nav-link no-underline focus-ring"
+            aria-label="Kembali ke materi"
             style={{
               background: "none",
               border: "none",
@@ -475,7 +478,7 @@ export default function PracticeClient() {
             <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
               {content.description}
             </p>
-            <button onClick={handleShowHint} className="btn btn-sm btn-ghost" style={{ color: "var(--primary-color)" }}>
+            <button onClick={handleShowHint} className="btn btn-sm btn-ghost focus-ring" style={{ color: "var(--color-primary-600)" }} aria-label="Dapatkan hint AI">
               <Lightbulb size={16} /> Hint
             </button>
           </div>
@@ -485,15 +488,17 @@ export default function PracticeClient() {
             <div
               style={{
                 background: "rgba(255, 157, 0, 0.1)",
-                border: "1px solid var(--primary-color)",
-                color: "var(--primary-color)",
+                border: "1px solid var(--color-primary-500)",
+                color: "var(--color-primary-600)",
                 padding: "10px 14px",
                 borderRadius: "var(--radius-md)",
                 fontSize: "0.875rem",
                 fontWeight: 600,
               }}
+              role="note"
+              aria-live="polite"
             >
-              {aiHint}
+              <Lightbulb size={16} weight="fill" style={{ marginRight: "6px", verticalAlign: "middle" }} aria-hidden="true" /> {aiHint}
             </div>
           )}
 

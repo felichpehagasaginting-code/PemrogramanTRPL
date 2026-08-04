@@ -90,7 +90,8 @@ export default function ProfilePage() {
             </p>
             <button
               onClick={() => setIsCustomizerOpen(true)}
-              className="btn btn-sm btn-primary"
+              className="btn btn-sm btn-primary focus-ring"
+              aria-label="Buka kustomisasi avatar"
               style={{ marginTop: "10px" }}
             >
               🎨 Kustomisasi Avatar Hero
@@ -122,6 +123,10 @@ export default function ProfilePage() {
               <button
                 key={av.id}
                 onClick={() => handleAvatarChange(av.id)}
+                aria-label={`Pilih avatar ${av.label}`}
+                aria-pressed={selectedAvatar === av.id}
+                title={av.label}
+                className="focus-ring"
                 style={{
                   background: selectedAvatar === av.id ? "rgba(255,107,0,0.1)" : "var(--bg-page-alt)",
                   border: selectedAvatar === av.id ? "2px solid var(--color-primary-500)" : "1.5px solid var(--border-color)",
@@ -134,7 +139,6 @@ export default function ProfilePage() {
                   justifyContent: "center",
                   transition: "all var(--transition-fast)",
                 }}
-                title={av.label}
               >
                 <AvatarIcon id={av.id} size={32} />
               </button>
@@ -158,7 +162,7 @@ export default function ProfilePage() {
           🏅 LEMARI BADGE MATRIKULASI ({user.badges.length} / 13)
         </h3>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }} className="badges-cabinet-grid">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }} className="badges-cabinet-grid">
           {BADGES.map((badge) => {
             const isEarned = user.badges.includes(badge.id);
             return (

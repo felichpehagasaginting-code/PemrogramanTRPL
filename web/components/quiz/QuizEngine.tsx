@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, ArrowRight, Star } from "@phosphor-icons/react";
+import { CheckCircle, XCircle, ArrowRight, Star, Book, Warning } from "@phosphor-icons/react";
 
 export interface QuizQuestion {
   id: string;
@@ -53,8 +53,24 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
     const pct = Math.round((finalScore / questions.length) * 100);
     return (
       <div style={{ textAlign: "center", padding: "var(--space-8)" }}>
-        <div style={{ fontSize: "4rem", marginBottom: "var(--space-4)" }}>
-          {pct >= 80 ? "🎉" : pct >= 50 ? "💪" : "📚"}
+        <div
+          style={{
+            fontSize: "3.5rem",
+            marginBottom: "var(--space-4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto var(--space-4)",
+          }}
+          aria-hidden="true"
+        >
+          {pct >= 80 ? (
+            <Star size={56} weight="fill" color="var(--color-primary-600)" />
+          ) : pct >= 50 ? (
+            <Warning size={56} color="var(--color-accent-yellow)" />
+          ) : (
+            <Book size={56} color="var(--color-accent-cyan)" />
+          )}
         </div>
         <h3 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
           Kuis Selesai!
@@ -127,13 +143,15 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
                   key={idx}
                   onClick={() => handleAnswer(idx)}
                   disabled={answered}
+                  className="focus-ring"
+                  aria-label={answered && (isCorrect || isWrong) ? `${opt}${isCorrect ? " — benar" : " — kurang tepat"}` : opt}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "12px",
                     padding: "var(--space-3) var(--space-4)",
                     borderRadius: "var(--radius-md)",
-                    border: isCorrect ? "2px solid #22C55E" : isWrong ? "2px solid #EF4444" : "1.5px solid var(--border-color)",
+                    border: isCorrect ? "2px solid var(--color-accent-green)" : isWrong ? "2px solid var(--color-accent-red)" : "1.5px solid var(--border-color)",
                     background: isCorrect ? "rgba(34,197,94,0.08)" : isWrong ? "rgba(239,68,68,0.08)" : "var(--bg-card)",
                     cursor: answered ? "default" : "pointer",
                     textAlign: "left",
@@ -149,7 +167,7 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
                       width: "28px",
                       height: "28px",
                       borderRadius: "50%",
-                      background: isCorrect ? "#22C55E" : isWrong ? "#EF4444" : "var(--color-neutral-150)",
+                      background: isCorrect ? "var(--color-accent-green)" : isWrong ? "var(--color-accent-red)" : "var(--color-neutral-150)",
                       color: "white",
                       display: "flex",
                       alignItems: "center",
@@ -171,18 +189,30 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              role="alert"
+              aria-live="polite"
               style={{
                 marginTop: "var(--space-4)",
                 padding: "var(--space-3) var(--space-4)",
                 borderRadius: "var(--radius-md)",
                 background: selected === question.correctIndex ? "rgba(34,197,94,0.08)" : "rgba(255,107,0,0.08)",
-                border: `1px solid ${selected === question.correctIndex ? "#22C55E" : "var(--border-color-strong)"}`,
+                border: `1px solid ${selected === question.correctIndex ? "var(--color-accent-green)" : "var(--border-color-strong)"}`,
                 fontSize: "0.875rem",
                 color: "var(--text-secondary)",
                 lineHeight: 1.5,
               }}
             >
-              <strong>{selected === question.correctIndex ? "✅ Benar!" : "❌ Kurang tepat"}</strong>
+              <strong style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                {selected === question.correctIndex ? (
+                  <>
+                    <CheckCircle size={16} weight="fill" color="var(--color-accent-green)" /> Benar!
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={16} weight="fill" color="var(--color-accent-red)" /> Kurang tepat
+                  </>
+                )}
+              </strong>
               <br />
               {question.explanation}
             </motion.div>
@@ -192,7 +222,7 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
 
       {answered && (
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "var(--space-6)" }}>
-          <button onClick={handleNext} className="btn btn-primary">
+          <button onClick={handleNext} className="btn btn-primary focus-ring" aria-label={currentQ < questions.length - 1 ? "Soal berikutnya" : "Lihat hasil kuis"}>
             {currentQ < questions.length - 1 ? "Soal Berikutnya" : "Lihat Hasil"}
             <ArrowRight size={16} weight="bold" />
           </button>

@@ -89,7 +89,7 @@ export default function DashboardPage() {
                   fontFamily: "var(--font-heading)",
                   fontSize: "1.875rem",
                   fontWeight: 800,
-                  color: "#FFF8F2",
+                  color: "rgba(255, 255, 255, 0.95)",
                   margin: "8px 0 4px",
                 }}
               >
@@ -237,15 +237,15 @@ export default function DashboardPage() {
                         </div>
                       ) : isCompleted ? (
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#15803D", fontSize: "0.8rem", fontWeight: 700 }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--color-accent-green)", fontSize: "0.8rem", fontWeight: 700 }}>
                             <CheckCircle size={16} weight="fill" /> Selesai
                           </span>
-                          <Link href={`/learn/${mod.id}`} className="btn btn-secondary btn-sm">
+                          <Link href={`/learn/${mod.id}`} className="btn btn-secondary btn-sm focus-ring" aria-label={`Ulangi modul ${mod.code}`}>
                             Ulangi
                           </Link>
                         </div>
                       ) : (
-                        <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm">
+                        <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm focus-ring" aria-label={`Mulai belajar modul ${mod.code}: ${mod.title}`}>
                           Mulai Belajar <Lightning size={14} weight="fill" />
                         </Link>
                     )}

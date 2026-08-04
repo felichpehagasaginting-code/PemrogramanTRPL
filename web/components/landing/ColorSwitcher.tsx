@@ -68,6 +68,9 @@ export function ColorSwitcher() {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.92 }}
             title={c.name}
+            aria-label={`Pilih tema ${c.name}`}
+            aria-pressed={active === c.family}
+            className="focus-ring"
             style={{
               width: "22px",
               height: "22px",

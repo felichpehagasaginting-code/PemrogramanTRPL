@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { useGameStore } from "@/lib/store/useGameStore";
@@ -15,7 +15,7 @@ import {
   BookOpen,
 } from "@phosphor-icons/react";
 import { fireConfetti } from "@/lib/confetti";
-import { getRandomMemes } from "@/lib/content/memes";
+import { getRandomMemes, Meme } from "@/lib/content/memes";
 
 interface QuestionData {
   text: string;
@@ -31,7 +31,14 @@ export default function QuizPage() {
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const gameApi = useGameStore.getState();
-  const quizMemes = getRandomMemes(moduleId as string, 2);
+  const [quizMemes, setQuizMemes] = useState<Meme[]>([]);
+
+  useEffect(() => {
+    if (moduleId) {
+      setQuizMemes(getRandomMemes(moduleId as string, 2));
+    }
+  }, [moduleId]);
+
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);

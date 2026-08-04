@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 const publicPaths = ["/", "/login", "/api"];
 const staticExtensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".ico", ".css", ".js", ".woff2", ".woff"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isStatic = staticExtensions.some((ext) => pathname.endsWith(ext));

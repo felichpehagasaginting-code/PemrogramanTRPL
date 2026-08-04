@@ -114,7 +114,9 @@ export default function LeaderboardPage() {
               justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "4px" }}>🥈</div>
+            <div style={{ fontSize: "2rem", marginBottom: "4px" }}>
+              <Medal size={32} weight="fill" color="#9E9E9E" aria-hidden="true" />
+            </div>
             <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[1].name}
             </div>
@@ -147,7 +149,9 @@ export default function LeaderboardPage() {
             <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", background: "#FFD93D", color: "#1C0A00", fontSize: "0.7rem", fontWeight: 900, padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
               CHAMPION
             </div>
-            <div style={{ fontSize: "2.5rem", marginBottom: "4px" }}>👑</div>
+            <div style={{ fontSize: "2.5rem", marginBottom: "4px" }}>
+              <Trophy size={40} weight="fill" color="#FFD93D" aria-hidden="true" />
+            </div>
             <div style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[0].name}
             </div>
@@ -176,7 +180,9 @@ export default function LeaderboardPage() {
               justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: "1.75rem", marginBottom: "4px" }}>🥉</div>
+            <div style={{ fontSize: "1.75rem", marginBottom: "4px" }}>
+              <Medal size={28} weight="fill" color="#CD7F32" aria-hidden="true" />
+            </div>
             <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[2].name}
             </div>

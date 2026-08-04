@@ -45,6 +45,33 @@
   --color-accent-yellow: #FFC107;
   --color-accent-cyan:   #06B6D4;
   --color-accent-red:    #EF4444;
+
+  /* === Backwards-compat aliases (deprecated → migrate to tokens) === */
+  --primary-color:        var(--color-primary-500);
+  --primary-color-600:    var(--color-primary-600);
+  --primary-color-700:    var(--color-primary-700);
+  --success-color:        var(--color-accent-green);
+  --error-color:          var(--color-accent-red);
+  --bg-secondary:         var(--bg-card);
+  --bg-page-strong:       var(--bg-page-alt);
+  --gradient-primary:     var(--gradient-hero);
+  --color-neutral-500:    var(--color-neutral-400);
+}
+
+/* Dark-mode aliases auto-follow because the themed values are set on
+   [data-theme] and overridden in .dark blocks below. */
+[data-theme="orange"].dark,
+[data-theme="purple"].dark,
+[data-theme="blue"].dark,
+[data-theme="emerald"].dark {
+  --primary-color:        var(--color-primary-500);
+  --primary-color-600:    var(--color-primary-600);
+  --primary-color-700:    var(--color-primary-700);
+  --success-color:        var(--color-accent-green);
+  --error-color:          var(--color-accent-red);
+  --bg-secondary:         var(--bg-card);
+  --bg-page-strong:       var(--bg-page-alt);
+  --gradient-primary:     var(--gradient-hero);
 }
 
 /* ══════════════════════════════════════════
@@ -705,6 +732,183 @@ code, pre {
 .shimmer-border {
   animation: shimmer-border 2.5s ease-in-out infinite;
 }
+
+/* =====================================================
+   SHARED COMPONENT-LEVEL UTILITIES
+   ===================================================== */
+/* Reusable card surface — theme-aware */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+.glass-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+/* Elevated card with border accent */
+.card-elevated {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+/* Pill button variant used by tab groups & toggles */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  outline: none;
+}
+.pill-btn-active {
+  background: var(--color-neutral-900);
+  color: #fff;
+}
+.pill-btn-inactive {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* Live / status badge */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.58rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  background: var(--gradient-hero);
+  color: #fff;
+}
+
+/* Section header eyebrow */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary-600);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Focus ring — apply on any interactive element */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.focus-ring:not(:disabled):focus-visible { box-shadow: var(--shadow-glow-soft); }
+
+/* Stat card — small numeric summary used in dashboard/leaderboard */
+.stat-card {
+  background: var(--bg-page-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+}
+
+/* Screen-reader-only reveal on focus (kept out of visual flow until focused) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.sr-only-focusable:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Missing spacing tokens referenced by components */
+:root {
+  --space-3: 0.75rem;
+  --space-14: 2.25rem;
+  --space-20: 3.5rem;
+}
+
+/* Progress bar track */
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--color-neutral-150);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-hero);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+/* Icon button — square/circle accessible */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.icon-btn:hover {
+  background: rgba(255, 107, 0, 0.08);
+  color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+}
+
+/* Navbar link */
+.nav-link {
+  position: relative;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.nav-link:hover { color: var(--color-primary-500); }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-hero);
+  border-radius: var(--radius-sm);
+  transition: width 0.2s ease;
+}
+.nav-link:hover::after { width: 100%; }
+.nav-link-active { color: var(--color-primary-500); }
+.nav-link-active::after { width: 100%; }
 
 @keyframes rgb-cycle {
   0%   { color: #FF6B00; filter: hue-rotate(0deg); }

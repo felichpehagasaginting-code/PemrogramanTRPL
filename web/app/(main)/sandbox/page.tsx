@@ -243,6 +243,8 @@ export default function VSCodeSandboxPage() {
             <button
               key={tab.id}
               onClick={() => setMobileActiveTab(tab.id as any)}
+              aria-pressed={mobileActiveTab === tab.id}
+              className="focus-ring"
               style={{
                 flex: 1,
                 padding: "10px",
@@ -317,6 +319,9 @@ export default function VSCodeSandboxPage() {
                 type="button"
                 onClick={() => setShowLeftSidebar(!showLeftSidebar)}
                 title={showLeftSidebar ? "Sembunyikan Sidebar Kiri" : "Tampilkan Sidebar Kiri"}
+                aria-label={showLeftSidebar ? "Sembunyikan sidebar kiri" : "Tampilkan sidebar kiri"}
+                aria-pressed={showLeftSidebar}
+                className="focus-ring"
                 style={{
                   background: showLeftSidebar ? "rgba(255,255,255,0.15)" : "transparent",
                   border: "none",
@@ -330,7 +335,7 @@ export default function VSCodeSandboxPage() {
                   fontSize: "0.72rem",
                 }}
               >
-                <SidebarSimple size={15} />
+                <SidebarSimple size={15} aria-hidden="true" />
                 {!isMobile && <span>Sidebar</span>}
               </button>
 
@@ -338,6 +343,9 @@ export default function VSCodeSandboxPage() {
                 type="button"
                 onClick={() => setShowBottomTerminal(!showBottomTerminal)}
                 title={showBottomTerminal ? "Sembunyikan Terminal" : "Tampilkan Terminal"}
+                aria-label={showBottomTerminal ? "Sembunyikan terminal" : "Tampilkan terminal"}
+                aria-pressed={showBottomTerminal}
+                className="focus-ring"
                 style={{
                   background: showBottomTerminal ? "rgba(255,255,255,0.15)" : "transparent",
                   border: "none",
@@ -351,7 +359,7 @@ export default function VSCodeSandboxPage() {
                   fontSize: "0.72rem",
                 }}
               >
-                <Terminal size={15} />
+                <Terminal size={15} aria-hidden="true" />
                 {!isMobile && <span>Terminal</span>}
               </button>
 
@@ -360,6 +368,9 @@ export default function VSCodeSandboxPage() {
                   type="button"
                   onClick={() => setShowRightPanel(!showRightPanel)}
                   title={showRightPanel ? "Sembunyikan Misi Side Panel" : "Tampilkan Misi Side Panel"}
+                  aria-label={showRightPanel ? "Sembunyikan panel misi" : "Tampilkan panel misi"}
+                  aria-pressed={showRightPanel}
+                  className="focus-ring"
                   style={{
                     background: showRightPanel ? "rgba(255,255,255,0.15)" : "transparent",
                     border: "none",
@@ -373,7 +384,7 @@ export default function VSCodeSandboxPage() {
                     fontSize: "0.72rem",
                   }}
                 >
-                  <Columns size={15} />
+                  <Columns size={15} aria-hidden="true" />
                   <span>Misi Panel</span>
                 </button>
               )}
@@ -382,6 +393,9 @@ export default function VSCodeSandboxPage() {
                 type="button"
                 onClick={() => setIsMaximized(!isMaximized)}
                 title={isMaximized ? "Keluar Layar Penuh" : "Layar Penuh"}
+                aria-label={isMaximized ? "Keluar layar penuh" : "Layar penuh"}
+                aria-pressed={isMaximized}
+                className="focus-ring"
                 style={{
                   background: "transparent",
                   border: "none",
@@ -391,7 +405,7 @@ export default function VSCodeSandboxPage() {
                   cursor: "pointer",
                 }}
               >
-                {isMaximized ? <ArrowsInSimple size={15} /> : <ArrowsOutSimple size={15} />}
+                {isMaximized ? <ArrowsInSimple size={15} aria-hidden="true" /> : <ArrowsOutSimple size={15} aria-hidden="true" />}
               </button>
             </div>
           </div>
@@ -413,10 +427,10 @@ export default function VSCodeSandboxPage() {
               }}
             >
               {[
-                { id: "explorer", icon: <Folder size={22} />, title: "Explorer (Ctrl+Shift+E)" },
-                { id: "search", icon: <MagnifyingGlass size={22} />, title: "Search (Ctrl+Shift+F)" },
-                { id: "git", icon: <GitBranch size={22} />, title: "Source Control (Ctrl+Shift+G)" },
-                { id: "extensions", icon: <SquaresFour size={22} />, title: "Marketplace Extensions" },
+                { id: "explorer", icon: <Folder size={22} aria-hidden="true" />, title: "Explorer (Ctrl+Shift+E)" },
+                { id: "search", icon: <MagnifyingGlass size={22} aria-hidden="true" />, title: "Search (Ctrl+Shift+F)" },
+                { id: "git", icon: <GitBranch size={22} aria-hidden="true" />, title: "Source Control (Ctrl+Shift+G)" },
+                { id: "extensions", icon: <SquaresFour size={22} aria-hidden="true" />, title: "Marketplace Extensions" },
               ].map((item) => {
                 const isActive = activeTab === item.id && showLeftSidebar;
                 return (
@@ -432,6 +446,9 @@ export default function VSCodeSandboxPage() {
                       }
                     }}
                     title={item.title}
+                    aria-label={item.title}
+                    aria-pressed={isActive}
+                    className="focus-ring"
                     style={{
                       background: "none",
                       border: "none",
@@ -470,6 +487,9 @@ export default function VSCodeSandboxPage() {
                     setShowLeftSidebar(true);
                   }}
                   title="Settings"
+                  aria-label="Settings"
+                  aria-pressed={activeTab === "settings" && showLeftSidebar}
+                  className="focus-ring"
                   style={{
                     background: "none",
                     border: "none",
@@ -477,7 +497,7 @@ export default function VSCodeSandboxPage() {
                     cursor: "pointer",
                   }}
                 >
-                  <Gear size={22} />
+                  <Gear size={22} aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -505,16 +525,20 @@ export default function VSCodeSandboxPage() {
                         type="button"
                         onClick={() => setIsCreatingFile(true)}
                         title="Buat Berkas Baru"
+                        aria-label="Buat berkas baru"
+                        className="focus-ring"
                         style={{ background: "none", border: "none", color: "#cccccc", cursor: "pointer" }}
                       >
-                        <Plus size={16} />
+                        <Plus size={16} aria-hidden="true" />
                       </button>
                     </div>
 
                     {/* New file input form */}
                     {isCreatingFile && (
                       <form onSubmit={createNewFile} style={{ marginBottom: "8px" }}>
+                        <label htmlFor="new-file-name" className="sr-only">Nama berkas baru</label>
                         <input
+                          id="new-file-name"
                           type="text"
                           autoFocus
                           placeholder="nama_file.py"
@@ -523,6 +547,8 @@ export default function VSCodeSandboxPage() {
                           onBlur={() => {
                             if (!newFileName.trim()) setIsCreatingFile(false);
                           }}
+                          className="focus-ring"
+                          aria-label="Nama berkas baru"
                           style={{
                             width: "100%",
                             background: "#1e1e1e",
@@ -546,7 +572,12 @@ export default function VSCodeSandboxPage() {
                           <div
                             key={file.name}
                             onClick={() => setActiveFileName(file.name)}
-                            className="explorer-file-item"
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveFileName(file.name); } }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Buka berkas ${file.name}`}
+                            aria-selected={isActive}
+                            className="explorer-file-item focus-ring"
                             style={{
                               display: "flex",
                               alignItems: "center",
@@ -561,17 +592,19 @@ export default function VSCodeSandboxPage() {
                             }}
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: "6px", overflow: "hidden" }}>
-                              <FileCode size={16} color={file.name.endsWith(".py") ? "#38bdf8" : "#9ca3af"} />
+                              <FileCode size={16} color={file.name.endsWith(".py") ? "#38bdf8" : "#9ca3af"} aria-hidden="true" />
                               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 {file.name}
                               </span>
                             </div>
                             <button
                               onClick={(e) => deleteFile(file.name, e)}
-                              className="file-delete-btn"
+                              aria-label={`Hapus berkas ${file.name}`}
+                              title={`Hapus ${file.name}`}
+                              className="file-delete-btn focus-ring"
                               style={{ background: "none", border: "none", color: "#888888", cursor: "pointer" }}
                             >
-                              <Trash size={14} />
+                              <Trash size={14} aria-hidden="true" />
                             </button>
                           </div>
                         );
@@ -647,9 +680,11 @@ export default function VSCodeSandboxPage() {
                             type="button"
                             disabled={isInstalled || isInstalling === ext.id}
                             onClick={() => handleInstallExtension(ext.id)}
+                            className="focus-ring"
+                            aria-label={isInstalled ? `${ext.name} terpasang` : `Instal ${ext.name}`}
                             style={{
                               width: "100%",
-                              background: isInstalled ? "#22c55e" : "var(--color-primary-500)",
+                              background: isInstalled ? "var(--color-accent-green)" : "var(--color-primary-500)",
                               color: "white",
                               border: "none",
                               padding: "4px 8px",
@@ -831,10 +866,11 @@ export default function VSCodeSandboxPage() {
                     type="button"
                     onClick={() => setShowRightPanel(false)}
                     title="Sembunyikan Panel Misi"
-                    className="btn btn-sm btn-ghost"
+                    aria-label="Sembunyikan panel misi"
+                    className="btn btn-sm btn-ghost focus-ring"
                     style={{ padding: "2px 6px" }}
                   >
-                    <X size={14} />
+                    <X size={14} aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -852,9 +888,9 @@ export default function VSCodeSandboxPage() {
                 ].map((m, idx) => (
                   <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
                     {m.done ? (
-                      <CheckCircle size={20} color="#22c55e" weight="fill" style={{ flexShrink: 0 }} />
+                      <CheckCircle size={20} color="var(--color-accent-green)" weight="fill" style={{ flexShrink: 0 }} aria-hidden="true" />
                     ) : (
-                      <Circle size={20} color="var(--border-color)" style={{ flexShrink: 0 }} />
+                      <Circle size={20} color="var(--border-color)" style={{ flexShrink: 0 }} aria-hidden="true" />
                     )}
                     <span style={{ fontSize: "0.8rem", color: m.done ? "var(--text-muted)" : "var(--text-primary)", textDecoration: m.done ? "line-through" : "none", lineHeight: 1.4 }}>
                       {m.text}

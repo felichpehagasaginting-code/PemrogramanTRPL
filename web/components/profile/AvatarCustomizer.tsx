@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { Sparkle, Check, X, ShieldCheck } from "@phosphor-icons/react";
+import { motion } from "framer-motion";
 import { soundFX } from "@/lib/audio";
 
 const AVATAR_OPTIONS = [
@@ -58,10 +59,10 @@ export function AvatarCustomizer({ isOpen, onClose }: AvatarCustomizerProps) {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)" }}>
           <h3 style={{ margin: 0, fontSize: "1.125rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "6px" }}>
-            <Sparkle size={20} color="var(--primary-color)" /> Kustomisasi Avatar Hero
+            <Sparkle size={20} color="var(--color-primary-500)" /> Kustomisasi Avatar Hero
           </h3>
-          <button onClick={onClose} className="btn btn-sm btn-ghost">
-            <X size={18} />
+          <button onClick={onClose} className="btn btn-sm btn-ghost focus-ring" aria-label="Tutup kustomisasi avatar">
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
@@ -74,12 +75,25 @@ export function AvatarCustomizer({ isOpen, onClose }: AvatarCustomizerProps) {
           {AVATAR_OPTIONS.map((opt) => {
             const isSelected = selected === opt.id;
             return (
-              <div
+              <motion.div
                 key={opt.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Pilih avatar ${opt.name}`}
+                aria-pressed={isSelected}
                 onClick={() => {
                   soundFX.playClick();
                   setSelected(opt.id);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    soundFX.playClick();
+                    setSelected(opt.id);
+                  }
+                }}
+                className="focus-ring"
+                whileHover={{ scale: 1.05 }}
                 style={{
                   background: opt.bg,
                   borderRadius: "var(--radius-lg)",
@@ -92,21 +106,21 @@ export function AvatarCustomizer({ isOpen, onClose }: AvatarCustomizerProps) {
                   transition: "all 0.2s ease",
                 }}
               >
-                <div style={{ fontSize: "2rem" }}>{opt.emoji}</div>
+                <div style={{ fontSize: "2rem" }} aria-hidden="true">{opt.emoji}</div>
                 <div style={{ fontSize: "0.75rem", color: "#FFF", fontWeight: 700, marginTop: "4px" }}>
                   {opt.name}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
         <div style={{ display: "flex", gap: "8px" }}>
-          <button onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>
+          <button onClick={onClose} className="btn btn-secondary focus-ring" style={{ flex: 1 }} aria-label="Batal">
             Batal
           </button>
-          <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-            <Check size={16} /> Simpan Avatar
+          <button onClick={handleSave} className="btn btn-primary focus-ring" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }} aria-label="Simpan avatar">
+            <Check size={16} aria-hidden="true" /> Simpan Avatar
           </button>
         </div>
       </div>

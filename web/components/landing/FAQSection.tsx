@@ -48,9 +48,10 @@ export function FAQSection() {
       </div>
 
       {/* Search Input */}
-      <div style={{ position: "relative", marginBottom: "var(--space-6)" }}>
+      <div role="search" style={{ position: "relative", marginBottom: "var(--space-6)" }}>
         <MagnifyingGlass
           size={18}
+          aria-hidden="true"
           style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}
         />
         <input
@@ -58,6 +59,8 @@ export function FAQSection() {
           placeholder="Cari pertanyaan... (contoh: laptop, gratis, sertifikat)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="focus-ring"
+          aria-label="Cari pertanyaan FAQ"
           style={{
             width: "100%",
             padding: "12px 14px 12px 42px",
@@ -80,6 +83,7 @@ export function FAQSection() {
         ) : (
           filtered.map((item, idx) => {
             const isOpen = openIndex === idx;
+            const answerId = `faq-answer-${idx}`;
             return (
               <div
                 key={idx}
@@ -91,7 +95,11 @@ export function FAQSection() {
                 }}
               >
                 <button
+                  id={`faq-toggle-${idx}`}
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  aria-expanded={isOpen}
+                  aria-controls={answerId}
+                  className="focus-ring"
                   style={{
                     width: "100%",
                     padding: "14px 18px",
@@ -108,11 +116,14 @@ export function FAQSection() {
                   }}
                 >
                   <span>{item.q}</span>
-                  {isOpen ? <CaretUp size={18} /> : <CaretDown size={18} />}
+                  {isOpen ? <CaretUp size={18} aria-hidden="true" /> : <CaretDown size={18} aria-hidden="true" />}
                 </button>
 
                 {isOpen && (
                   <div
+                    id={answerId}
+                    role="region"
+                    aria-labelledby={`faq-toggle-${idx}`}
                     style={{
                       padding: "0 18px 16px 18px",
                       fontSize: "0.875rem",
@@ -122,7 +133,7 @@ export function FAQSection() {
                       paddingTop: "12px",
                     }}
                   >
-                    💬 {item.a}
+                    {item.a}
                   </div>
                 )}
               </div>

@@ -50,7 +50,8 @@ export const Footer = memo(function Footer() {
                 <a
                   key={i}
                   href="#"
-                  className="footer-social-icon"
+                  aria-label={i === 0 ? "Instagram Matrikulasi TRPL" : "GitHub Matrikulasi TRPL"}
+                  className="footer-social-icon focus-ring"
                   style={{
                     width: "36px",
                     height: "36px",
@@ -80,7 +81,8 @@ export const Footer = memo(function Footer() {
               <a
                 key={item}
                 href="#"
-                className="footer-link"
+                className="footer-link focus-ring"
+                aria-label={item}
                 style={{
                   display: "block",
                   color: "rgba(255,250,246,0.65)",
@@ -102,7 +104,8 @@ export const Footer = memo(function Footer() {
               <a
                 key={item}
                 href="#"
-                className="footer-link"
+                className="footer-link focus-ring"
+                aria-label={item}
                 style={{
                   display: "block",
                   color: "rgba(255,250,246,0.65)",
@@ -118,7 +121,8 @@ export const Footer = memo(function Footer() {
               href="https://himaprodi-trpl-cwe.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer-link"
+              className="footer-link focus-ring"
+              aria-label="Kunjungi situs HIMA TRPL"
               style={{
                 display: "flex",
                 alignItems: "center",

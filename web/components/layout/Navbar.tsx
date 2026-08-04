@@ -23,6 +23,8 @@ export const Navbar = memo(function Navbar() {
     { label: "Fitur", href: "#fitur" },
   ];
 
+  const isExternalHash = (href: string) => href.startsWith("#");
+
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
@@ -35,11 +37,11 @@ export const Navbar = memo(function Navbar() {
       }`}
     >
       <div className="section-container">
-        <nav className="flex items-center justify-between h-[70px]">
-          <Link href="/" className="flex items-center gap-[10px] no-underline">
+        <nav className="flex items-center justify-between h-[70px]" aria-label="Navigasi utama">
+          <Link href="/" className="flex items-center gap-[10px] no-underline" aria-label="Beranda Matrikulasi TRPL">
             <motion.div
               whileHover={{ rotate: 10, scale: 1.1 }}
-              className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center"
+              className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center focus-ring"
               style={{
                 background: "var(--gradient-hero)",
                 boxShadow: "var(--shadow-glow-soft)",
@@ -59,26 +61,20 @@ export const Navbar = memo(function Navbar() {
           </Link>
 
           <div className="items-center gap-[var(--space-8)] desktop-nav hidden md:flex">
-            {navLinks.map((link) => (
-              <motion.a
-                key={link.href}
-                href={link.href}
-                className="no-underline font-semibold text-[0.9375rem] relative pb-1"
-                style={{ color: "var(--text-secondary)" }}
-                whileHover={{ color: "var(--color-primary-500)" }}
-              >
-                {link.label}
-                <motion.span
-                  className="absolute bottom-0 left-0 h-[2px] rounded-sm"
-                  style={{
-                    background: "var(--gradient-hero)",
-                    width: 0,
-                  }}
-                  whileHover={{ width: "100%" }}
-                  transition={{ duration: 0.2 }}
-                />
-              </motion.a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = typeof window !== "undefined" && window.location.hash === link.href;
+              return (
+                <motion.a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isExternalHash(link.href) ? undefined : isActive ? "page" : undefined}
+                  className={`nav-link no-underline ${isActive ? "nav-link-active" : ""}`}
+                  whileHover={{ color: "var(--color-primary-500)" }}
+                >
+                  {link.label}
+                </motion.a>
+              );
+            })}
 
             <ThemeToggle />
 
@@ -92,7 +88,9 @@ export const Navbar = memo(function Navbar() {
             <motion.button
               onClick={() => setMenuOpen(!menuOpen)}
               whileTap={{ scale: 0.9 }}
-              className="w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer"
+              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              aria-expanded={menuOpen}
+              className="w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer focus-ring"
               style={{
                 background: "rgba(255,107,0,0.08)",
                 border: "1px solid rgba(255,107,0,0.2)",
@@ -127,7 +125,7 @@ export const Navbar = memo(function Navbar() {
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: i * 0.08 }}
                   onClick={() => setMenuOpen(false)}
-                  className="block py-3 no-underline font-semibold border-b"
+                  className="block py-3 no-underline font-semibold border-b focus-ring"
                   style={{
                     color: "var(--text-secondary)",
                     borderColor: "var(--border-color)",

@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
@@ -131,7 +129,20 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "var(--radius-md)", padding: "10px", marginBottom: "var(--space-4)", color: "#EF4444", fontSize: "0.85rem", textAlign: "center" }}>
+          <div
+            role="alert"
+            aria-live="assertive"
+            style={{
+              background: "rgba(239,68,68,0.1)",
+              border: "1px solid var(--color-accent-red)",
+              borderRadius: "var(--radius-md)",
+              padding: "10px",
+              marginBottom: "var(--space-4)",
+              color: "var(--color-accent-red)",
+              fontSize: "0.85rem",
+              textAlign: "center",
+            }}
+          >
             {error}
           </div>
         )}
@@ -139,7 +150,8 @@ export default function LoginPage() {
         <button
           onClick={handleSSOLogin}
           disabled={loading || checkingRedirect}
-          className="login-btn"
+          className="login-btn focus-ring"
+          aria-label={loading ? "Memproses login..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
           style={{
             width: "100%",
             padding: "var(--space-3) var(--space-4)",
@@ -157,7 +169,7 @@ export default function LoginPage() {
             opacity: loading ? 0.6 : 1,
           }}
         >
-          <GoogleLogo size={20} weight="bold" color="#FF6B00" />
+          <GoogleLogo size={20} weight="bold" color="var(--color-primary-500)" />
           {loading ? "Memproses..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
         </button>
 
@@ -165,6 +177,8 @@ export default function LoginPage() {
           <button
             onClick={handleMockLogin}
             disabled={loading || checkingRedirect}
+            className="focus-ring"
+            aria-label="Login mock (tanpa Firebase)"
             style={{
               width: "100%",
               padding: "var(--space-3) var(--space-4)",
@@ -182,7 +196,7 @@ export default function LoginPage() {
               marginTop: "12px",
             }}
           >
-            <User size={18} /> Login Mock (tanpa Firebase)
+            <User size={18} aria-hidden="true" /> Login Mock (tanpa Firebase)
           </button>
         )}
       </div>

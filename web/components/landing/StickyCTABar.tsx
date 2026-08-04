@@ -27,7 +27,7 @@ export function StickyCTABar() {
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 9999,
-        background: "rgba(15, 23, 42, 0.85)",
+        background: "color-mix(in srgb, var(--bg-dark) 85%, transparent)",
         backdropFilter: "blur(16px)",
         border: "1px solid var(--border-color)",
         borderRadius: "9999px",
@@ -38,14 +38,15 @@ export function StickyCTABar() {
         boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#FFF", fontSize: "0.875rem", fontWeight: 700 }}>
-        <Rocket size={20} color="var(--primary-color)" />
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 700 }}>
+        <Rocket size={20} color="var(--color-primary-500)" />
         <span>Siap Mulai Matrikulasi TRPL 2026?</span>
       </div>
 
       <Link
         href="/login"
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary btn-sm focus-ring"
+        aria-label="Mulai matrikulasi"
         style={{
           borderRadius: "9999px",
           display: "flex",

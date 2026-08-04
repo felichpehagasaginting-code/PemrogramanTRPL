@@ -32,7 +32,7 @@ export function DailyStreakWidget({ streak = 1 }: DailyStreakWidgetProps) {
       <div
         style={{
           background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(255, 107, 0, 0.15))",
-          border: "1px solid var(--error-color)",
+          border: "1px solid var(--color-accent-red)",
           borderRadius: "var(--radius-xl)",
           padding: "var(--space-5)",
           display: "flex",
@@ -46,7 +46,7 @@ export function DailyStreakWidget({ streak = 1 }: DailyStreakWidgetProps) {
               width: "48px",
               height: "48px",
               borderRadius: "50%",
-              background: "var(--gradient-primary)",
+              background: "var(--gradient-hero)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -66,7 +66,21 @@ export function DailyStreakWidget({ streak = 1 }: DailyStreakWidgetProps) {
         </div>
 
         {/* Circular progress wheel (100% completed) */}
-        <div style={{ width: "42px", height: "42px", borderRadius: "50%", border: "3px solid var(--primary-color)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "0.8125rem", color: "var(--primary-color)" }}>
+        <div
+          aria-label="Streak 100% aktif"
+          style={{
+            width: "42px",
+            height: "42px",
+            borderRadius: "50%",
+            border: "3px solid var(--color-primary-500)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 800,
+            fontSize: "0.8125rem",
+            color: "var(--color-primary-600)",
+          }}
+        >
           100%
         </div>
       </div>
@@ -82,10 +96,15 @@ export function DailyStreakWidget({ streak = 1 }: DailyStreakWidgetProps) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--primary-color)", display: "flex", alignItems: "center", gap: "4px" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-primary-600)", display: "flex", alignItems: "center", gap: "4px" }}>
             <Sparkle size={14} /> PROGRAMMING QUOTE / MEME
           </span>
-          <button onClick={nextMeme} className="btn btn-sm btn-ghost" title="Meme Berikutnya">
+          <button
+            onClick={nextMeme}
+            className="btn btn-sm btn-ghost focus-ring"
+            title="Meme Berikutnya"
+            aria-label="Meme berikutnya"
+          >
             <ArrowClockwise size={14} /> Acak
           </button>
         </div>

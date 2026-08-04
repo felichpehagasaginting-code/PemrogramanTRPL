@@ -24,7 +24,7 @@ import {
 import { Button, BadgeIcon } from "@/components/ui";
 import { MODULES_META } from "@/lib/content/modules-data";
 import { BADGES } from "@/lib/store/useUserStore";
-import { getRandomMemes } from "@/lib/content/memes";
+import { getRandomMemes, MODULE_MEMES, Meme } from "@/lib/content/memes";
 import { ColorSwitcher } from "./ColorSwitcher";
 import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
 import { ModulePreviewModal } from "./ModulePreviewModal";
@@ -77,8 +77,8 @@ function HeroSandbox() {
   };
 
   const tabStyle = (a: boolean) => ({
-    background: a ? "#1E293B" : "transparent",
-    color: a ? "#fff" : "#6B7280",
+    background: a ? "var(--color-neutral-900)" : "transparent",
+    color: a ? "#fff" : "var(--text-muted)",
     border: "none",
     borderRadius: "6px",
     padding: "5px 12px",
@@ -98,7 +98,7 @@ function HeroSandbox() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
       style={{
-        background: "#0F172A",
+        background: "var(--bg-dark)",
         borderRadius: "var(--radius-xl)",
         border: "1.5px solid rgba(255,255,255,0.06)",
         boxShadow: "0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03)",
@@ -111,13 +111,13 @@ function HeroSandbox() {
       {/* Chrome */}
       <div style={{ background: "#1E293B", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 14px", height: "42px", userSelect: "none" }}>
         <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FF5F57" }} />
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FFBD2E" }} />
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28C840" }} />
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FF5F57" }} aria-hidden="true" />
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FFBD2E" }} aria-hidden="true" />
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28C840" }} aria-hidden="true" />
           <div style={{ display: "flex", gap: "3px", marginLeft: "14px" }}>
-            <button onClick={() => setTab("code")} style={tabStyle(tab === "code")}><Code size={11} /> Code</button>
-            <button onClick={() => setTab("preview")} style={tabStyle(tab === "preview")}><Play size={11} /> Preview</button>
-            <button onClick={() => setTab("folder")} style={tabStyle(tab === "folder")}><Books size={11} /> Folder</button>
+            <button onClick={() => setTab("code")} aria-label="Tab kode sumber" aria-selected={tab === "code"} style={tabStyle(tab === "code")}><Code size={11} /> Code</button>
+            <button onClick={() => setTab("preview")} aria-label="Tab preview" aria-selected={tab === "preview"} style={tabStyle(tab === "preview")}><Play size={11} /> Preview</button>
+            <button onClick={() => setTab("folder")} aria-label="Tab folder workspace" aria-selected={tab === "folder"} style={tabStyle(tab === "folder")}><Books size={11} /> Folder</button>
           </div>
         </div>
         {tab === "code" && (
@@ -125,6 +125,7 @@ function HeroSandbox() {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={run} disabled={running}
+            aria-label={running ? "Sedang menjalankan kode" : "Jalankan kode Python"}
             style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e", padding: "4px 14px", borderRadius: "20px", fontSize: "0.68rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
           >
             {running ? <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} /> : <Play size={10} weight="fill" />}
@@ -382,7 +383,11 @@ const features = [
 
 export function FeaturesSection() {
   const [memeIdx, setMemeIdx] = useState(0);
-  const memePool = getRandomMemes("M8", 5);
+  const [memePool, setMemePool] = useState<Meme[]>(MODULE_MEMES["M8"] || []);
+
+  useEffect(() => {
+    setMemePool(getRandomMemes("M8", 5));
+  }, []);
 
   useEffect(() => {
     if (memePool.length < 2) return;
@@ -550,6 +555,10 @@ export function CurriculumSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
               onClick={() => setPreviewModuleId(m.id)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewModuleId(m.id); } }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Preview modul ${m.code}: ${m.title}`}
               transition={{ duration: 0.35, delay: i * 0.04 }}
               style={{ display: "flex", gap: "var(--space-5)", padding: "var(--space-4) 0", borderBottom: i < mods.length - 1 ? "1px solid var(--border-color)" : "none", cursor: "pointer" }}
             >

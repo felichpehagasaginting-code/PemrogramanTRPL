@@ -59,14 +59,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </span>
           </Link>
 
-          <nav style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }} className="platform-nav">
+          <nav style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }} className="platform-nav" aria-label="Navigasi platform">
             {menuLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", color: isActive ? "var(--color-primary-500)" : "var(--text-secondary)", textDecoration: "none", fontWeight: isActive ? 700 : 600, fontSize: "0.875rem", transition: "color var(--transition-fast)" }}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`nav-link no-underline ${isActive ? "nav-link-active" : ""}`}
                 >
                   {link.icon}
                   <span>{link.label}</span>
@@ -76,13 +77,28 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ background: "rgba(255,107,0,0.08)", border: "1.5px solid var(--border-color)", padding: "4px 12px", borderRadius: "var(--radius-full)", fontSize: "0.8rem", fontFamily: "var(--font-heading)", fontWeight: 700, color: "var(--color-primary-600)" }}>
+            <div
+              style={{
+                background: "rgba(255,107,0,0.08)",
+                border: "1.5px solid var(--border-color-strong)",
+                padding: "4px 12px",
+                borderRadius: "var(--radius-full)",
+                fontSize: "0.8rem",
+                fontFamily: "var(--font-heading)",
+                fontWeight: 700,
+                color: "var(--color-primary-600)",
+              }}
+              aria-label="Poin pengguna"
+            >
               ⚡ {user.xp} XP
             </div>
             <ThemeToggle />
-            <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "6px", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "0.875rem", fontWeight: 600, transition: "color var(--transition-fast)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent-red)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+            <button onClick={handleLogout}
+              className="nav-link no-underline focus-ring"
+              aria-label="Keluar"
+              style={{ color: "var(--text-muted)" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-accent-red)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
             >
               <SignOut size={20} />
               <span className="logout-text">Keluar</span>

@@ -54,6 +54,8 @@ function FolderCreationSimulator() {
               placeholder="Contoh: belajar_python atau matrikulasi-trpl"
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
+              className="focus-ring"
+              aria-label="Nama folder proyek"
               style={{
                 width: "100%",
                 background: "var(--bg-page-alt)",
@@ -70,13 +72,13 @@ function FolderCreationSimulator() {
             {folderName.length > 0 && (
               <div style={{ fontSize: "0.75rem", marginTop: "6px" }}>
                 {hasSpace && (
-                  <span style={{ color: "#EF4444" }}>❌ Mengandung spasi! Terminal akan memperlakukan spasi sebagai pemisah perintah. Gunakan <code>_</code> atau <code>-</code>.</span>
+                  <span style={{ color: "var(--color-accent-red)" }}>❌ Mengandung spasi! Terminal akan memperlakukan spasi sebagai pemisah perintah. Gunakan <code>_</code> atau <code>-</code>.</span>
                 )}
                 {hasSpecialChar && !hasSpace && (
-                  <span style={{ color: "#EF4444" }}>❌ Mengandung karakter spesial terlarang! Gunakan hanya huruf, angka, underscore, atau tanda hubung.</span>
+                  <span style={{ color: "var(--color-accent-red)" }}>❌ Mengandung karakter spesial terlarang! Gunakan hanya huruf, angka, underscore, atau tanda hubung.</span>
                 )}
                 {isNameValid && (
-                  <span style={{ color: "#22C55E" }}>✅ Nama folder memenuhi standar profesional!</span>
+                  <span style={{ color: "var(--color-accent-green)" }}>✅ Nama folder memenuhi standar profesional!</span>
                 )}
               </div>
             )}
@@ -101,9 +103,11 @@ function FolderCreationSimulator() {
                     key={loc.path}
                     type="button"
                     onClick={() => setSelectedPath(loc.path)}
+                    aria-pressed={isSelected}
+                    className="focus-ring"
                     style={{
                       background: isSelected ? (isProper ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)") : "var(--bg-page-alt)",
-                      border: isSelected ? `2px solid ${isProper ? "#22C55E" : "#EF4444"}` : "1px solid var(--border-color)",
+                      border: isSelected ? `2px solid ${isProper ? "var(--color-accent-green)" : "var(--color-accent-red)"}` : "1px solid var(--border-color)",
                       padding: "10px",
                       borderRadius: "var(--radius-md)",
                       textAlign: "left",
@@ -121,16 +125,16 @@ function FolderCreationSimulator() {
             {selectedPath && (
               <div style={{ fontSize: "0.75rem", marginTop: "8px" }}>
                 {selectedPath.includes("Desktop") && (
-                  <span style={{ color: "#EF4444" }}>❌ Desktop tersinkronisasi otomatis oleh cloud (OneDrive) yang sering mengunci file database/interpreter.</span>
+                  <span style={{ color: "var(--color-accent-red)" }}>❌ Desktop tersinkronisasi otomatis oleh cloud (OneDrive) yang sering mengunci file database/interpreter.</span>
                 )}
                 {selectedPath.includes("Downloads") && (
-                  <span style={{ color: "#EF4444" }}>❌ Downloads adalah folder temp bersih-bersih, bukan untuk menyimpan codebase.</span>
+                  <span style={{ color: "var(--color-accent-red)" }}>❌ Downloads adalah folder temp bersih-bersih, bukan untuk menyimpan codebase.</span>
                 )}
                 {selectedPath.includes("Program Files") && (
-                  <span style={{ color: "#EF4444" }}>❌ Membutuhkan hak akses Administrator. Python akan ditolak saat menulis file kode baru.</span>
+                  <span style={{ color: "var(--color-accent-red)" }}>❌ Membutuhkan hak akses Administrator. Python akan ditolak saat menulis file kode baru.</span>
                 )}
                 {selectedPath === "D:\\TRPL\\Pemrograman" && (
-                  <span style={{ color: "#22C55E" }}>✅ Sempurna! Partisi non-sistem (D:) aman dari proteksi izin OS dan sinkronisasi otomatis.</span>
+                  <span style={{ color: "var(--color-accent-green)" }}>✅ Sempurna! Partisi non-sistem (D:) aman dari proteksi izin OS dan sinkronisasi otomatis.</span>
                 )}
               </div>
             )}
@@ -141,6 +145,8 @@ function FolderCreationSimulator() {
             type="button"
             disabled={!isEverythingValid}
             onClick={() => setIsCreated(true)}
+            className="focus-ring"
+            aria-label="Buat folder proyek"
             style={{
               background: isEverythingValid ? "var(--color-primary-500)" : "var(--bg-page-alt)",
               color: isEverythingValid ? "white" : "var(--text-secondary)",
@@ -158,12 +164,12 @@ function FolderCreationSimulator() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center", color: "#22C55E", fontSize: "0.9rem", fontWeight: 700 }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", color: "var(--color-accent-green)", fontSize: "0.9rem", fontWeight: 700 }}>
             <CheckCircle size={20} weight="fill" />
             <span>Folder Berhasil Dibuat di Lokasi yang Benar!</span>
           </div>
 
-          <div style={{ background: "#111827", border: "1px solid var(--border-color)", padding: "14px", borderRadius: "var(--radius-md)", fontFamily: "var(--font-code)", fontSize: "0.85rem", color: "#E5E7EB", lineHeight: 1.6 }}>
+          <div style={{ background: "var(--bg-dark)", border: "1px solid var(--border-color)", padding: "14px", borderRadius: "var(--radius-md)", fontFamily: "var(--font-code)", fontSize: "0.85rem", color: "#E5E7EB", lineHeight: 1.6 }}>
             <div>📁 {selectedPath}\{folderName}\</div>
             <div style={{ color: "#9CA3AF" }}>├── 📁 .vscode\</div>
             <div style={{ color: "#9CA3AF" }}>│   └── 📄 settings.json <span style={{ color: "#6B7280", fontSize: "0.75rem" }}>(konfigurasi workspace)</span></div>
@@ -182,6 +188,8 @@ function FolderCreationSimulator() {
               setFolderName("");
               setSelectedPath("");
             }}
+            className="focus-ring"
+            aria-label="Ulangi simulasi pembuatan folder"
             style={{
               background: "transparent",
               border: "1px solid var(--border-color)",
@@ -475,51 +483,58 @@ export default function LearnModulePage() {
               {/* Target Slots */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
                 {[
-                  { id: "desktop", label: "💻 Desktop", color: "#EF4444" },
-                  { id: "downloads", label: "📥 Downloads", color: "#EF4444" },
-                  { id: "proper", label: "📁 D:\\TRPL\\proyek", color: "#22C55E" },
-                ].map((slot) => (
-                  <button
-                    key={slot.id}
-                    onClick={() => {
-                      setDragLocation(slot.id as any);
-                      if (slot.id === "proper") {
-                        completeSubModule("M1", "sub-1.2");
-                      }
-                    }}
-                    style={{
-                      background: dragLocation === slot.id ? `${slot.color}15` : "var(--bg-page-alt)",
-                      border: dragLocation === slot.id ? `2px solid ${slot.color}` : "1.5px dashed var(--border-color)",
-                      padding: "var(--space-4)",
-                      borderRadius: "var(--radius-md)",
-                      cursor: "pointer",
-                      fontSize: "0.875rem",
-                      fontWeight: 700,
-                      color: "var(--text-primary)",
-                      textAlign: "center",
-                      transition: "all var(--transition-fast)",
-                    }}
-                  >
-                    {slot.label}
-                  </button>
-                ))}
+                  { id: "desktop", label: "💻 Desktop", danger: true },
+                  { id: "downloads", label: "📥 Downloads", danger: true },
+                  { id: "proper", label: "📁 D:\\TRPL\\proyek", danger: false },
+                ].map((slot) => {
+                  const isSelected = dragLocation === slot.id;
+                  const accent = slot.danger ? "var(--color-accent-red)" : "var(--color-accent-green)";
+                  return (
+                    <button
+                      key={slot.id}
+                      type="button"
+                      onClick={() => {
+                        setDragLocation(slot.id as any);
+                        if (slot.id === "proper") {
+                          completeSubModule("M1", "sub-1.2");
+                        }
+                      }}
+                      aria-pressed={isSelected}
+                      className="focus-ring"
+                      style={{
+                        background: isSelected ? `${slot.danger ? "rgba(239,68,68,0.10)" : "rgba(34,197,94,0.10)"}` : "var(--bg-page-alt)",
+                        border: isSelected ? `2px solid ${accent}` : "1.5px dashed var(--border-color)",
+                        padding: "var(--space-4)",
+                        borderRadius: "var(--radius-md)",
+                        cursor: "pointer",
+                        fontSize: "0.875rem",
+                        fontWeight: 700,
+                        color: isSelected ? accent : "var(--text-primary)",
+                        textAlign: "center",
+                        transition: "all var(--transition-fast)",
+                      }}
+                    >
+                      {slot.label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Feedback Message */}
               <div style={{ marginTop: "var(--space-4)", minHeight: "60px" }}>
                 {dragLocation === "desktop" && (
-                  <div style={{ color: "#EF4444", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
-                    <Warning size={18} /> Jangan taruh di Desktop! Folder Desktop mudah terhapus dan mengganggu set environment path.
+                  <div style={{ color: "var(--color-accent-red)", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
+                    <Warning size={18} aria-hidden="true" /> Jangan taruh di Desktop! Folder Desktop mudah terhapus dan mengganggu set environment path.
                   </div>
                 )}
                 {dragLocation === "downloads" && (
-                  <div style={{ color: "#EF4444", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
-                    <Warning size={18} /> Downloads adalah folder sampah sementara. Project coding tidak boleh diletakkan di sini!
+                  <div style={{ color: "var(--color-accent-red)", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
+                    <Warning size={18} aria-hidden="true" /> Downloads adalah folder sampah sementara. Project coding tidak boleh diletakkan di sini!
                   </div>
                 )}
                 {dragLocation === "proper" && (
-                  <div style={{ color: "#22C55E", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
-                    <CheckCircle size={18} weight="fill" /> Sempurna! Local disk D: atau partisi non-sistem adalah tempat terbaik untuk proyek coding.
+                  <div style={{ color: "var(--color-accent-green)", fontSize: "0.875rem", display: "flex", gap: "6px", alignItems: "center" }}>
+                    <CheckCircle size={18} weight="fill" aria-hidden="true" /> Sempurna! Local disk D: atau partisi non-sistem adalah tempat terbaik untuk proyek coding.
                   </div>
                 )}
               </div>
@@ -586,19 +601,19 @@ export default function LearnModulePage() {
               {/* Console simulator window */}
               <div
                 style={{
-                  background: "#111827",
-                  color: "#34D399",
+                  background: "var(--bg-dark)",
+                  color: "var(--text-primary)",
                   fontFamily: "var(--font-code)",
                   fontSize: "0.875rem",
                   padding: "var(--space-4)",
                   borderRadius: "var(--radius-lg)",
                   boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                  border: "1px solid rgba(255,107,0,0.15)",
+                  border: "1px solid var(--border-color-strong)",
                   marginBottom: "var(--space-4)",
                 }}
               >
-                <div style={{ display: "flex", gap: "6px", borderBottom: "1px solid #1F2937", paddingBottom: "8px", marginBottom: "12px", color: "#9CA3AF" }}>
-                  <Terminal size={16} /> Console Simulator
+                <div style={{ display: "flex", gap: "6px", borderBottom: "1px solid var(--border-color)", paddingBottom: "8px", marginBottom: "12px", color: "var(--text-muted)" }}>
+                  <Terminal size={16} aria-hidden="true" /> Console Simulator
                 </div>
                 <div style={{ minHeight: "120px", display: "flex", flexDirection: "column", gap: "4px" }}>
                   {cliOutput.map((line, i) => (
@@ -638,11 +653,15 @@ export default function LearnModulePage() {
                 }}
                 style={{ display: "flex", gap: "8px" }}
               >
+                <label htmlFor="cli-input" className="sr-only">Masukkan perintah terminal</label>
                 <input
+                  id="cli-input"
                   type="text"
                   placeholder="Ketik 'python --version' di sini..."
                   value={cliInput}
                   onChange={(e) => setCliInput(e.target.value)}
+                  className="focus-ring"
+                  aria-label="Masukkan perintah terminal"
                   style={{
                     flex: 1,
                     background: "var(--bg-card)",
@@ -655,7 +674,7 @@ export default function LearnModulePage() {
                     color: "var(--text-primary)",
                   }}
                 />
-                <button type="submit" className="btn btn-primary btn-sm">
+                <button type="submit" className="btn btn-primary btn-sm focus-ring" aria-label="Kirim perintah">
                   Kirim
                 </button>
               </form>
@@ -1871,6 +1890,8 @@ export default function LearnModulePage() {
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "var(--space-6)" }}>
         <button
           onClick={() => router.push("/dashboard")}
+          className="focus-ring"
+          aria-label="Kembali ke dashboard"
           style={{
             background: "none",
             cursor: "pointer",
@@ -1963,6 +1984,9 @@ export default function LearnModulePage() {
           <button
             onClick={handlePrev}
             disabled={currentSlideIndex === 0}
+            aria-label="Kembali ke slide sebelumnya"
+            aria-disabled={currentSlideIndex === 0}
+            className="focus-ring"
             style={{
               background: "transparent",
               border: "1.5px solid var(--border-color)",
@@ -1983,6 +2007,8 @@ export default function LearnModulePage() {
 
           <button
             onClick={handleNext}
+            aria-label={isLastSlide ? (moduleId === "M0" || moduleId === "M1" ? "Mulai kuis" : "Lanjut ke latihan") : "Lanjut ke slide berikutnya"}
+            className="focus-ring"
             style={{
               background: "var(--gradient-hero)",
               border: "none",

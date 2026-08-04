@@ -85,8 +85,8 @@ export function SkillTree({ progress }: SkillTreeProps) {
         <span
           style={{
             background: "rgba(255, 157, 0, 0.15)",
-            border: "1px solid var(--primary-color)",
-            color: "var(--primary-color)",
+            border: "1px solid var(--color-accent-yellow)",
+            color: "var(--color-accent-yellow)",
             padding: "4px 12px",
             borderRadius: "var(--radius-full)",
             fontSize: "0.75rem",
@@ -177,7 +177,7 @@ export function SkillTree({ progress }: SkillTreeProps) {
                     width: "56px",
                     height: "56px",
                     borderRadius: "50%",
-                    background: "var(--bg-secondary)",
+                    background: "var(--bg-page-alt)",
                     border: "2px solid var(--border-color)",
                     display: "flex",
                     alignItems: "center",
@@ -195,6 +195,7 @@ export function SkillTree({ progress }: SkillTreeProps) {
                   href={`/learn/${node.id}`}
                   style={{ textDecoration: "none" }}
                   title={`${node.id}: ${node.title} (${node.xp} XP)`}
+                  aria-label={`Buka modul ${node.id}: ${node.title}, ${node.xp} XP`}
                 >
                   <div
                     style={{
@@ -236,7 +237,7 @@ export function SkillTree({ progress }: SkillTreeProps) {
                   style={{
                     fontSize: "0.75rem",
                     fontWeight: 800,
-                    color: isActive ? "var(--primary-color)" : isCompleted ? "var(--success-color)" : "var(--text-muted)",
+                    color: isActive ? "var(--color-primary-500)" : isCompleted ? "var(--color-accent-green)" : "var(--text-muted)",
                   }}
                 >
                   {node.id}
