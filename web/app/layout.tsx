@@ -35,6 +35,8 @@ export const viewport = {
   userScalable: false,
 };
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pemrograman-trpl.vercel.app";
+
 export const metadata: Metadata = {
   title: {
     default: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
@@ -46,22 +48,37 @@ export const metadata: Metadata = {
   authors: [{ name: "Divisi Pemrograman Matrikulasi TRPL" }],
   creator: "Felich Pehagasa Ginting",
   publisher: "HIMA TRPL",
-  metadataBase: new URL("https://matrikulasi-trpl.vercel.app"),
+  metadataBase: new URL(appUrl),
   openGraph: {
     title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
     description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL. Live coding, gamifikasi, kuis seru, dan meme relevan.",
-    type: "website",
-    locale: "id_ID",
+    url: appUrl,
     siteName: "Matrikulasi TRPL",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
     description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL.",
+    images: ["/og-image.png"],
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    shortcut: "/icons/icon-192x192.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
   other: {
