@@ -916,7 +916,13 @@ export default function VSCodeSandboxPage() {
               {/* Bottom Integrated PowerShell Terminal */}
               {(showBottomTerminal || (isMobile && mobileActiveTab === "terminal")) && (
                 <div style={{ flex: 1, minHeight: "200px", borderTop: "1px solid #2d2d2d", overflow: "hidden" }}>
-                  <PowerShellTerminal code={activeFile.content} />
+                  <PowerShellTerminal
+                    code={activeFile.content}
+                    virtualFiles={files.reduce<Record<string, string>>((acc, f) => {
+                      acc[f.name] = f.content;
+                      return acc;
+                    }, {})}
+                  />
                 </div>
               )}
             </div>
