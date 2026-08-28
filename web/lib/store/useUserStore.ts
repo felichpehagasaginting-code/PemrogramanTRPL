@@ -437,17 +437,22 @@ export const useUserStore = create<UserState>()(
       },
 
       awardXP: async (uid, amount) => {
-        const { allUsers } = get();
+        const { allUsers, user } = get();
         const updated = allUsers.map((u) => {
           if (u.uid !== uid) return u;
           const newXP = u.xp + amount;
           return { ...u, xp: newXP, level: getLevelName(newXP) };
         });
-        set({ allUsers: updated });
+        const currentUserUpdated = user && user.uid === uid
+          ? { ...user, xp: user.xp + amount, level: getLevelName(user.xp + amount) }
+          : user;
+        set({ allUsers: updated, user: currentUserUpdated });
         if (!isMockFirebase) {
           try {
-            const user = allUsers.find((u) => u.uid === uid);
-            if (user) await updateDoc(doc(db, "users", uid), { xp: user.xp + amount, level: getLevelName(user.xp + amount) });
+            await updateDoc(doc(db, "users", uid), {
+              xp: (currentUserUpdated?.xp || 0),
+              level: getLevelName(currentUserUpdated?.xp || 0),
+            });
           } catch {}
         }
       },

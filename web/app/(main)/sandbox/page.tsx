@@ -105,6 +105,24 @@ export default function VSCodeSandboxPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Load incoming code if shared from AskHelp snapshot
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const incomingCode = searchParams.get("code");
+      if (incomingCode) {
+        setFiles((prev) => {
+          const hasMain = prev.some((f) => f.name === "main.py");
+          if (hasMain) {
+            return prev.map((f) => (f.name === "main.py" ? { ...f, content: incomingCode } : f));
+          }
+          return [{ name: "main.py", content: incomingCode }, ...prev];
+        });
+        setActiveFileName("main.py");
+      }
+    }
+  }, []);
+
   // Auto detect missions progress
   useEffect(() => {
     if (files.some((f) => f.name === "app.py")) setMission1(true);

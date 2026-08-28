@@ -99,10 +99,20 @@ export default function HelpSnapshotPage() {
               Dibuat pada: {new Date(snapshot.createdAt).toLocaleString("id-ID")}
             </p>
           </div>
-          <button onClick={handleCopyCode} className="btn btn-secondary" style={{ gap: "6px" }}>
-            {copied ? <Check size={16} /> : <Copy size={16} />}
-            {copied ? "Kode Disalin!" : "Salin Kode"}
-          </button>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <Link
+              href={`/sandbox?code=${encodeURIComponent(snapshot.code)}`}
+              className="btn btn-primary"
+              style={{ gap: "6px", textDecoration: "none" }}
+            >
+              <Play size={16} weight="bold" />
+              Uji di Sandbox IDE
+            </Link>
+            <button onClick={handleCopyCode} className="btn btn-secondary" style={{ gap: "6px" }}>
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+              {copied ? "Kode Disalin!" : "Salin Kode"}
+            </button>
+          </div>
         </div>
 
         {snapshot.error && (

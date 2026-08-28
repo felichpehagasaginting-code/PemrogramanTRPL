@@ -27,12 +27,66 @@ const DAILY_PUZZLES: LogicPuzzle[] = [
   },
   {
     id: "pz-2",
-    topic: "String Concatenation",
+    topic: "String Replication",
     code: `a = "5"\nb = 3\nprint(a * b)`,
     question: "Apa hasil cetakan dari `a * b`?",
     options: ["15", "555", "Error", "5 5 5"],
     correctIdx: 1,
-    explanation: "Mengalikan string teks dengan angka di Python akan menduplikasi string tersebut sebanyak angka pengali: '5' * 3 = '555'.",
+    explanation: "Mengalikan string dengan integer di Python akan menduplikasi teks sebanyak nilai integer ('5' * 3 = '555').",
+  },
+  {
+    id: "pz-3",
+    topic: "Boolean & Truthiness",
+    code: `nama = ""\nif nama:\n    print("Ada nama")\nelse:\n    print("Kosong")`,
+    question: "Apa output dari blok percabangan di atas?",
+    options: ["Ada nama", "Kosong", "Error", "None"],
+    correctIdx: 1,
+    explanation: "String kosong `\"\"` di Python bernilai Falsy (False), sehingga blok `else` yang akan dieksekusi.",
+  },
+  {
+    id: "pz-4",
+    topic: "Modulo Arithmetic",
+    code: `x = 17 % 5\nprint(x)`,
+    question: "Berapa nilai `x` yang dicetak?",
+    options: ["3.4", "2", "3", "1"],
+    correctIdx: 1,
+    explanation: "Operator modulo `%` menghasilkan sisa bagi integer. 17 dibagi 5 adalah 3 dengan sisa 2.",
+  },
+  {
+    id: "pz-5",
+    topic: "Integer Division",
+    code: `hasil = 7 // 2\nprint(hasil)`,
+    question: "Berapa hasil eksekusi `7 // 2`?",
+    options: ["3.5", "3", "4", "3.0"],
+    correctIdx: 1,
+    explanation: "Operator floor division `//` membagi angka dan membulatkan ke bawah menghasilkan bilangan bulat integer (3).",
+  },
+  {
+    id: "pz-6",
+    topic: "Range Function",
+    code: `total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)`,
+    question: "Berapa nilai akhir `total`?",
+    options: ["6", "10", "4", "3"],
+    correctIdx: 0,
+    explanation: "`range(1, 4)` menghasilkan angka 1, 2, dan 3 (stop 4 tidak diikutkan). Total = 1 + 2 + 3 = 6.",
+  },
+  {
+    id: "pz-7",
+    topic: "List Append & Length",
+    code: `buah = ["Apel", "Jeruk"]\nbuah.append("Mangga")\nprint(len(buah))`,
+    question: "Berapa panjang list `buah` sekarang?",
+    options: ["2", "3", "4", "None"],
+    correctIdx: 1,
+    explanation: "Metode `.append()` menambahkan satu item baru di akhir list, sehingga jumlah elemen menjadi 3.",
+  },
+  {
+    id: "pz-8",
+    topic: "String Slicing",
+    code: `teks = "TRPL2026"\nprint(teks[:4])`,
+    question: "Apa output dari slicing `teks[:4]`?",
+    options: ["TRPL", "2026", "TRPL2", "T"],
+    correctIdx: 0,
+    explanation: "Slicing `[:4]` mengambil karakter dari indeks 0 hingga sebelum indeks 4, yaitu 'T', 'R', 'P', 'L'.",
   },
 ];
 
@@ -41,7 +95,7 @@ export function DailyLogicBiteModal() {
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [puzzle, setPuzzle] = useState<LogicPuzzle>(DAILY_PUZZLES[0]);
-  const awardXP = useUserStore((s) => s.awardXP);
+  const addXP = useUserStore((s) => s.addXP);
   const user = useUserStore((s) => s.user);
 
   useEffect(() => {
@@ -61,7 +115,7 @@ export function DailyLogicBiteModal() {
     setSubmitted(true);
 
     if (selectedOpt === puzzle.correctIdx && user) {
-      await awardXP(user.uid, 25);
+      await addXP(25);
     }
     const today = new Date().toISOString().split("T")[0];
     localStorage.setItem("daily_logic_bite_date", today);

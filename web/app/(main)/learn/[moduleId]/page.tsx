@@ -1776,6 +1776,7 @@ export default function LearnModulePage() {
   const isLastSlide = currentSlideIndex === slides.length - 1;
 
   const handleNext = () => {
+    completeSubModule(moduleId as string, `slide-${currentSlideIndex}`);
     if (currentSlideIndex < slides.length - 1) {
       setCurrentSlideIndex(currentSlideIndex + 1);
     } else {
