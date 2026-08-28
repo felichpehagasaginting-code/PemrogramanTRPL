@@ -27,8 +27,10 @@ import {
   ArrowsInSimple,
   CaretDown,
   CaretUp,
+  Users,
 } from "@phosphor-icons/react";
 import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
+import { PairProgrammingRoom } from "@/components/editor/PairProgrammingRoom";
 
 interface VirtualFile {
   name: string;
@@ -63,6 +65,7 @@ export default function VSCodeSandboxPage() {
   // Mobile & Aspect Ratio Responsiveness State
   const [isMobile, setIsMobile] = useState(false);
   const [mobileActiveTab, setMobileActiveTab] = useState<"editor" | "terminal" | "misi">("editor");
+  const [sandboxMode, setSandboxMode] = useState<"vscode" | "pair">("vscode");
 
   const [activeTab, setActiveTab] = useState<"explorer" | "search" | "git" | "extensions" | "settings">("explorer");
   const [activeFileName, setActiveFileName] = useState<string>("main.py");
@@ -203,25 +206,77 @@ export default function VSCodeSandboxPage() {
         overflowX: "hidden",
       }}
     >
-      {/* Header Info */}
+      {/* Header Info & Mode Switcher */}
       {!isMaximized && (
-        <div style={{ marginBottom: "var(--space-4)" }}>
-          <h1
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "12px", marginBottom: "var(--space-4)" }}>
+          <div>
+            <h1
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: isMobile ? "1.5rem" : "1.875rem",
+                fontWeight: 800,
+                color: "var(--text-primary)",
+                margin: "0 0 4px",
+              }}
+            >
+              VS Code Sandbox <span className="gradient-text">Simulator</span>
+            </h1>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", margin: 0 }}>
+              Workspace simulasi mandiri untuk melatih pembuatan file, edit kode Python, dan eksekusi Terminal CLI!
+            </p>
+          </div>
+
+          {/* Mode Selector Pill */}
+          <div
             style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: isMobile ? "1.5rem" : "1.875rem",
-              fontWeight: 800,
-              color: "var(--text-primary)",
-              margin: "0 0 4px",
+              display: "flex",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "var(--radius-full)",
+              padding: "3px",
             }}
           >
-            VS Code Sandbox <span className="gradient-text">Simulator</span>
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", margin: 0 }}>
-            Workspace simulasi mandiri untuk melatih pembuatan file, edit kode Python, dan eksekusi Terminal CLI!
-          </p>
+            <button
+              onClick={() => setSandboxMode("vscode")}
+              style={{
+                padding: "6px 14px",
+                borderRadius: "var(--radius-full)",
+                border: "none",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                background: sandboxMode === "vscode" ? "var(--primary)" : "transparent",
+                color: sandboxMode === "vscode" ? "white" : "var(--text-secondary)",
+              }}
+            >
+              Mode Mandiri
+            </button>
+            <button
+              onClick={() => setSandboxMode("pair")}
+              style={{
+                padding: "6px 14px",
+                borderRadius: "var(--radius-full)",
+                border: "none",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                background: sandboxMode === "pair" ? "var(--primary)" : "transparent",
+                color: sandboxMode === "pair" ? "white" : "var(--text-secondary)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Users size={14} /> Pair Programming
+            </button>
+          </div>
         </div>
       )}
+
+      {sandboxMode === "pair" ? (
+        <PairProgrammingRoom />
+      ) : (
+        <>
 
       {/* Mobile Tab Navigation Bar (For 1080x2400 and Smartphone viewports) */}
       {isMobile && (
@@ -931,6 +986,8 @@ export default function VSCodeSandboxPage() {
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Embedded CSS */}
       <style jsx>{`

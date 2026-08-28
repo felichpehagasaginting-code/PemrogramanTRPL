@@ -1,4 +1,4 @@
-// Client-side Pyodide runner using dynamic script loading & WASM sandbox
+// Client-side Pyodide runner using Dedicated Web Worker Sandbox & Anti-Infinite-Loop protection
 
 declare global {
   interface Window {
@@ -11,6 +11,40 @@ export interface ExecutionResult {
   output: string[];
   error?: string;
   executionTimeMs: number;
+}
+
+let activeWorker: Worker | null = null;
+let workerInitPromise: Promise<boolean> | null = null;
+let reqIdCounter = 0;
+
+function getWorker(): Worker | null {
+  if (typeof window === "undefined" || typeof Worker === "undefined") {
+    return null;
+  }
+  if (!activeWorker) {
+    try {
+      activeWorker = new Worker("/workers/pyodide.worker.js");
+      activeWorker.onerror = (e) => {
+        console.warn("Pyodide worker error:", e);
+      };
+    } catch (e) {
+      console.warn("Could not instantiate Web Worker, falling back to main thread:", e);
+      activeWorker = null;
+    }
+  }
+  return activeWorker;
+}
+
+function terminateAndRespawnWorker() {
+  if (activeWorker) {
+    try {
+      activeWorker.terminate();
+    } catch {
+      // ignore
+    }
+    activeWorker = null;
+    workerInitPromise = null;
+  }
 }
 
 let pyodidePromise: Promise<any> | null = null;
@@ -61,7 +95,8 @@ export async function getPyodide(): Promise<any> {
   return pyodidePromise;
 }
 
-export async function runPythonCodeClient(
+// Fallback execution on main thread if Web Worker is disabled/unsupported
+async function runPythonMainThread(
   code: string,
   inputs: string[] = []
 ): Promise<ExecutionResult> {
@@ -69,11 +104,9 @@ export async function runPythonCodeClient(
   try {
     const pyodide = await getPyodide();
 
-    // Setup stdout and stderr capture with interactive JS input prompt fallback
     const setupPyCode = `
 import sys
 import io
-import js
 
 _captured_stdout = io.StringIO()
 _captured_stderr = io.StringIO()
@@ -94,21 +127,11 @@ def input(prompt_text=""):
         _input_idx += 1
         print(val)
         return val
-    
-    # Interactive browser prompt (Scanner-style interactive input)
-    try:
-        user_val = js.prompt(prompt_str or "Masukkan nilai input:")
-        if user_val is None:
-            user_val = "0"
-        print(user_val)
-        return user_val
-    except Exception:
-        return "0"
+    return "0"
 `;
 
     await pyodide.runPythonAsync(setupPyCode);
 
-    // Execute student code
     try {
       await pyodide.runPythonAsync(code);
     } catch (pythonErr: any) {
@@ -126,7 +149,7 @@ def input(prompt_text=""):
     const lines = capturedOut ? capturedOut.split("\n").filter((l, i, arr) => i < arr.length - 1 || l !== "") : [];
 
     return {
-      output: lines.length > 0 ? lines : ["(Kode berjalan tanpa output cetakan)"],
+      output: lines.length > 0 ? lines : ["(Kode berjalan lancar tanpa output cetakan)"],
       executionTimeMs,
     };
   } catch (err: any) {
@@ -138,3 +161,70 @@ def input(prompt_text=""):
     };
   }
 }
+
+export async function runPythonCodeClient(
+  code: string,
+  inputs: string[] = [],
+  timeoutMs: number = 7000
+): Promise<ExecutionResult> {
+  const worker = getWorker();
+
+  if (!worker) {
+    return runPythonMainThread(code, inputs);
+  }
+
+  const reqId = ++reqIdCounter;
+  const startTime = performance.now();
+
+  return new Promise((resolve) => {
+    let hasResolved = false;
+
+    const timer = setTimeout(() => {
+      if (hasResolved) return;
+      hasResolved = true;
+      // Terminate worker to kill infinite loop
+      terminateAndRespawnWorker();
+      const executionTimeMs = Math.round(performance.now() - startTime);
+      resolve({
+        output: [
+          "⏱️ [Waktu Eksekusi Habis - Timeout 7s]",
+          "💡 Tips Mentor: Kemungkinan kodinganmu mengalami loop tak terhingga (misal: 'while True:' tanpa 'break' atau lupa update variabel counter).",
+          "Silakan periksa kondisi perulangan kamu lalu jalankan ulang ya!"
+        ],
+        error: "ExecutionTimeout: Loop tanpa henti terdeteksi.",
+        executionTimeMs,
+      });
+    }, timeoutMs);
+
+    const messageHandler = (event: MessageEvent) => {
+      if (event.data && event.data.id === reqId) {
+        if (hasResolved) return;
+        hasResolved = true;
+        clearTimeout(timer);
+        worker.removeEventListener("message", messageHandler);
+
+        if (event.data.type === "RUN_SUCCESS") {
+          resolve({
+            output: event.data.output || [],
+            executionTimeMs: event.data.executionTimeMs || Math.round(performance.now() - startTime),
+          });
+        } else {
+          resolve({
+            output: event.data.output || [event.data.error || "Terjadi error."],
+            error: event.data.error,
+            executionTimeMs: event.data.executionTimeMs || Math.round(performance.now() - startTime),
+          });
+        }
+      }
+    };
+
+    worker.addEventListener("message", messageHandler);
+    worker.postMessage({
+      id: reqId,
+      type: "RUN",
+      code,
+      inputs,
+    });
+  });
+}
+
