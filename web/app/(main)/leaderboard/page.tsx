@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore } from "@/lib/store/useUserStore";
+import { useUserStore, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
 import { AvatarIcon } from "@/components/ui";
@@ -253,8 +253,27 @@ export default function LeaderboardPage() {
                     <AvatarIcon id={item.avatar} size={26} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "0.9375rem" }}>
-                      {item.name} {isSelf && <span style={{ fontSize: "0.7rem", background: "var(--color-primary-500)", color: "white", padding: "1px 6px", borderRadius: "var(--radius-full)", marginLeft: "4px" }}>KAMU</span>}
+                    <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "0.9375rem", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+                      <span>{item.name}</span>
+                      {isSelf && <span style={{ fontSize: "0.7rem", background: "var(--color-primary-500)", color: "white", padding: "1px 6px", borderRadius: "var(--radius-full)" }}>KAMU</span>}
+                      {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
+                        <span
+                          style={{
+                            fontSize: "0.68rem",
+                            fontWeight: 800,
+                            background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)",
+                            color: "#000",
+                            padding: "2px 8px",
+                            borderRadius: "var(--radius-full)",
+                            boxShadow: "0 0 10px rgba(245,158,11,0.5)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "3px",
+                          }}
+                        >
+                          👑 Platform Creator
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{item.level}</div>
                   </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore, BADGES } from "@/lib/store/useUserStore";
+import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { MODULES_META } from "@/lib/content/modules-data";
 import Link from "next/link";
 import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket } from "@phosphor-icons/react";
@@ -11,6 +11,7 @@ import { PointingPopup } from "@/components/ui/PointingPopup";
 import { DASHBOARD_FEATURES, POINTING_FEATURES } from "@/lib/features";
 import { SkillTree } from "@/components/learning/SkillTree";
 import { DailyStreakWidget } from "@/components/dashboard/DailyStreakWidget";
+import { DailyLogicBiteModal } from "@/components/learning/DailyLogicBiteModal";
 
 const moduleIconMap: Record<string, React.ReactNode> = {
   M0: <Lightning size={22} weight="fill" />, M1: <Lightning size={22} weight="fill" />,
@@ -153,6 +154,34 @@ export default function DashboardPage() {
               <span>M0: Orientasi</span>
               <span>{completedCount} dari 9 Modul Selesai</span>
               <span>M8: Mini Project</span>
+            </div>
+
+            {/* Certificate Link Banner */}
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "12px 16px",
+                background: "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
+                border: "1px solid rgba(245, 158, 11, 0.4)",
+                borderRadius: "var(--radius-lg)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem", color: "var(--text-primary)" }}>
+                <Trophy size={20} color="#F59E0B" weight="fill" />
+                <span>
+                  {percentage >= 80
+                    ? "🎉 Selamat! Kamu berhak mengklaim Sertifikat Kelulusan Resmi TRPL!"
+                    : "Selesaikan modul sampai M8 untuk membuka Sertifikat Kelulusan Resmi TRPL."}
+                </span>
+              </div>
+              <Link href="/certificate" className="btn btn-sm btn-primary" style={{ padding: "4px 12px", fontSize: "0.75rem" }}>
+                {percentage >= 80 ? "Klaim Sertifikat 🎓" : "Lihat Sertifikat"}
+              </Link>
             </div>
           </div>
 
@@ -322,7 +351,12 @@ export default function DashboardPage() {
                     <span style={{ fontSize: "0.8rem", fontWeight: 800, color: idx === 0 ? "#FFD93D" : idx === 1 ? "#9E9E9E" : idx === 2 ? "#CD7F32" : "var(--text-muted)", width: "16px" }}>
                       #{idx + 1}
                     </span>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)" }}>{item.name}</span>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px" }}>
+                      {item.name}
+                      {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
+                        <span title="Platform Creator" style={{ fontSize: "0.7rem", background: "linear-gradient(135deg, #FF6B00, #F59E0B)", color: "#000", padding: "1px 6px", borderRadius: "10px", fontWeight: 800 }}>👑 Creator</span>
+                      )}
+                    </span>
                   </div>
                   <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--color-primary-600)" }}>
                     ⚡ {item.xp} XP
@@ -383,6 +417,7 @@ export default function DashboardPage() {
       `}</style>
       <FeaturePopupQueue features={DASHBOARD_FEATURES} delay={6000} />
       <PointingPopup {...POINTING_FEATURES.moduleStart} delay={9000} position="right" />
+      <DailyLogicBiteModal />
     </div>
   );
 }
