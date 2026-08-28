@@ -28,7 +28,7 @@ async function initPyodideWorker() {
 }
 
 self.onmessage = async (event) => {
-  const { id, type, code, inputs = [] } = event.data;
+  const { id, type, code, inputs = [], files = {} } = event.data;
 
   if (type === "INIT") {
     try {
@@ -44,6 +44,17 @@ self.onmessage = async (event) => {
     const startTime = performance.now();
     try {
       const pyodide = await initPyodideWorker();
+
+      // Mount Virtual Filesystem (VFS) into Pyodide
+      if (files && typeof files === "object") {
+        for (const [filename, content] of Object.entries(files)) {
+          try {
+            pyodide.FS.writeFile(filename, String(content));
+          } catch (fsErr) {
+            console.warn("Pyodide VFS write error:", fsErr);
+          }
+        }
+      }
 
       const setupPyCode = `
 import sys
