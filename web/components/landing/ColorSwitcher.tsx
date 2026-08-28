@@ -36,21 +36,21 @@ export function ColorSwitcher() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
       style={{
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
         gap: "10px",
-        background: "rgba(255,255,255,0.06)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--bg-page-alt)",
+        border: "1.5px solid var(--border-color-strong)",
         borderRadius: "var(--radius-full)",
-        padding: "6px 14px 6px 18px",
+        padding: "6px 14px 6px 16px",
+        boxShadow: "var(--shadow-sm)",
+        width: "fit-content",
       }}
     >
       <span
         style={{
-          fontSize: "0.7rem",
-          fontWeight: 600,
+          fontSize: "0.72rem",
+          fontWeight: 700,
           color: "var(--text-muted)",
           textTransform: "uppercase",
           letterSpacing: "0.08em",
@@ -60,7 +60,7 @@ export function ColorSwitcher() {
         Warna
       </span>
 
-      <div style={{ display: "flex", gap: "6px" }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         {COLORS.map((c) => (
           <motion.button
             key={c.family}
@@ -75,14 +75,14 @@ export function ColorSwitcher() {
               width: "22px",
               height: "22px",
               borderRadius: "50%",
-              border: active === c.family ? "2px solid rgba(255,255,255,0.9)" : "2px solid transparent",
+              border: active === c.family ? "2px solid var(--text-primary)" : "2px solid transparent",
               background: c.hex,
               cursor: "pointer",
               position: "relative",
-              transition: "border-color 0.2s ease",
+              transition: "all 0.2s ease",
               outline: "none",
               boxShadow: active === c.family
-                ? `0 0 0 2px ${c.hex}, 0 0 16px ${c.hex}55`
+                ? `0 0 0 2px ${c.hex}, 0 0 12px ${c.hex}66`
                 : "0 2px 6px rgba(0,0,0,0.15)",
             }}
           >
@@ -94,7 +94,7 @@ export function ColorSwitcher() {
                   position: "absolute",
                   inset: "-4px",
                   borderRadius: "50%",
-                  border: "2px solid rgba(255,255,255,0.5)",
+                  border: "2px solid var(--color-primary-500)",
                   pointerEvents: "none",
                 }}
               />
@@ -112,12 +112,12 @@ export function ColorSwitcher() {
         title="Mode Font Ramah Disleksia"
         aria-label="Mode Font Ramah Disleksia"
         style={{
-          background: "rgba(255,255,255,0.08)",
-          border: "1px solid rgba(255,255,255,0.12)",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-color)",
           borderRadius: "var(--radius-full)",
-          padding: "2px 8px",
-          color: "#F8FAFC",
-          fontSize: "0.68rem",
+          padding: "3px 10px",
+          color: "var(--text-primary)",
+          fontSize: "0.72rem",
           fontWeight: 700,
           cursor: "pointer",
           marginLeft: "4px",

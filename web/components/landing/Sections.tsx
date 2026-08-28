@@ -237,30 +237,31 @@ export function HeroSection() {
       style={{
         minHeight: "100dvh",
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        padding: "clamp(6.5rem, 13vh, 8.5rem) 0 clamp(3.5rem, 8vh, 5rem)",
+        paddingTop: "clamp(90px, 14vh, 130px)",
+        paddingBottom: "clamp(50px, 8vh, 80px)",
         background: "var(--bg-page)",
       }}
     >
       {/* Dot-grid texture */}
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
 
-      {/* Floating decorative text */}
-      <div className="float-text" style={{ position: "absolute", top: "15%", right: "5%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-500)", opacity: 0.06, fontFamily: "var(--font-code)", lineHeight: 1, letterSpacing: "0.3em", pointerEvents: "none", userSelect: "none" }}>Hello World!</div>
-      <div className="float-text" style={{ position: "absolute", bottom: "25%", left: "3%", fontSize: "0.95rem", fontWeight: 600, color: "var(--color-primary-400)", opacity: 0.05, fontFamily: "var(--font-code)", lineHeight: 1, animationDelay: "-2.5s", pointerEvents: "none", userSelect: "none" }}>print("Halo TRPL!")</div>
+      {/* Floating decorative ambient text in clean corner positions */}
+      <div className="float-text" style={{ position: "absolute", top: "12%", right: "4%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-500)", opacity: 0.05, fontFamily: "var(--font-code)", lineHeight: 1, letterSpacing: "0.3em", pointerEvents: "none", userSelect: "none" }}>Hello World!</div>
 
       {/* Scroll-driven glow parallax */}
       <div style={{ position: "absolute", top: "-300px", right: "-200px", width: "800px", height: "800px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.05, pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: "-200px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.035, pointerEvents: "none" }} />
 
-      <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem, 5vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
-          <motion.div style={{ opacity: heroOpacity }}>
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "var(--space-4)" }}>
-              <span className="badge badge-primary">
-                <Sparkle size={12} weight="fill" />
+      <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1, margin: "auto 0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: "clamp(2.5rem, 5vw, 4rem)", alignItems: "center" }} className="hero-grid">
+          <motion.div style={{ opacity: heroOpacity, display: "flex", flexDirection: "column" }}>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "20px" }}>
+              <span className="badge badge-primary" style={{ padding: "6px 14px", fontSize: "0.8rem", gap: "6px" }}>
+                <Sparkle size={14} weight="fill" />
                 Matrikulasi TRPL 2026
               </span>
             </motion.div>
@@ -270,7 +271,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
             >
-              <h1 className="headline-float" style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: "var(--space-5)", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
+              <h1 className="headline-float" style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.65rem)", fontWeight: 800, lineHeight: 1.15, marginBottom: "24px", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
                 Coding itu{" "}
                 <motion.span
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -287,7 +288,7 @@ export function HeroSection() {
                   seru
                 </motion.span>
                 .{" "}
-                <span className="gradient-text" style={{ display: "block" }}>Percaya deh.</span>
+                <span className="gradient-text" style={{ display: "block", marginTop: "4px" }}>Percaya deh.</span>
               </h1>
             </motion.div>
 
@@ -295,7 +296,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.25 }}
-              style={{ fontSize: "clamp(0.95rem, 2vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: "var(--space-6)", maxWidth: "480px" }}
+              style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "32px", maxWidth: "520px" }}
             >
               Belajar koding dari nol bareng senior TRPL yang{" "}
               <strong className="rgb-text" style={{ fontWeight: 700, display: "inline-block" }}>suportif & anti-ribet</strong>.
@@ -306,7 +307,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.35 }}
-              style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap", marginBottom: "var(--space-5)" }}
+              style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center", marginBottom: "28px" }}
             >
               <Button href="/login" variant="primary" size="lg">
                 Mulai Belajar Bareng Senior <ArrowRight size={18} weight="bold" />
@@ -316,7 +317,9 @@ export function HeroSection() {
               </Button>
             </motion.div>
 
-            <ColorSwitcher />
+            <div>
+              <ColorSwitcher />
+            </div>
           </motion.div>
 
           <motion.div className="hero-visual" style={{ scale: sandboxScale }}>
@@ -331,7 +334,7 @@ export function HeroSection() {
         transition={{ delay: 0.8 }}
         style={{
           position: "absolute",
-          bottom: "16px",
+          bottom: "20px",
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",
@@ -341,14 +344,15 @@ export function HeroSection() {
           color: "var(--text-muted)",
           fontSize: "0.75rem",
           cursor: "pointer",
+          zIndex: 2,
         }}
         onClick={() => {
           document.getElementById("fitur")?.scrollIntoView({ behavior: "smooth" });
         }}
       >
-        <span style={{ letterSpacing: "0.05em", textTransform: "uppercase", fontSize: "0.68rem" }}>Eksplor Modul</span>
+        <span style={{ letterSpacing: "0.08em", textTransform: "uppercase", fontSize: "0.68rem", fontWeight: 700 }}>Eksplor Modul</span>
         <motion.div
-          animate={{ y: [0, 4, 0] }}
+          animate={{ y: [0, 5, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
           ↓

@@ -1796,7 +1796,7 @@ export default function LearnModulePage() {
   };
 
   return (
-    <div className="section-container" style={{ maxWidth: "720px", paddingTop: "var(--space-4)" }}>
+    <div className="section-container" style={{ maxWidth: "760px", paddingTop: "var(--space-6)", paddingBottom: "var(--space-12)" }}>
       {/* Header Info */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "var(--space-6)" }}>
         <button
