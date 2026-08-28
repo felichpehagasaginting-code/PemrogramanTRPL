@@ -284,11 +284,22 @@ export const useUserStore = create<UserState>()(
           await get().login("Budi Google Fallback", "budi.fallback@student.polsri.ac.id");
           return;
         }
-        const result = await signInWithPopup(auth, googleProvider);
-        if (result.user) await processFirebaseUser(result.user);
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          if (result.user) await processFirebaseUser(result.user);
+        } catch (err: any) {
+          if (err?.code === "auth/popup-blocked" || err?.code === "auth/popup-closed-by-user") {
+            throw new Error("Popup login ditutup atau diblokir browser. Izinkan popup untuk login Google SSO.");
+          }
+          if (err?.code === "auth/missing-initial-state" || err?.message?.includes("missing initial state") || err?.message?.includes("storage-partitioned")) {
+            throw new Error("Safari membatasi sesi pihak ketiga (storage partitioning). Silakan nonaktifkan 'Prevent Cross-Site Tracking' di Pengaturan Safari atau gunakan Masuk Cepat.");
+          }
+          throw err;
+        }
       },
 
       handleRedirectResult: async () => {
+        if (isMockFirebase) return false;
         try {
           const result = await getRedirectResult(auth);
           if (!result?.user) return false;

@@ -42,14 +42,20 @@ const stagger = { visible: { transition: { staggerChildren: 0.05, delayChildren:
 /* ============================================================
    HERO — Code Sandbox with Live Preview
    ============================================================ */
+/* ============================================================
+   HERO — Code Sandbox with Live Preview
+   ============================================================ */
 function HeroSandbox() {
   const [tab, setTab] = useState<"code" | "folder" | "preview">("code");
-  const [code, setCode] = useState(`# Coba jalankan kode pertamamu!\nnama = "Maba TRPL 2026"\nprint("Halo " + nama + "!")\nprint("Selamat datang di platform matrikulasi!")\n`);
-  const [out, setOut] = useState<string[]>([]);
+  const [code, setCode] = useState(`# Coba jalankan kodemu di sini!\nnama = "Maba TRPL 2026"\nprint(f"Halo {nama}! 👋")\nprint("Selamat datang di platform matrikulasi!")\n`);
+  const [out, setOut] = useState<string[]>([
+    "Halo Maba TRPL 2026! 👋",
+    "Selamat datang di platform matrikulasi!",
+  ]);
   const [running, setRunning] = useState(false);
-  const [fname, setFname] = useState("");
-  const [spath, setSpath] = useState("");
-  const [fb, setFb] = useState("");
+  const [fname, setFname] = useState("proyek_pertama");
+  const [spath, setSpath] = useState("D:\\TRPL\\Proyek");
+  const [fb, setFb] = useState("D: drive aman & bebas sync-lock");
   const [created, setCreated] = useState(false);
 
   const hasSpace = /\s/.test(fname);
@@ -60,12 +66,16 @@ function HeroSandbox() {
 
   const run = async () => {
     setRunning(true);
-    setOut(["⚡ Executing Python code via WebAssembly (Pyodide)..."]);
+    setOut(["⚡ Menjalankan kode Python via WebAssembly..."]);
     try {
       const res = await runPythonCodeClient(code);
-      setOut(res.output);
+      if (res.error) {
+        setOut([`Error: ${res.error}`]);
+      } else {
+        setOut(res.output.length > 0 ? res.output : ["(Program selesai tanpa output)"]);
+      }
     } catch {
-      setOut(["SyntaxError: Gagal menjalankan kode"]);
+      setOut(["SyntaxError: Gagal mengeksekusi kode"]);
     } finally {
       setRunning(false);
     }
@@ -73,23 +83,31 @@ function HeroSandbox() {
 
   const selectPath = (p: string) => {
     setSpath(p);
-    setFb(p.includes("Desktop") ? "Desktop rawan sync-lock" : p.includes("Downloads") ? "Downloads folder temp" : p.includes("Program Files") ? "Butuh Admin" : "D: drive aman");
+    setFb(
+      p.includes("Desktop")
+        ? "Desktop rawan sync-lock OneDrive"
+        : p.includes("Downloads")
+        ? "Downloads adalah folder sementara"
+        : p.includes("Program Files")
+        ? "Butuh izin Administrator"
+        : "D: drive aman & terstruktur"
+    );
   };
 
   const tabStyle = (a: boolean) => ({
-    background: a ? "var(--color-neutral-900)" : "transparent",
-    color: a ? "#fff" : "var(--text-muted)",
+    background: a ? "rgba(255,255,255,0.15)" : "transparent",
+    color: a ? "#ffffff" : "rgba(255,255,255,0.6)",
     border: "none",
     borderRadius: "6px",
     padding: "5px 12px",
-    fontSize: "0.72rem",
+    fontSize: "0.75rem",
     fontWeight: 600,
     cursor: "pointer",
     fontFamily: "var(--font-heading)",
     transition: "all 0.15s ease",
     display: "flex",
     alignItems: "center",
-    gap: "4px",
+    gap: "5px",
   });
 
   return (
@@ -98,117 +116,277 @@ function HeroSandbox() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
       style={{
-        background: "var(--bg-dark)",
+        background: "#090D16",
         borderRadius: "var(--radius-xl)",
-        border: "1.5px solid rgba(255,255,255,0.06)",
-        boxShadow: "0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03)",
+        border: "1.5px solid rgba(255,255,255,0.1)",
+        boxShadow: "0 24px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.05)",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        minHeight: "440px",
+        width: "100%",
+        maxWidth: "560px",
+        margin: "0 auto",
       }}
     >
-      {/* Chrome */}
-      <div style={{ background: "#1E293B", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 14px", height: "42px", userSelect: "none" }}>
+      {/* Chrome Top Bar */}
+      <div
+        style={{
+          background: "#121826",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 14px",
+          height: "44px",
+          userSelect: "none",
+        }}
+      >
         <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FF5F57" }} aria-hidden="true" />
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#FFBD2E" }} aria-hidden="true" />
-          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28C840" }} aria-hidden="true" />
-          <div style={{ display: "flex", gap: "3px", marginLeft: "14px" }}>
-            <button onClick={() => setTab("code")} aria-label="Tab kode sumber" aria-selected={tab === "code"} style={tabStyle(tab === "code")}><Code size={11} /> Code</button>
-            <button onClick={() => setTab("preview")} aria-label="Tab preview" aria-selected={tab === "preview"} style={tabStyle(tab === "preview")}><Play size={11} /> Preview</button>
-            <button onClick={() => setTab("folder")} aria-label="Tab folder workspace" aria-selected={tab === "folder"} style={tabStyle(tab === "folder")}><Books size={11} /> Folder</button>
+          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FF5F57", display: "inline-block" }} aria-hidden="true" />
+          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FFBD2E", display: "inline-block" }} aria-hidden="true" />
+          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#28C840", display: "inline-block" }} aria-hidden="true" />
+          <div style={{ display: "flex", gap: "3px", marginLeft: "12px" }}>
+            <button onClick={() => setTab("code")} aria-label="Tab kode sumber" aria-selected={tab === "code"} style={tabStyle(tab === "code")}><Code size={13} /> Code</button>
+            <button onClick={() => setTab("preview")} aria-label="Tab preview" aria-selected={tab === "preview"} style={tabStyle(tab === "preview")}><Play size={13} /> Output</button>
+            <button onClick={() => setTab("folder")} aria-label="Tab folder workspace" aria-selected={tab === "folder"} style={tabStyle(tab === "folder")}><Books size={13} /> Workspace</button>
           </div>
         </div>
-        {tab === "code" && (
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={run} disabled={running}
-            aria-label={running ? "Sedang menjalankan kode" : "Jalankan kode Python"}
-            style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e", padding: "4px 14px", borderRadius: "20px", fontSize: "0.68rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
-          >
-            {running ? <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} /> : <Play size={10} weight="fill" />}
-            {running ? "Running" : "Run"}
-          </motion.button>
-        )}
+
+        <motion.button
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={run}
+          disabled={running}
+          aria-label={running ? "Sedang menjalankan kode" : "Jalankan kode Python"}
+          style={{
+            background: "var(--gradient-hero)",
+            border: "none",
+            color: "white",
+            padding: "5px 14px",
+            borderRadius: "var(--radius-full)",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            cursor: "pointer",
+            boxShadow: "0 2px 10px rgba(255,107,0,0.3)",
+          }}
+        >
+          {running ? (
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ffffff", display: "inline-block" }} />
+          ) : (
+            <Play size={11} weight="fill" />
+          )}
+          {running ? "Memproses..." : "Jalankan (Run)"}
+        </motion.button>
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", padding: "16px", background: "#0F172A" }}>
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          style={{ flex: 1, display: "flex", flexDirection: "column", background: "#0B101D", padding: "14px" }}
+        >
           {tab === "code" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflow: "hidden" }}>
-              <div style={{ flex: 1, position: "relative", minHeight: "140px" }}>
-                <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "24px", color: "#4B5563", fontSize: "0.72rem", fontFamily: "var(--font-code)", textAlign: "right", paddingRight: "6px", userSelect: "none", lineHeight: "1.6" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {/* Code editor container */}
+              <div
+                style={{
+                  position: "relative",
+                  background: "#080C16",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: "8px",
+                  padding: "10px 10px 10px 38px",
+                  minHeight: "130px",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "8px",
+                    top: "10px",
+                    bottom: "10px",
+                    width: "24px",
+                    color: "#4B5563",
+                    fontSize: "0.78rem",
+                    fontFamily: "var(--font-code)",
+                    textAlign: "right",
+                    userSelect: "none",
+                    lineHeight: "1.6",
+                  }}
+                >
                   {code.split("\n").map((_, i) => <div key={i}>{i + 1}</div>)}
                 </div>
-                <textarea value={code} onChange={e => setCode(e.target.value)} style={{ width: "100%", height: "100%", background: "transparent", border: "none", outline: "none", resize: "none", paddingLeft: "30px", color: "#e5e7eb", fontFamily: "var(--font-code)", fontSize: "0.78rem", lineHeight: "1.6" }} />
+                <textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  aria-label="Editor kode Python interaktif"
+                  style={{
+                    width: "100%",
+                    minHeight: "110px",
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    color: "#38BDF8",
+                    fontFamily: "var(--font-code)",
+                    fontSize: "0.85rem",
+                    lineHeight: "1.6",
+                  }}
+                />
               </div>
-              <div style={{ marginTop: "10px" }}>
-                <PowerShellTerminal code={code} />
+
+              {/* Console Output Window */}
+              <div
+                style={{
+                  background: "#040810",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "8px",
+                  padding: "10px 14px",
+                  fontFamily: "var(--font-code)",
+                  fontSize: "0.8rem",
+                  minHeight: "90px",
+                  maxHeight: "130px",
+                  overflowY: "auto",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "rgba(255,255,255,0.5)", fontSize: "0.7rem", marginBottom: "6px", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "4px" }}>
+                  <Terminal size={12} /> Output Konsol (Python 3.12 via Pyodide)
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {out.map((line, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        color: line.startsWith("Error") ? "#F87171" : line.startsWith("⚡") ? "#FACC15" : "#4ADE80",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {line}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {tab === "preview" && (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#9CA3AF", fontSize: "0.85rem", textAlign: "center", padding: "20px" }}>
+            <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", justifyContent: "center", minHeight: "220px", textAlign: "center" }}>
+              <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "rgba(34, 197, 94, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#22C55E" }}>
+                <Rocket size={24} weight="fill" />
+              </div>
               <div>
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} style={{ width: "56px", height: "56px", borderRadius: "var(--radius-lg)", background: "linear-gradient(135deg, rgba(123,31,162,0.2), rgba(255,107,0,0.1))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#CE93D8" }}>
-                  <Rocket size={28} weight="fill" />
-                </motion.div>
-                <p style={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}>Kode kamu akan tampil di sini</p>
-                <p style={{ fontSize: "0.78rem", color: "#6B7280" }}>Klik Run untuk melihat hasil eksekusi</p>
-                {out.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: "16px", background: "#0B1121", borderRadius: "8px", border: "1px solid #1E293B", padding: "12px 16px", fontFamily: "var(--font-code)", fontSize: "0.78rem", color: "#34D399", textAlign: "left", maxWidth: "320px" }}>
-                    {out.map((l, i) => <div key={i} style={{ padding: "2px 0" }}>{l}</div>)}
-                  </motion.div>
-                )}
+                <h4 style={{ color: "#F8FAFC", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 4px" }}>Output Eksekusi Python</h4>
+                <p style={{ color: "#94A3B8", fontSize: "0.8rem", margin: 0 }}>Klik tombol <strong>Jalankan</strong> untuk melihat output program.</p>
+              </div>
+              <div style={{ width: "100%", background: "#050914", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "12px", fontFamily: "var(--font-code)", fontSize: "0.8rem", color: "#4ADE80", textAlign: "left" }}>
+                {out.map((l, i) => <div key={i}>{l}</div>)}
               </div>
             </div>
           )}
 
           {tab === "folder" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", fontSize: "0.78rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "0.8rem", color: "#E2E8F0" }}>
               {!created ? (
                 <>
                   <div>
-                    <label style={{ display: "block", color: "#9CA3AF", fontWeight: 600, marginBottom: "4px", fontSize: "0.72rem" }}>Project folder</label>
-                    <input type="text" placeholder="belajar_python" value={fname} onChange={e => setFname(e.target.value)} style={{ width: "100%", background: "#1E293B", border: fname && !nameOk ? "1px solid #EF4444" : "1px solid #374151", borderRadius: "6px", padding: "7px 10px", color: "white", outline: "none", fontFamily: "var(--font-code)", fontSize: "0.78rem" }} />
+                    <label style={{ display: "block", color: "#94A3B8", fontWeight: 600, marginBottom: "4px", fontSize: "0.75rem" }}>Nama Folder Proyek</label>
+                    <input
+                      type="text"
+                      placeholder="belajar_python"
+                      value={fname}
+                      onChange={(e) => setFname(e.target.value)}
+                      style={{
+                        width: "100%",
+                        background: "#161F30",
+                        border: fname && !nameOk ? "1.5px solid #EF4444" : "1.5px solid rgba(255,255,255,0.12)",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        color: "white",
+                        outline: "none",
+                        fontFamily: "var(--font-code)",
+                        fontSize: "0.825rem",
+                      }}
+                    />
                     {fname && (
-                      <div style={{ fontSize: "0.68rem", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-                        <span style={{ color: nameOk ? "#22C55E" : "#EF4444" }}>{hasSpace ? "Spaces not allowed" : hasSpec ? "No special chars" : "Valid name"}</span>
+                      <div style={{ fontSize: "0.7rem", marginTop: "4px", color: nameOk ? "#22C55E" : "#EF4444" }}>
+                        {hasSpace ? "❌ Jangan gunakan spasi" : hasSpec ? "❌ Jangan pakai karakter spesial" : "✅ Nama folder valid"}
                       </div>
                     )}
                   </div>
+
                   <div>
-                    <label style={{ display: "block", color: "#9CA3AF", fontWeight: 600, marginBottom: "4px", fontSize: "0.72rem" }}>Path</label>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px" }}>
-                      {["C:\\Desktop", "C:\\Downloads", "C:\\Program Files", "D:\\TRPL\\Proyek"].map(p => (
-                        <button key={p} onClick={() => selectPath(p)} style={{ background: spath === p ? "rgba(255,107,0,0.08)" : "#1E293B", border: spath === p ? "1.5px solid var(--color-primary-500)" : "1px solid #374151", padding: "6px", borderRadius: "4px", color: "white", textAlign: "left", cursor: "pointer", fontSize: "0.68rem", fontFamily: "var(--font-code)", transition: "all 0.15s ease" }}>{p}</button>
+                    <label style={{ display: "block", color: "#94A3B8", fontWeight: 600, marginBottom: "4px", fontSize: "0.75rem" }}>Pilih Partisi / Lokasi</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                      {["C:\\Desktop", "C:\\Downloads", "C:\\Program Files", "D:\\TRPL\\Proyek"].map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => selectPath(p)}
+                          style={{
+                            background: spath === p ? "rgba(255,107,0,0.12)" : "#161F30",
+                            border: spath === p ? "1.5px solid var(--color-primary-500)" : "1px solid rgba(255,255,255,0.08)",
+                            padding: "8px 10px",
+                            borderRadius: "6px",
+                            color: "white",
+                            textAlign: "left",
+                            cursor: "pointer",
+                            fontSize: "0.72rem",
+                            fontFamily: "var(--font-code)",
+                          }}
+                        >
+                          {p}
+                        </button>
                       ))}
                     </div>
-                    {spath && <div style={{ fontSize: "0.68rem", marginTop: "4px", color: pathOk ? "#22C55E" : "#EF4444" }}>{fb}</div>}
+                    {spath && <div style={{ fontSize: "0.7rem", marginTop: "4px", color: pathOk ? "#22C55E" : "#EF4444" }}>{fb}</div>}
                   </div>
-                  <motion.button
-                    whileHover={allOk ? { scale: 1.02 } : {}}
-                    whileTap={allOk ? { scale: 0.98 } : {}}
-                    disabled={!allOk} onClick={() => setCreated(true)}
-                    style={{ background: allOk ? "var(--color-primary-500)" : "#374151", color: allOk ? "white" : "#9CA3AF", border: "none", borderRadius: "6px", padding: "8px", fontWeight: 700, cursor: allOk ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+
+                  <button
+                    type="button"
+                    disabled={!allOk}
+                    onClick={() => setCreated(true)}
+                    style={{
+                      background: allOk ? "var(--color-primary-500)" : "#232D42",
+                      color: allOk ? "white" : "#64748B",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "10px",
+                      fontWeight: 700,
+                      cursor: allOk ? "pointer" : "not-allowed",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      marginTop: "4px",
+                    }}
                   >
-                    <CheckCircle size={14} /> Create
-                  </motion.button>
+                    <CheckCircle size={15} /> Buat Folder Proyek
+                  </button>
                 </>
               ) : (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <span style={{ color: "#22C55E", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}><CheckCircle size={16} weight="fill" /> Created</span>
-                  <div style={{ background: "#0B1121", border: "1px solid #1E293B", padding: "10px", borderRadius: "6px", fontFamily: "var(--font-code)", fontSize: "0.72rem", color: "#e5e7eb", lineHeight: 1.6 }}>
-                    <div style={{ color: "#FF8C42" }}>{spath}\{fname}\</div>
-                    <div style={{ color: "#6B7280" }}>├── .vscode/</div>
-                    <div style={{ color: "#D4D4D4" }}>├── main.py</div>
-                    <div style={{ color: "#D4D4D4" }}>└── readme.md</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ color: "#22C55E", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
+                    <CheckCircle size={18} weight="fill" /> Folder Workspace Siap Digunakan!
                   </div>
-                  <button onClick={() => { setCreated(false); setFname(""); setSpath(""); setFb(""); }} style={{ background: "transparent", border: "1px solid #374151", color: "#9CA3AF", padding: "6px", borderRadius: "4px", cursor: "pointer", fontSize: "0.68rem" }}>Reset</button>
-                </motion.div>
+                  <div style={{ background: "#060A14", border: "1px solid rgba(255,255,255,0.08)", padding: "12px", borderRadius: "8px", fontFamily: "var(--font-code)", fontSize: "0.75rem", color: "#E2E8F0", lineHeight: 1.6 }}>
+                    <div style={{ color: "#FF8C42" }}>📁 {spath}\{fname}\</div>
+                    <div style={{ color: "#64748B" }}>├── 📁 .vscode\</div>
+                    <div style={{ color: "#94A3B8" }}>├── 📄 main.py</div>
+                    <div style={{ color: "#94A3B8" }}>└── 📄 readme.md</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setCreated(false); setFname("proyek_baru"); }}
+                    style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "#94A3B8", padding: "8px", borderRadius: "6px", cursor: "pointer", fontSize: "0.75rem" }}
+                  >
+                    Ulangi Simulasi 🔄
+                  </button>
+                </div>
               )}
             </div>
           )}
@@ -228,38 +406,35 @@ export function HeroSection() {
     offset: ["start start", "end start"],
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.15]);
-  const sandboxScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  const sandboxScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
 
   return (
     <section
       id="hero"
       ref={heroRef}
       style={{
-        minHeight: "100dvh",
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        paddingTop: "clamp(90px, 14vh, 130px)",
-        paddingBottom: "clamp(50px, 8vh, 80px)",
+        paddingTop: "clamp(85px, 12vh, 110px)",
+        paddingBottom: "clamp(40px, 6vh, 60px)",
         background: "var(--bg-page)",
       }}
     >
       {/* Dot-grid texture */}
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
 
-      {/* Floating decorative ambient text in clean corner positions */}
-      <div className="float-text" style={{ position: "absolute", top: "12%", right: "4%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-500)", opacity: 0.05, fontFamily: "var(--font-code)", lineHeight: 1, letterSpacing: "0.3em", pointerEvents: "none", userSelect: "none" }}>Hello World!</div>
-
-      {/* Scroll-driven glow parallax */}
-      <div style={{ position: "absolute", top: "-300px", right: "-200px", width: "800px", height: "800px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.05, pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-200px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.035, pointerEvents: "none" }} />
+      {/* Ambient glowing blobs */}
+      <div style={{ position: "absolute", top: "-200px", right: "-150px", width: "600px", height: "600px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.08, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-150px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.06, pointerEvents: "none" }} />
 
       <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1, margin: "auto 0" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: "clamp(2.5rem, 5vw, 4rem)", alignItems: "center" }} className="hero-grid">
+        <div style={{ display: "grid", gridTemplateColumns: "1.08fr 0.92fr", gap: "clamp(2rem, 4vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
           <motion.div style={{ opacity: heroOpacity, display: "flex", flexDirection: "column" }}>
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "20px" }}>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "16px" }}>
               <span className="badge badge-primary" style={{ padding: "6px 14px", fontSize: "0.8rem", gap: "6px" }}>
                 <Sparkle size={14} weight="fill" />
                 Matrikulasi TRPL 2026
@@ -271,7 +446,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
             >
-              <h1 className="headline-float" style={{ fontSize: "clamp(2.25rem, 4.8vw, 3.65rem)", fontWeight: 800, lineHeight: 1.15, marginBottom: "24px", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
+              <h1 className="headline-float" style={{ fontSize: "clamp(2.25rem, 4.4vw, 3.6rem)", fontWeight: 800, lineHeight: 1.15, marginBottom: "20px", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
                 Coding itu{" "}
                 <motion.span
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -296,7 +471,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.25 }}
-              style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "32px", maxWidth: "520px" }}
+              style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "28px", maxWidth: "520px" }}
             >
               Belajar koding dari nol bareng senior TRPL yang{" "}
               <strong className="rgb-text" style={{ fontWeight: 700, display: "inline-block" }}>suportif & anti-ribet</strong>.
@@ -307,7 +482,8 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.35 }}
-              style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center", marginBottom: "28px" }}
+              style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center", marginBottom: "24px" }}
+              className="hero-buttons"
             >
               <Button href="/login" variant="primary" size="lg">
                 Mulai Belajar Bareng Senior <ArrowRight size={18} weight="bold" />
@@ -322,7 +498,7 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          <motion.div className="hero-visual" style={{ scale: sandboxScale }}>
+          <motion.div className="hero-visual" style={{ scale: sandboxScale, width: "100%" }}>
             <HeroSandbox />
           </motion.div>
         </div>
@@ -334,7 +510,7 @@ export function HeroSection() {
         transition={{ delay: 0.8 }}
         style={{
           position: "absolute",
-          bottom: "20px",
+          bottom: "16px",
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",

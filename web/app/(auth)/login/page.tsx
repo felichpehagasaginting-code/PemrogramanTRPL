@@ -39,16 +39,16 @@ export default function LoginPage() {
       setLoading(false);
     } catch (e: any) {
       const msg = e?.code === "auth/unauthorized-domain"
-        ? "Domain ini belum terdaftar. Akses via localhost atau tambahkan IP ini ke Firebase Console."
-        : e?.message || "Gagal login. Coba lagi.";
+        ? "Domain ini belum terdaftar di Firebase Console."
+        : e?.message || "Gagal login dengan Google. Silakan coba lagi atau gunakan Masuk Cepat.";
       setError(msg);
       setLoading(false);
     }
   };
 
-  const handleMockLogin = () => {
+  const handleGuestLogin = () => {
     setLoading(true);
-    login("Demo User (Mock)", "demo@student.polsri.ac.id");
+    login("Maba TRPL 2026", "maba2026@student.polsri.ac.id");
   };
 
   return (
@@ -61,7 +61,7 @@ export default function LoginPage() {
         background: "var(--bg-page)",
         position: "relative",
         overflow: "hidden",
-        padding: "20px",
+        padding: "20px 16px",
       }}
     >
       <div
@@ -136,69 +136,75 @@ export default function LoginPage() {
               background: "rgba(239,68,68,0.1)",
               border: "1px solid var(--color-accent-red)",
               borderRadius: "var(--radius-md)",
-              padding: "10px",
+              padding: "10px 14px",
               marginBottom: "var(--space-4)",
               color: "var(--color-accent-red)",
-              fontSize: "0.85rem",
-              textAlign: "center",
+              fontSize: "0.825rem",
+              textAlign: "left",
+              lineHeight: 1.5,
             }}
           >
             {error}
           </div>
         )}
 
-        <button
-          onClick={handleSSOLogin}
-          disabled={loading || checkingRedirect}
-          className="login-btn focus-ring"
-          aria-label={loading ? "Memproses login..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
-          style={{
-            width: "100%",
-            padding: "var(--space-3) var(--space-4)",
-            borderRadius: "var(--radius-full)",
-            border: "1.5px solid var(--border-color-strong)",
-            background: "transparent",
-            color: "var(--text-primary)",
-            fontWeight: 600,
-            fontSize: "0.9375rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px",
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.6 : 1,
-          }}
-        >
-          <GoogleLogo size={20} weight="bold" color="var(--color-primary-500)" />
-          {loading ? "Memproses..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
-        </button>
-
-        {isMockFirebase && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <button
-            onClick={handleMockLogin}
+            onClick={handleSSOLogin}
             disabled={loading || checkingRedirect}
-            className="focus-ring"
-            aria-label="Login mock (tanpa Firebase)"
+            className="login-btn focus-ring"
+            aria-label={loading ? "Memproses login..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
             style={{
               width: "100%",
               padding: "var(--space-3) var(--space-4)",
               borderRadius: "var(--radius-full)",
-              border: "1px dashed var(--border-color)",
+              border: "1.5px solid var(--border-color-strong)",
+              background: "var(--bg-page-alt)",
+              color: "var(--text-primary)",
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.6 : 1,
+            }}
+          >
+            <GoogleLogo size={20} weight="bold" color="var(--color-primary-500)" />
+            {loading ? "Memproses..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Akun Google"}
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "4px 0", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+            <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
+            <span>ATAU</span>
+            <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
+          </div>
+
+          <button
+            onClick={handleGuestLogin}
+            disabled={loading || checkingRedirect}
+            className="focus-ring"
+            aria-label="Masuk langsung mode tamu / demo"
+            style={{
+              width: "100%",
+              padding: "var(--space-3) var(--space-4)",
+              borderRadius: "var(--radius-full)",
+              border: "1.5px dashed var(--border-color-strong)",
               background: "transparent",
-              color: "var(--text-secondary)",
-              fontWeight: 500,
+              color: "var(--text-primary)",
+              fontWeight: 600,
               fontSize: "0.875rem",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: "8px",
               cursor: "pointer",
-              marginTop: "12px",
             }}
           >
-            <User size={18} aria-hidden="true" /> Login Mock (tanpa Firebase)
+            <User size={18} aria-hidden="true" color="var(--color-primary-500)" /> Masuk Cepat (Mode Tamu / Maba)
           </button>
-        )}
+        </div>
       </div>
       <FeaturePopupQueue features={LOGIN_FEATURES} delay={3000} />
     </main>
