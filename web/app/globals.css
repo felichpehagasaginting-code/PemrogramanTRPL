@@ -1336,13 +1336,15 @@ code, pre {
   line-height: 1.8 !important;
 }
 
-/* Print Certificate Optimization */
+/* Print Optimization for Certificate and Printable Binder Sheets */
 @media print {
   body * {
     visibility: hidden;
   }
   #certificate-print-area,
-  #certificate-print-area * {
+  #certificate-print-area *,
+  #printable-binder-sheet,
+  #printable-binder-sheet * {
     visibility: visible;
   }
   #certificate-print-area {
@@ -1354,5 +1356,21 @@ code, pre {
     border: none !important;
     box-shadow: none !important;
   }
+  #printable-binder-sheet {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 15mm 20mm;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
+
 
