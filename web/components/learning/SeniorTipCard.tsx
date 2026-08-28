@@ -49,7 +49,7 @@ export function SeniorTipCard({ data }: SeniorTipCardProps) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Sparkle size={16} color="var(--primary)" weight="fill" />
+          <Sparkle size={16} color="var(--color-primary-500)" weight="fill" />
           <span>💡 Tips Senior & Contekan Cepat</span>
         </div>
         {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
@@ -74,13 +74,13 @@ export function SeniorTipCard({ data }: SeniorTipCardProps) {
             {data.analogy && (
               <div
                 style={{
-                  background: "rgba(255, 107, 0, 0.08)",
-                  border: "1px solid rgba(255, 107, 0, 0.2)",
+                  background: "var(--bg-page-alt)",
+                  border: "1px solid var(--border-color)",
                   borderRadius: "var(--radius-md)",
                   padding: "10px 14px",
                 }}
               >
-                <div style={{ fontWeight: 700, color: "var(--primary)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={{ fontWeight: 700, color: "var(--color-primary-500)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
                   <BookOpen size={16} /> Analogi Santai Senior:
                 </div>
                 <p style={{ margin: 0, color: "var(--text-primary)", lineHeight: 1.5 }}>

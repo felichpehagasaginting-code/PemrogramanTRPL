@@ -642,23 +642,37 @@ export default function LearnModulePage() {
               {/* Console simulator window */}
               <div
                 style={{
-                  background: "var(--bg-dark)",
-                  color: "var(--text-primary)",
+                  background: "#08140D",
+                  color: "#ECFDF5",
                   fontFamily: "var(--font-code)",
                   fontSize: "0.875rem",
                   padding: "var(--space-4)",
                   borderRadius: "var(--radius-lg)",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                  border: "1px solid var(--border-color-strong)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+                  border: "1.5px solid var(--border-color-strong)",
                   marginBottom: "var(--space-4)",
                 }}
               >
-                <div style={{ display: "flex", gap: "6px", borderBottom: "1px solid var(--border-color)", paddingBottom: "8px", marginBottom: "12px", color: "var(--text-muted)" }}>
-                  <Terminal size={16} aria-hidden="true" /> Console Simulator
+                <div style={{ display: "flex", gap: "6px", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "8px", marginBottom: "12px", color: "#86EFAC" }}>
+                  <Terminal size={16} aria-hidden="true" /> <span style={{ fontWeight: 700 }}>Console Simulator</span>
                 </div>
-                <div style={{ minHeight: "120px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ minHeight: "120px", display: "flex", flexDirection: "column", gap: "6px", lineHeight: 1.6 }}>
                   {cliOutput.map((line, i) => (
-                    <div key={i}>{line}</div>
+                    <div
+                      key={i}
+                      style={{
+                        color: line.startsWith("✅")
+                          ? "#4ADE80"
+                          : line.includes("not recognized")
+                          ? "#F87171"
+                          : line.startsWith("C:\\")
+                          ? "#86EFAC"
+                          : "#F1F5F9",
+                        fontWeight: line.startsWith("✅") || line.startsWith("C:\\") ? 600 : 400,
+                      }}
+                    >
+                      {line}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -705,8 +719,8 @@ export default function LearnModulePage() {
                   aria-label="Masukkan perintah terminal"
                   style={{
                     flex: 1,
-                    background: "var(--bg-card)",
-                    border: "1.5px solid var(--border-color)",
+                    background: "var(--bg-page-alt)",
+                    border: "1.5px solid var(--border-color-strong)",
                     padding: "10px 16px",
                     borderRadius: "var(--radius-full)",
                     outline: "none",

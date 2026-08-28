@@ -79,18 +79,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div
               style={{
-                background: "rgba(255,107,0,0.08)",
+                background: "var(--bg-page-alt)",
                 border: "1.5px solid var(--border-color-strong)",
                 padding: "4px 12px",
                 borderRadius: "var(--radius-full)",
                 fontSize: "0.8rem",
                 fontFamily: "var(--font-heading)",
                 fontWeight: 700,
-                color: "var(--color-primary-600)",
+                color: "var(--text-primary)",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
               }}
               aria-label="Poin pengguna"
             >
-              ⚡ {user.xp} XP
+              <span style={{ color: "var(--color-primary-500)" }}>⚡</span> {user.xp} XP
             </div>
             <ThemeToggle />
             <button onClick={handleLogout}
