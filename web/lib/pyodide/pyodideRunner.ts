@@ -165,7 +165,8 @@ def input(prompt_text=""):
 export async function runPythonCodeClient(
   code: string,
   inputs: string[] = [],
-  timeoutMs: number = 7000
+  timeoutMs: number = 7000,
+  virtualFiles?: Record<string, string>
 ): Promise<ExecutionResult> {
   const worker = getWorker();
 
@@ -224,6 +225,7 @@ export async function runPythonCodeClient(
       type: "RUN",
       code,
       inputs,
+      files: virtualFiles || {},
     });
   });
 }
