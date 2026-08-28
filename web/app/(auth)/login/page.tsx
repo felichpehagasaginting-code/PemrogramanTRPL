@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { isMockFirebase } from "@/lib/firebase";
-import { Code, GoogleLogo, User } from "@phosphor-icons/react";
+import { Code, GoogleLogo, User, ShieldCheck } from "@phosphor-icons/react";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { LOGIN_FEATURES } from "@/lib/features";
+import { SESSION_EXPIRED_KEY } from "@/lib/auth/useSessionTimeout";
+import { DosenPinDialpadModal } from "@/components/auth/DosenPinDialpadModal";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +19,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkingRedirect, setCheckingRedirect] = useState(true);
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState(false);
+  const [dosenModalOpen, setDosenModalOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const expiredFromStorage = sessionStorage.getItem(SESSION_EXPIRED_KEY);
+      if (expiredFromStorage === "true" || (typeof window !== "undefined" && window.location.search.includes("session_expired"))) {
+        setSessionExpiredNotice(true);
+        sessionStorage.removeItem(SESSION_EXPIRED_KEY);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     handleRedirectResult().then((signedIn) => {
@@ -128,6 +142,34 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {sessionExpiredNotice && (
+          <div
+            role="alert"
+            style={{
+              background: "rgba(245, 158, 11, 0.12)",
+              border: "1px solid #F59E0B",
+              borderRadius: "var(--radius-md)",
+              padding: "10px 14px",
+              marginBottom: "var(--space-4)",
+              color: "#F59E0B",
+              fontSize: "0.825rem",
+              textAlign: "left",
+              lineHeight: 1.5,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "8px",
+            }}
+          >
+            <span style={{ fontSize: "1.1rem" }}>🔒</span>
+            <div>
+              <strong style={{ color: "var(--text-primary)" }}>Sesi Berakhir Demi Keamanan</strong>
+              <div style={{ fontSize: "0.775rem", color: "var(--text-secondary)", marginTop: "2px" }}>
+                Tidak ada aktivitas selama 1 jam. Silakan login kembali untuk melanjutkan ngoding!
+              </div>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div
             role="alert"
@@ -204,8 +246,37 @@ export default function LoginPage() {
           >
             <User size={18} aria-hidden="true" color="var(--color-primary-500)" /> Masuk Cepat (Mode Tamu / Maba)
           </button>
+
+          <button
+            onClick={() => setDosenModalOpen(true)}
+            className="focus-ring"
+            aria-label="Masuk sebagai dosen penguji"
+            style={{
+              width: "100%",
+              padding: "10px var(--space-4)",
+              borderRadius: "var(--radius-full)",
+              border: "1px solid rgba(168, 85, 247, 0.4)",
+              background: "rgba(168, 85, 247, 0.08)",
+              color: "var(--text-primary)",
+              fontWeight: 700,
+              fontSize: "0.825rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              cursor: "pointer",
+              marginTop: "4px",
+            }}
+          >
+            <ShieldCheck size={18} color="#A855F7" weight="fill" />
+            <span>Masuk sebagai Dosen Penguji (PIN Khusus)</span>
+          </button>
         </div>
       </div>
+      <DosenPinDialpadModal
+        isOpen={dosenModalOpen}
+        onClose={() => setDosenModalOpen(false)}
+      />
       <FeaturePopupQueue features={LOGIN_FEATURES} delay={3000} />
     </main>
   );
