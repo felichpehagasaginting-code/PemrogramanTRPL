@@ -8,6 +8,7 @@ import { explainPythonError, ExplainedError } from "@/lib/ai/errorExplainer";
 interface PowerShellTerminalProps {
   code: string;
   onExplainedError?: (err: ExplainedError | null) => void;
+  virtualFiles?: Record<string, string>;
 }
 
 interface HistoryItem {
@@ -16,7 +17,7 @@ interface HistoryItem {
   type: "header" | "prompt" | "user-command" | "input-prompt" | "user-input" | "output" | "error" | "system";
 }
 
-export function PowerShellTerminal({ code, onExplainedError }: PowerShellTerminalProps) {
+export function PowerShellTerminal({ code, onExplainedError, virtualFiles }: PowerShellTerminalProps) {
   const [history, setHistory] = useState<HistoryItem[]>([
     {
       id: "hdr-1",
@@ -55,7 +56,7 @@ export function PowerShellTerminal({ code, onExplainedError }: PowerShellTermina
     if (onExplainedError) onExplainedError(null);
 
     try {
-      const res = await runPythonCodeClient(code, inputsToPass);
+      const res = await runPythonCodeClient(code, inputsToPass, 7000, virtualFiles);
 
       setHistory((prev) => [
         ...prev,
