@@ -4,87 +4,90 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![Python](https://img.shields.io/badge/Python-WASM%20Pyodide-yellow?style=for-the-badge&logo=python)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-orange?style=for-the-badge&logo=firebase)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Vitest](https://img.shields.io/badge/Vitest-31%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
+![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
-Platform pembelajaran pemrograman interaktif, adaptif, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026**.
+Platform pembelajaran pemrograman interaktif, adaptif, ramah pemula, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026**.
 
-Dibangun menggunakan **Next.js 16 (App Router)**, **Pyodide WebAssembly (WASM)**, **Monaco Editor**, **PowerShell Lite Terminal Simulator**, **Auto-Grader**, dan **Firebase Suite**.
+Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dari nol mutlak hingga siap membangun aplikasi nyata, lengkap dengan **Pyodide WebAssembly (WASM)**, **Monaco Editor**, **PowerShell Lite 7.4 Simulator**, **Auto-Grader**, dan **Sistem Gamifikasi Lengkap**.
 
 ---
 
 ## 🌟 Fitur Utama & Sistem Unggulan
 
-### 💻 1. Client-Side Python WASM Engine (Pyodide)
-- Executing Python code 100% di browser pengguna berbasis WebAssembly (0ms latency).
-- Bebas dari ketergantungan server backend eksternal dan aman dari sandbox escape.
+### 💡 1. Friendly Senior Mentor & Sistem Pedagogi Maba
+- **Tips Senior & Contekan Cepat**: Di setiap slide materi (M0 hingga M8), tersedia tips trik praktis, contekan kode kilat, dan relevansi industri dunia kerja.
+- **Analogi Kehidupan Nyata**: Konsep teknis rumit dijelaskan dengan analogi santai (memasak mie instan, robot pelayan kopi, dompet pintar, kasir warkop TRPL).
+- **Kamus Kata Gaul Pemrograman**: Glosarium istilah gaul (*syntax, bug, runtime error, infinite loop, return value*) yang mudah dipahami pemula.
+- **Proyek Kasir Warkop TRPL 2026 (M8)**: Scaffolding bertahap 3-Fase (*Fase 1: Hitung Total, Fase 2: Diskon Member & Validasi, Fase 3: Struk Rapi & Cetak Nota*).
 
-### 🖥️ 2. PowerShell Lite 7.4 Terminal Simulator
+### 🆘 2. Sistem "Minta Bantuan" & Snapshot Kode Instan
+- Mahasiswa yang mengalami error atau kebingungan dapat menekan tombol **"Minta Bantuan"**.
+- Menghasilkan tautan snapshot permanen (`/help/[snapshotId]`) yang menyimpan kode aktif, riwayat output terminal, dan penjelasan AI.
+- Senior mentor atau asisten dapat langsung membuka link tersebut, meninjau masalah dalam 1 klik, dan memberikan bimbingan terarah.
+
+### 💻 3. Client-Side Python WASM Engine (Pyodide)
+- Menjalankan kode Python 3.11 100% di browser pengguna berbasis WebAssembly (0ms latency).
+- Bebas dari ketergantungan server backend eksternal, anti-loop execution, dan aman dari sandbox escape.
+
+### 🖥️ 4. PowerShell Lite 7.4 Terminal Simulator
 - Terminal interaktif gaya **Windows PowerShell 7.4** (`PS D:\TRPL\Pemrograman>`).
-- Mendukung eksekusi perintah CLI (`python main.py`, `cls`, `dir`, `ls`, `help`).
-- **Interactive Scanner Input**: Mendukung input interaktif step-by-step untuk fungsi `input()` secara real-time di terminal console.
+- Mendukung eksekusi perintah CLI nyata (`python main.py`, `python --version`, `cls`, `dir`, `ls`, `help`).
+- **Interactive Scanner Input**: Mendukung input interaktif bertahap untuk fungsi `input()` secara real-time langsung di terminal console.
 
-### 🎯 3. Adaptive VS Code Sandbox IDE
-- Layout VS Code 100% dinamis dengan panel kontrol fleksibel:
-  - Toggle Primary Sidebar (Left Explorer & Marketplace)
-  - Toggle Bottom Panel (PowerShell Terminal)
-  - Toggle Secondary Panel (Misi Sandbox & Help)
-- **100% Responsive & Mobile Adaptive**: Tampilan sempurna pada rasio layar Smartphone (1080x2400) hingga Desktop 4K tanpa ada elemen yang terpotong.
+### 🎨 5. 4 Tema Warna & Mode Gelap Konsisten (WCAG AAA)
+- **4 Palet Warna Kustom**: *Orange (Jeruk TRPL)*, *Ungu (Royal Amethyst)*, *Biru (Ocean Navy)*, dan *Zamrud (Emerald Forest)*.
+- **Light & Dark Mode Presisi**: Menjaga kontras tajam pada teks, card background, dan terminal di semua kondisi pencahayaan tanpa warna silau atau redup.
+- **Mode Ramah Disleksia (`Aa`)**: Toggle instan penyesuaian spasi kata dan jenis font untuk kenyamanan pembaca dengan disleksia.
 
-### 🤖 4. Auto-Grader & Automated Submission Checker
+### 📱 6. Desain 100% Responsif (Desktop Widescreen hingga iPhone 15 Plus Safari)
+- **Desktop Widescreen**: Layout grid 2-kolom terpusat presisi (`margin: 0 auto; max-width: 1280px`).
+- **Mobile Safari iOS (iPhone 15 Plus)**: Tata letak ramah sentuhan, tombol full-width, dan font size input 16px untuk mencegah *auto-zoom* iOS yang mengganggu.
+- **Resilient Firebase Auth**: Penanganan khusus isolasi penyimpanan Safari iOS (*Storage Partitioning / ITP*) dengan fallback tombol **"Masuk Cepat (Mode Tamu)"**.
+
+### 🤖 7. Auto-Grader & Automated Submission Checker
 - Penguji koding otomatis berbasis *Multi-Test-Case Verification* & *Structural Rule Check* (memeriksa keberadaan `for`, `while`, `def`, `return`).
-- Penilaian transparan lengkap dengan skor kecocokan output.
+- Penilaian transparan lengkap dengan skor kecocokan output dan visualisasi perbedaan (*Code Diff Viewer*).
 
-### 🧠 5. Visual Execution Debugger & AI Error Explainer
-- **Visual Debugger**: Melacak eksekusi variabel baris-demi-baris dengan pemantau memori RAM visual.
-- **AI Error Explainer**: Menerjemahkan pesan error Python teknis menjadi penjelasan Bahasa Indonesia ramah maba beserta saran perbaikan langsung.
-
-### 🧩 6. Parsons Problems (Teka-Teki Kode)
-- Latihan menyusun blok kode acak dengan drag-and-drop dan pengontrol indentasi untuk mengasah logika dasar.
-
-### 🗺️ 7. Interactive SVG Skill-Tree Roadmap
-- Peta jalan kurikulum 2D interaktif berbasis SVG grafis yang menghubungkan modul **M0 hingga M8**.
-- Dilengkapi **Module Preview Drawer** untuk melihat estimasi waktu, reward XP, slide materi, dan teaser kuis.
-
-### 🏆 8. Gamifikasi & Dynamic 3D Leaderboard
-- **Podium 3D Leaderboard**: Tampilan podium kelas dengan efek berkilau untuk peringkat 3 besar.
-- **Avatar Customizer**: Ubah avatar profil dan kumpulkan 13 badge prestasi eksklusif.
-- **Meme Widget & Daily Streak**: Meme pemrograman kontekstual yang muncul secara dinamis saat kuis dan latihan selesai.
-
-### 📊 9. Admin Dashboard & Report Exporter
-- Dashboard analitik khusus pengajar/dosen untuk memantau statistik kelulusan mahasiswa, distribusi nilai, dan fitur ekspor laporan ke format **CSV & PDF**.
+### 🏆 8. Gamifikasi, Podium 3D & 13 Badge Eksklusif
+- **Podium 3D Leaderboard**: Papan peringkat mahasiswa satu angkatan dengan efek podium 3D berkilau untuk peringkat 3 besar.
+- **Badge Prestasi**: 13 badge pencapaian (Langkah Pertama, Master Loop, Ahli Fungsi, Arsitek Kasir, dll).
+- **Label Creator Khusus**: Badge verifikasi eksklusif pada akun pembuat/senior.
+- **Sertifikat Digital Resmi**: Generator sertifikat kelulusan matrikulasi lengkap dengan QR Code verifikasi dan mode cetak PDF.
 
 ---
 
 ## 📚 Kurikulum Modul Matrikulasi TRPL 2026
 
-| Modul | Judul Modul | Estimasi Waktu | Reward XP | Topik Utama |
+| Modul | Judul Modul | Estimasi Waktu | Reward XP | Analogi & Proyek Utama |
 |---|---|---|---|---|
-| **M0** | Pre-Test & Orientasi | 15 Menit | 50 XP | Pemetaan awal & pengenalan TRPL |
-| **M1** | Dasar Komputer & Workspace | 30 Menit | 100 XP | File system, path, VS Code setup |
-| **M2** | Logika & Algoritma | 40 Menit | 100 XP | Flowchart & Pseudocode |
-| **M3** | Variabel & Tipe Data | 45 Menit | 120 XP | Integer, float, string, casting |
-| **M4** | Percabangan (If-Else) | 50 Menit | 150 XP | Logic conditions & nested if |
-| **M5** | Perulangan (Loops) | 55 Menit | 150 XP | `for` loop, `while` loop, `range()` |
-| **M6** | Fungsi & Prosedur | 60 Menit | 180 XP | Modular code (`def`) & `return` |
-| **M7** | Array & List Data | 60 Menit | 200 XP | Struktur data list & iterasi |
-| **M8** | Mini Project Akhir | 90 Menit | 300 XP | Aplikasi Kalkulator / Sistem Kasir |
+| **M0** | Kuis Pemetaan & Orientasi | 15 Menit | 50 XP | Analogi Belajar Gitar & Mindset Problem-Solving |
+| **M1** | Komputer & Workspace | 30 Menit | 100 XP | Simulasi Partisi `D:\TRPL\Proyek` & PATH Python |
+| **M2** | Logika & Algoritma | 40 Menit | 100 XP | Analogi Memasak Mie Instan & Resep Rahasia |
+| **M3** | Variabel & Tipe Data | 45 Menit | 120 XP | Analogi Kotak Sepatu & Label Keranjang Buah |
+| **M4** | Percabangan (If-Else) | 50 Menit | 150 XP | Analogi Pintu Bioskop & Pengecekan Usia KTP |
+| **M5** | Perulangan (Loops) | 55 Menit | 150 XP | Analogi Putaran Lapangan Lari & Pompa Air Otomatis |
+| **M6** | Fungsi & Prosedur | 60 Menit | 180 XP | Analogi Blender Jus & Resep Masakan Berulang |
+| **M7** | Array & List Data | 60 Menit | 200 XP | Analogi Loker Gym & Daftar Belanjaan Supermarket |
+| **M8** | Mini Project Akhir | 90 Menit | 300 XP | **Sistem Kasir Warkop TRPL 2026 (Scaffolding 3 Fase)** |
 
 ---
 
 ## 🛠️ Teknologi & Arsitektur
 
 ### Core Stack
-- **Framework**: Next.js 16 (App Router, Turbopack, SSG static pre-rendering)
-- **Language**: TypeScript 5.0
-- **Execution Engine**: Pyodide WebAssembly (Client-Side WASM Python 3.11)
-- **Editor**: Monaco Editor (`@monaco-editor/react`)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack, React 19)
+- **Language**: [TypeScript 5.0](https://www.typescriptlang.org/)
+- **Execution Engine**: [Pyodide WebAssembly](https://pyodide.org/) (Python 3.11 WASM)
+- **Code Editor**: Monaco Editor (`@monaco-editor/react`)
 - **Icons & Animation**: `@phosphor-icons/react`, `framer-motion`, `canvas-confetti`
-- **Database & Auth**: Firebase Authentication & Firestore Cloud Database
+- **Database & Auth**: Google Firebase (Authentication & Cloud Firestore)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 
-### Automated Quality Assurance
-- **Unit Testing**: Vitest test runner (`npm run test`)
-- **Static Type Safety**: `npx tsc --noEmit` (0 errors)
-- **CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`)
+### Quality Assurance & Automated Testing
+- **Unit Testing**: Vitest test suite (`npm run test` -> **31/31 passed**)
+- **Static Type Safety**: `npx tsc --noEmit` (**0 errors**)
+- **CI/CD Pipeline**: GitHub Actions Automated Testing Workflow (`.github/workflows/ci.yml`)
 
 ---
 
@@ -94,26 +97,33 @@ Dibangun menggunakan **Next.js 16 (App Router)**, **Pyodide WebAssembly (WASM)**
 PemrogramanTRPL/
 ├── .github/
 │   └── workflows/ci.yml       # Automated CI testing pipeline
-├── docs/                      # PRD & Arsitektur dokumentasi
 ├── firestore.rules            # Aturan keamanan database Firestore
 └── web/                       # Aplikasi Utama Next.js
+    ├── __tests__/             # Vitest test suites (grader, api, store, ui)
     ├── app/                   # Next.js App Router Pages
-    │   ├── (auth)/            # Login & Registrasi
-    │   ├── (main)/            # Dashboard, Learn, Sandbox, Leaderboard, Admin, Profile
-    │   └── api/               # API Routes (Run-code, Gamification)
+    │   ├── (auth)/login/      # Halaman Login SSO & Mode Tamu
+    │   ├── (main)/            # Layout utama aplikasi
+    │   │   ├── dashboard/     # Dashboard progres belajar mahasiswa
+    │   │   ├── learn/         # Modul interaktif (M0–M8), kuis, dan latihan koding
+    │   │   ├── leaderboard/   # Podium peringkat angkatan & profil
+    │   │   ├── sandbox/       # VS Code Sandbox IDE mandiri
+    │   │   ├── certificate/   # Generator sertifikat kelulusan TRPL
+    │   │   └── help/          # Halaman peninjauan snapshot Minta Bantuan
+    │   ├── admin/             # Dashboard monitoring dosen & analitik
+    │   └── api/               # API Routes & graders
     ├── components/
-    │   ├── admin/             # Analytics Dashboard & PDF Exporter
-    │   ├── editor/            # Monaco Editor, PowerShellTerminal, CodeDiffViewer, VisualDebugger
-    │   ├── landing/           # Hero Sandbox, Cyber Background, XP Calculator, FAQ, CTA
-    │   ├── learning/          # SkillTree, ParsonsProblem, QuizEngine
-    │   ├── profile/           # AvatarCustomizer
-    │   └── ui/                # Audio Web FX, Floating XP, GlassSkeleton
-    ├── lib/
-    │   ├── ai/                # AI Error Explainer
-    │   ├── grader/            # Auto-Grader Engine
-    │   ├── pyodide/           # Pyodide WASM Client Runner
-    │   └── store/             # Zustand Game & User Progress Store
-    └── __tests__/             # Suite Pengujian Unit
+    │   ├── editor/            # Monaco, PowerShellTerminal, VisualDebugger, DiffViewer
+    │   ├── landing/           # HeroSandbox, ColorSwitcher, XP Calculator, FAQ
+    │   ├── learning/          # SeniorTipCard, SkillTree, ParsonsProblem, QuizEngine
+    │   └── layout/            # Navbar, Footer, ThemeToggle
+    └── lib/
+        ├── ai/                # AI Error Explainer
+        ├── content/           # Konten modul materi & dataset meme
+        ├── firebase/          # Konfigurasi Firebase Auth & Firestore
+        ├── grader/            # Auto-Grader Engine
+        ├── pyodide/           # Runner WebAssembly Python
+        ├── store/             # Zustand store (User progress, theme, streak)
+        └── theme.ts           # Logika tema warna & mode gelap
 ```
 
 ---
@@ -124,7 +134,7 @@ PemrogramanTRPL/
 - Node.js `v18.0.0` atau lebih baru
 - npm `v9.0.0` atau lebih baru
 
-### Langkah Instalasi & Pengecekan
+### Langkah Instalasi & Menjalankan
 
 1. **Clone Repositori**:
    ```bash
@@ -141,22 +151,22 @@ PemrogramanTRPL/
    ```bash
    npm run dev
    ```
-   Buka `http://localhost:3000` di browser Anda.
+   Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-4. **Verifikasi Build Production**:
-   ```bash
-   npm run build
-   ```
-
-5. **Jalankan Suite Pengujian Unit**:
+4. **Jalankan Suite Pengujian Otomatis**:
    ```bash
    npm run test
+   ```
+
+5. **Verifikasi Build Production**:
+   ```bash
+   npm run build
    ```
 
 ---
 
 ## 📜 Lisensi & Kontribusi
 
-Proyek ini dikembangkan oleh **Divisi Pemrograman HIMA TRPL** untuk Kegiatan Matrikulasi Mahasiswa Baru Teknologi Rekayasa Perangkat Lunak 2026.
+Proyek ini dikembangkan oleh **Divisi Pemrograman HIMA TRPL** untuk Kegiatan Matrikulasi Mahasiswa Baru Program Studi Teknologi Rekayasa Perangkat Lunak 2026.
 
 Dilisensikan di bawah [MIT License](LICENSE).
