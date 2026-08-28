@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserStore, BADGES } from "@/lib/store/useUserStore";
+import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
@@ -8,6 +8,7 @@ import { AvatarIcon, BadgeIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PROFILE_FEATURES } from "@/lib/features";
 import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
+import { SkillRadarChart } from "@/components/profile/SkillRadarChart";
 
 const AVATARS = [
   { id: "avatar_default", emoji: "🤖", label: "Robot" },
@@ -19,7 +20,7 @@ const AVATARS = [
 ];
 
 export default function ProfilePage() {
-  const { user, updateAvatar } = useUserStore();
+  const { user, updateAvatar, restoreCreatorProgress } = useUserStore();
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || "avatar_default");
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
 
@@ -79,23 +80,53 @@ export default function ProfilePage() {
       >
         <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", alignItems: "flex-start" }}>
           <div>
-            <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)" }}>
-              {user.name}
-            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                {user.name}
+              </h2>
+              {isCreator(user) && (
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    background: "linear-gradient(135deg, #FF6B00, #F59E0B)",
+                    color: "#000",
+                    padding: "3px 10px",
+                    borderRadius: "var(--radius-full)",
+                    fontWeight: 800,
+                    boxShadow: "0 0 12px rgba(245,158,11,0.5)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  👑 Platform Creator & Lead Architect
+                </span>
+              )}
+            </div>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
               <Calendar size={16} /> Mahasiswa TRPL Angkatan 2026
             </p>
             <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: "4px" }}>
               {user.email}
             </p>
-            <button
-              onClick={() => setIsCustomizerOpen(true)}
-              className="btn btn-sm btn-primary focus-ring"
-              aria-label="Buka kustomisasi avatar"
-              style={{ marginTop: "10px" }}
-            >
-              🎨 Kustomisasi Avatar Hero
-            </button>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
+              <button
+                onClick={() => setIsCustomizerOpen(true)}
+                className="btn btn-sm btn-primary focus-ring"
+                aria-label="Buka kustomisasi avatar"
+              >
+                🎨 Kustomisasi Avatar Hero
+              </button>
+              {isCreator(user) && (
+                <button
+                  onClick={() => restoreCreatorProgress()}
+                  className="btn btn-sm btn-secondary focus-ring"
+                  title="Pulihkan seluruh progres modul M0-M8 dan semua badges kelulusan"
+                >
+                  ⚡ Pulihkan Progres Penuh (M0-M8)
+                </button>
+              )}
+            </div>
           </div>
 
           <AvatarCustomizer
@@ -205,6 +236,12 @@ export default function ProfilePage() {
           })}
         </div>
       </div>
+
+      {/* Skill Radar Competency Polygon */}
+      <div style={{ marginTop: "var(--space-6)" }}>
+        <SkillRadarChart studentLevel={user.level || "TRPL Cadet"} />
+      </div>
+
       <style jsx>{`
         @media (max-width: 640px) {
           .badges-cabinet-grid { grid-template-columns: 1fr !important; }

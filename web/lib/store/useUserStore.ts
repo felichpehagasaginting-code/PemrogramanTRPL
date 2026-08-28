@@ -9,6 +9,18 @@ const clearAuthCookie = () => { document.cookie = "matrikulasi-auth=; path=/; ma
 const ADMIN_EMAILS = ["felich@mhs.cwe.ac.id", "felichpehagasa@gmail.com"];
 export const isAdmin = (user: UserProfile | null): boolean => user?.email ? ADMIN_EMAILS.includes(user.email.toLowerCase()) : false;
 
+export const isCreator = (user: { email?: string; name?: string } | null): boolean => {
+  if (!user) return false;
+  const email = (user.email || "").toLowerCase();
+  const name = (user.name || "").toLowerCase();
+  return (
+    email === "felich@mhs.cwe.ac.id" ||
+    email === "felichpehagasa@gmail.com" ||
+    name.includes("felich") ||
+    name.includes("ginting")
+  );
+};
+
 export interface UserProgress {
   [moduleId: string]: {
     completedSubModules: string[];
@@ -26,6 +38,7 @@ export interface UserProfile {
   badges: string[];
   streak: number;
   progress: UserProgress;
+  isCreator?: boolean;
 }
 
 export interface BadgeInfo {
@@ -39,9 +52,11 @@ export interface BadgeInfo {
 export interface LeaderboardUser {
   uid: string;
   name: string;
+  email?: string;
   avatar: string;
   xp: number;
   level: string;
+  isCreator?: boolean;
 }
 
 export const LEVELS = [
@@ -72,6 +87,20 @@ export const BADGES: BadgeInfo[] = [
   { id: "perfect_streak_7", name: "7-Day Streak", emoji: "🔥", color: "#EF4444", description: "Belajar 7 hari berturut-turut" },
 ];
 
+export const ALL_BADGE_IDS = BADGES.map((b) => b.id);
+
+export const COMPLETED_FULL_PROGRESS: UserProgress = {
+  M0: { completedSubModules: ["m0-welcome", "m0-what-is-programming", "m0-roadmap", "m0-pretest"], status: "completed" },
+  M1: { completedSubModules: ["m1-prerequisites", "m1-how-computer-works", "m1-code-reading", "m1-folder-rules", "m1-folder-sim", "m1-drag", "m1-extensions", "m1-gui-cli", "m1-cli", "m1-editor", "m1-checklist"], status: "completed" },
+  M2: { completedSubModules: ["m2-algorithm", "m2-flowchart", "m2-pseudocode", "m2-good-algorithm", "m2-flowchart-practice", "m2-pseudo-to-python"], status: "completed" },
+  M3: { completedSubModules: ["m3-variables", "m3-data-types", "m3-naming", "m3-type-casting", "m3-practice"], status: "completed" },
+  M4: { completedSubModules: ["m4-if-else", "m4-comparison", "m4-logical-op", "m4-nested-if", "m4-practice"], status: "completed" },
+  M5: { completedSubModules: ["m5-for-loop", "m5-while-loop", "m5-range", "m5-break-continue", "m5-practice"], status: "completed" },
+  M6: { completedSubModules: ["m6-function-def", "m6-parameters", "m6-return-value", "m6-scope", "m6-practice"], status: "completed" },
+  M7: { completedSubModules: ["m7-list-creation", "m7-indexing", "m7-list-methods", "m7-looping-list", "m7-practice"], status: "completed" },
+  M8: { completedSubModules: ["m8-summary", "m8-spec", "m8-steps"], status: "completed" },
+};
+
 const INITIAL_PROGRESS: UserProgress = {
   M0: { completedSubModules: [], status: "active" },
   M1: { completedSubModules: [], status: "locked" },
@@ -87,6 +116,7 @@ const INITIAL_PROGRESS: UserProgress = {
 export const MODULE_KEYS = Object.keys(INITIAL_PROGRESS);
 
 const DEFAULT_MOCK_LEADERBOARD: LeaderboardUser[] = [
+  { uid: "creator-felich", name: "Felich Pehagasa Ginting", email: "felich@mhs.cwe.ac.id", avatar: "avatar_default", xp: 1550, level: "TRPL Legend", isCreator: true },
   { uid: "leader-1", name: "Reza TRPL", avatar: "avatar_1", xp: 1150, level: "TRPL Legend" },
   { uid: "leader-2", name: "Aditya Cipta", avatar: "avatar_2", xp: 950, level: "Algorithm Master" },
   { uid: "leader-3", name: "Siti Rahma", avatar: "avatar_3", xp: 820, level: "Algorithm Master" },
@@ -117,6 +147,7 @@ interface UserState {
   unlockBadge: (badgeId: string) => Promise<void>;
   completeSubModule: (moduleId: string, subModuleId: string) => Promise<void>;
   completeModule: (moduleId: string) => Promise<void>;
+  restoreCreatorProgress: () => Promise<void>;
   closeBadgePopup: () => void;
   closeLevelUpPopup: () => void;
   closeMemePopup: () => void;
@@ -136,23 +167,44 @@ export const useUserStore = create<UserState>()(
       const processFirebaseUser = async (fbUser: any) => {
         const uid = fbUser.uid;
         const userRef = doc(db, "users", uid);
+        const isFelich = isCreator({ email: fbUser.email, name: fbUser.displayName });
+        
         const tempProfile: UserProfile = {
-          uid, name: fbUser.displayName || "Maba TRPL", email: fbUser.email || "",
-          avatar: "avatar_default", xp: 0, level: "Script Kiddie",
-          badges: ["langkah_pertama"], streak: 1, progress: INITIAL_PROGRESS,
+          uid,
+          name: fbUser.displayName || (isFelich ? "Felich Pehagasa Ginting" : "Maba TRPL"),
+          email: fbUser.email || (isFelich ? "felich@mhs.cwe.ac.id" : ""),
+          avatar: "avatar_default",
+          xp: isFelich ? 1550 : 0,
+          level: isFelich ? "TRPL Legend" : "Script Kiddie",
+          badges: isFelich ? ALL_BADGE_IDS : ["langkah_pertama"],
+          streak: isFelich ? 7 : 1,
+          progress: isFelich ? COMPLETED_FULL_PROGRESS : INITIAL_PROGRESS,
+          isCreator: isFelich,
         };
+
         try {
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
-            set({ user: userDoc.data() as UserProfile }); setAuthCookie();
+            const data = userDoc.data() as UserProfile;
+            // If Felich has reset progress, restore full completed curriculum
+            if (isFelich && (data.xp === 0 || Object.values(data.progress || {}).filter(p => p.status === "completed").length < 8)) {
+              const restored = { ...data, ...tempProfile, uid };
+              await setDoc(userRef, restored, { merge: true });
+              set({ user: restored });
+            } else {
+              set({ user: { ...data, isCreator: isFelich || data.isCreator } });
+            }
+            setAuthCookie();
           } else {
             await setDoc(userRef, tempProfile);
-            set({ user: tempProfile }); setAuthCookie();
+            set({ user: tempProfile });
+            setAuthCookie();
           }
           await get().fetchLeaderboard();
         } catch {
           console.warn("Firestore sync failed");
-          set({ user: tempProfile }); setAuthCookie();
+          set({ user: tempProfile });
+          setAuthCookie();
         }
       };
 
@@ -165,27 +217,66 @@ export const useUserStore = create<UserState>()(
       memePopup: { isOpen: false, memeUrl: "", caption: "" },
 
       login: async (name, email) => {
-        const uid = `user-${Date.now()}`;
+        const isFelich = isCreator({ email, name });
+        const uid = isFelich ? "creator-felich" : `user-${Date.now()}`;
         const mockProfile: UserProfile = {
-          uid, name, email, avatar: "avatar_default", xp: 0, level: "Script Kiddie",
-          badges: ["langkah_pertama"], streak: 1, progress: INITIAL_PROGRESS,
+          uid,
+          name: isFelich ? "Felich Pehagasa Ginting" : name,
+          email: isFelich ? "felich@mhs.cwe.ac.id" : email,
+          avatar: "avatar_default",
+          xp: isFelich ? 1550 : 0,
+          level: isFelich ? "TRPL Legend" : "Script Kiddie",
+          badges: isFelich ? ALL_BADGE_IDS : ["langkah_pertama"],
+          streak: isFelich ? 7 : 1,
+          progress: isFelich ? COMPLETED_FULL_PROGRESS : INITIAL_PROGRESS,
+          isCreator: isFelich,
         };
         if (!isMockFirebase) {
           try {
             const userRef = doc(db, "users", uid);
             const userDoc = await getDoc(userRef);
             if (userDoc.exists()) {
-              set({ user: userDoc.data() as UserProfile }); setAuthCookie();
+              const data = userDoc.data() as UserProfile;
+              if (isFelich) {
+                const restored = { ...data, ...mockProfile };
+                await setDoc(userRef, restored, { merge: true });
+                set({ user: restored });
+              } else {
+                set({ user: data });
+              }
+              setAuthCookie();
             } else {
               await setDoc(userRef, mockProfile);
-              set({ user: mockProfile }); setAuthCookie();
+              set({ user: mockProfile });
+              setAuthCookie();
             }
             await get().fetchLeaderboard();
             return;
           } catch {}
         }
-        set({ user: mockProfile }); setAuthCookie();
+        set({ user: mockProfile });
+        setAuthCookie();
         await get().fetchLeaderboard();
+      },
+
+      restoreCreatorProgress: async () => {
+        const { user } = get();
+        if (!user) return;
+        const restored: UserProfile = {
+          ...user,
+          xp: 1550,
+          level: "TRPL Legend",
+          badges: ALL_BADGE_IDS,
+          streak: 7,
+          progress: COMPLETED_FULL_PROGRESS,
+          isCreator: true,
+        };
+        set({ user: restored });
+        if (!isMockFirebase) {
+          try {
+            await setDoc(doc(db, "users", user.uid), restored, { merge: true });
+          } catch {}
+        }
       },
 
       loginWithGoogle: async () => {
@@ -214,7 +305,15 @@ export const useUserStore = create<UserState>()(
           const list: LeaderboardUser[] = [];
           snapshot.forEach((doc) => {
             const d = doc.data();
-            list.push({ uid: d.uid || doc.id, name: d.name || "Anonymous", avatar: d.avatar || "avatar_default", xp: d.xp || 0, level: d.level || "Script Kiddie" });
+            list.push({
+              uid: d.uid || doc.id,
+              name: d.name || "Anonymous",
+              email: d.email || "",
+              avatar: d.avatar || "avatar_default",
+              xp: d.xp || 0,
+              level: d.level || "Script Kiddie",
+              isCreator: Boolean(d.isCreator || isCreator({ email: d.email, name: d.name })),
+            });
           });
           set({ leaderboard: list });
         } catch {}
