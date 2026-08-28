@@ -16,11 +16,14 @@ import {
   Bookmark,
   Sparkle,
 } from "@phosphor-icons/react";
+import { InlineAnnotationThread } from "@/components/learning/InlineAnnotationThread";
+import { SeniorTipCard, SeniorTipData } from "@/components/learning/SeniorTipCard";
 
 interface Slide {
   title: string;
   type: "text" | "interactive-drag" | "interactive-cli" | "checklist";
   content: React.ReactNode;
+  tipData?: SeniorTipData;
 }
 
 function FolderCreationSimulator() {
@@ -239,11 +242,21 @@ export default function LearnModulePage() {
   // Modul details metadata
   const moduleMap: Record<string, { title: string; slides: Slide[] }> = {
     M0: {
-      title: "Pre-Test & Orientasi",
+      title: "Kuis Pemetaan & Orientasi",
       slides: [
         {
           title: "Selamat Datang di Platform Matrikulasi!",
           type: "text",
+          tipData: {
+            analogy: "Belajar coding itu kayak belajar main gitar atau game baru. Awalnya jari kaku dan bingung tombol, tapi kalau udah paham ritmenya, kamu bisa bikin lagu atau aplikasi apa pun yang kamu mau!",
+            cheatSheet: '# Baris pertama kodemu di Python\nprint("Halo Dunia TRPL 2026!")',
+            industryContext: "Semua aplikasi raksasa seperti Instagram, Spotify, dan Gojek dimulai dari baris print dan logika sederhana.",
+            glossary: [
+              { term: "Syntax", meaning: "Aturan tata bahasa penulisan kode komputer (kalau typo huruf kecil-besar, program bisa ngambek)." },
+              { term: "Bug", meaning: "Kesalahan/kejanggalan di dalam baris kode yang membuat aplikasi error." },
+              { term: "Debugging", meaning: "Seni mencari dan memperbaiki bug sampai aplikasi berjalan mulus." }
+            ]
+          },
           content: (
             <div style={{ textAlign: "center" }}>
               <div style={{ display: "flex", justifyContent: "center", marginBottom: "15px" }}>
@@ -262,6 +275,15 @@ export default function LearnModulePage() {
         {
           title: "Apa itu Pemrograman?",
           type: "text",
+          tipData: {
+            analogy: "Komputer itu kayak robot koki yang sangat setia tapi polos. Kalau kamu minta 'bikin kopi', dia diam saja. Kamu harus instruksikan: 'ambil gelas ➡️ tuang kopi ➡️ beri air panas ➡️ aduk'.",
+            cheatSheet: '# Komputer membaca dari atas ke bawah\nprint("Langkah 1: Siapkan gelas")\nprint("Langkah 2: Tuang air panas")\nprint("Langkah 3: Kopi siap diminum!")',
+            industryContext: "Logika instruksi bertahap ini dipakai di backend sistem checkout Tokopedia saat memvalidasi pembayaran dan mengirim barang.",
+            glossary: [
+              { term: "Interpreter", meaning: "Penerjemah yang membaca dan menjalankan kode baris demi baris secara langsung (seperti Python)." },
+              { term: "Output", meaning: "Tampilan hasil kerja program yang dicetak ke layar monitor." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -301,15 +323,15 @@ export default function LearnModulePage() {
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
                 {[
-                  { kode: "M0", nama: "Pre-Test & Orientasi", warna: "#FF9D00", aktif: true },
+                  { kode: "M0", nama: "Kuis Pemetaan & Orientasi", warna: "#FF9D00", aktif: true },
                   { kode: "M1", nama: "Dasar Komputer & Workspace", warna: "#FF8C42" },
-                  { kode: "M2", nama: "Logika & Algoritma", warna: "#FF6B00" },
-                  { kode: "M3", nama: "Variabel & Tipe Data", warna: "#06B6D4" },
-                  { kode: "M4", nama: "Percabangan (if-else)", warna: "#EF4444" },
-                  { kode: "M5", nama: "Perulangan (Loop)", warna: "#22C55E" },
-                  { kode: "M6", nama: "Fungsi & Prosedur", warna: "#D45900" },
-                  { kode: "M7", nama: "Array & List", warna: "#FF8C42" },
-                  { kode: "M8", nama: "Mini Project Akhir", warna: "#FF6B00" },
+                  { kode: "M2", nama: "Logika & Algoritma Naratif", warna: "#FF6B00" },
+                  { kode: "M3", nama: "Toples Variabel & Tipe Data", warna: "#06B6D4" },
+                  { kode: "M4", nama: "Percabangan & Keputusan Diskon", warna: "#EF4444" },
+                  { kode: "M5", nama: "Perulangan Loop Tanpa Pusing", warna: "#22C55E" },
+                  { kode: "M6", nama: "Resep Fungsi & Dapur Kode", warna: "#D45900" },
+                  { kode: "M7", nama: "Rak Menu & List Data", warna: "#FF8C42" },
+                  { kode: "M8", nama: "Mini Project Kasir Warkop", warna: "#FF6B00" },
                 ].map((m) => (
                   <div key={m.kode} style={{ display: "flex", alignItems: "center", gap: "12px", background: m.aktif ? `${m.warna}12` : "var(--bg-page-alt)", border: m.aktif ? `1.5px solid ${m.warna}` : "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "8px 14px" }}>
                     <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", fontWeight: 800, color: m.warna, width: "28px", flexShrink: 0 }}>{m.kode}</span>
@@ -322,22 +344,22 @@ export default function LearnModulePage() {
           ),
         },
         {
-          title: "Pre-Test Pemetaan Kemampuan",
+          title: "Kuis Pemetaan Petualang Koding",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "var(--space-4)" }}>
-                Sebelum mulai belajar, kita akan melakukan tes diagnostik singkat.
-                Tujuannya bukan untuk memberi nilai jelek, melainkan untuk memetakan level awal kamu.
+                Sebelum mulai belajar, kita akan melakukan pemetaan awal yang santai.
+                Tujuannya bukan untuk memberi nilai jelek atau menentukan lulus-tidak lulus, melainkan untuk mengetahui gaya belajarmu!
               </p>
               <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                <li>Durasi: sekitar 10 menit</li>
-                <li>Format: 10 Soal Pilihan Ganda Logika Dasar</li>
-                <li>Sifat: Diagnostik (bebas stres, tidak ada nilai buruk!)</li>
+                <li>Durasi: sekitar 5 - 10 menit</li>
+                <li>Format: 5 Soal Pilihan Ganda Logika Santai</li>
+                <li>Sifat: Pemetaan diri (Bebas stres, santai aja bro!)</li>
               </ul>
               <div style={{ marginTop: "var(--space-6)", textAlign: "center" }}>
                 <Link href={`/learn/${moduleId}/quiz`} className="btn btn-primary">
-                  Mulai Pre-Test Sekarang &rarr;
+                  Mulai Kuis Pemetaan Sekarang &rarr;
                 </Link>
               </div>
             </div>
@@ -346,11 +368,21 @@ export default function LearnModulePage() {
       ],
     },
     M1: {
-      title: "Dasar Komputer & Workspace",
+      title: "Dasar Komputer & Workspace VS Code",
       slides: [
         {
           title: "Prasyarat Penting Sebelum Menulis Kode",
           type: "text",
+          tipData: {
+            analogy: "Drive D: itu lantai gedung kos, folder itu kamar tidurmu, dan file .py itu barang-barang di lemari. Jangan taruh barang di lorong jalan umum (Desktop/Downloads) biar gak hilang atau ketendang sistem!",
+            cheatSheet: '# 3 Perintah Terminal Wajib Hafal:\ncd nama_folder   # Masuk ke folder\nls               # Lihat isi folder (atau dir di Windows)\npython main.py   # Jalankan kode Python',
+            industryContext: "Software Engineer profesional di Tokopedia dan Google bekerja 80% menggunakan Terminal karena 10x lebih cepat daripada klik mouse di GUI.",
+            glossary: [
+              { term: "Path", meaning: "Alamat lengkap file di komputer (contoh: D:\\TRPL\\proyek\\main.py)." },
+              { term: "CLI", meaning: "Command Line Interface (layar terminal tempat mengetik perintah teks)." },
+              { term: "GUI", meaning: "Graphical User Interface (tampilan visual dengan tombol, mouse, dan ikon)." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -427,6 +459,15 @@ export default function LearnModulePage() {
         {
           title: "Aturan Folder & Peta Harddisk",
           type: "text",
+          tipData: {
+            analogy: "Menamai folder dengan spasi seperti 'tugas python' itu kayak bikin nama file yang terbelah dua. Komputer mengira 'tugas' dan 'python' adalah dua perintah terpisah.",
+            cheatSheet: '# Standar Nama File & Folder Programmer:\n# BENAR:   belajar_python atau latihan-maba-2026\n# SALAH:   belajar python atau tugas (1) copy.py',
+            industryContext: "Server cloud Linux tempat hosting aplikasi modern akan langsung error jika nama folder mengandung spasi atau karakter aneh.",
+            glossary: [
+              { term: "Snake Case", meaning: "Gaya penulisan dengan pemisah garis bawah, contoh: nama_folder_kamu." },
+              { term: "Kebab Case", meaning: "Gaya penulisan dengan tanda hubung, contoh: nama-folder-kamu." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -764,11 +805,20 @@ export default function LearnModulePage() {
       ],
     },
     M2: {
-      title: "Logika & Algoritma",
+      title: "Logika & Algoritma Naratif",
       slides: [
         {
           title: "Apa itu Algoritma?",
           type: "text",
+          tipData: {
+            analogy: "Algoritma itu persis resep memasak nasi goreng atau mie instan. Urutannya gak boleh kebalik: panaskan minyak ➡️ tumis bumbu ➡️ masukkan nasi. Kalau nasinya digoreng tanpa minyak dan api, hasilnya gak bisa dimakan!",
+            cheatSheet: '# Struktur Algoritma Sederhana di Python\npanjang = 10\nlebar = 5\nluas = panjang * lebar\nprint(f"Luas: {luas}")',
+            industryContext: "Algoritma pencarian rute driver terdekat di Gojek menggunakan logika langkah bertahap yang mirip dengan prinsip ini.",
+            glossary: [
+              { term: "Finiteness", meaning: "Algoritma wajib memiliki titik berhenti (tidak boleh berputar selamanya tanpa hasil)." },
+              { term: "Definiteness", meaning: "Setiap langkah harus jelas dan tidak bermakna ganda bagi komputer." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -817,6 +867,14 @@ export default function LearnModulePage() {
         {
           title: "Menulis Logika dengan Pseudocode",
           type: "text",
+          tipData: {
+            analogy: "Pseudocode itu kayak kamu nulis catatan rencana belanja atau draft caption Instagram sebelum diposting. Gak perlu mikir aturan tanda kurung atau titik koma dulu, yang penting alurnya masuk akal!",
+            cheatSheet: '# Pseudocode -> Python:\n# BACA nama       -> nama = input("Nama: ")\n# TAMPILKAN nama  -> print(nama)',
+            industryContext: "Software Architect di tech unicorn selalu menulis pseudocode di papan tulis sebelum tim programmer mulai koding.",
+            glossary: [
+              { term: "Pseudocode", meaning: "Kode tiruan dalam bahasa manusia yang terstruktur rapi sebelum diterjemahkan ke bahasa pemrograman asli." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -940,11 +998,20 @@ export default function LearnModulePage() {
       ],
     },
     M3: {
-      title: "Variabel & Tipe Data",
+      title: "Toples Variabel & Tipe Data",
       slides: [
         {
           title: "Variabel: Loker Penyimpan Data",
           type: "text",
+          tipData: {
+            analogy: "Variabel itu toples transparan di meja dapur. Toples gula pasir cuma boleh diisi gula (integer), toples sirup diisi cairan (float), dan label toples adalah teks (string).",
+            cheatSheet: '# Deklarasi Variabel & Cetak\nnama = "Budi"\numur = 18\ntinggi = 172.5\nprint(f"Nama: {nama}, Umur: {umur}, Tinggi: {tinggi}")',
+            industryContext: "Form registrasi aplikasi menyimpan input nama, email, dan password ke variabel sebelum diproses ke database.",
+            glossary: [
+              { term: "Variable", meaning: "Nama pengenal untuk menyimpan nilai data di memori RAM komputer." },
+              { term: "Assignment (=)", meaning: "Operator untuk memasukkan data ke dalam variabel (bukan sama dengan matematika)." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -1121,11 +1188,20 @@ export default function LearnModulePage() {
       ],
     },
     M4: {
-      title: "Percabangan",
+      title: "Percabangan & Keputusan Diskon",
       slides: [
         {
           title: "Logika Percabangan & Struktur if",
           type: "text",
+          tipData: {
+            analogy: "Percabangan itu seperti satpam gerbang kampus: 'Kalau kamu bawa KTM ➡️ Silakan masuk gratis. Kalau tidak bawa ➡️ Silakan beli karcis parkir!'.",
+            cheatSheet: '# Percabangan If-Elif-Else\ntotal_belanja = 50000\nif total_belanja >= 30000:\n    diskon = 0.10 * total_belanja\n    print("Dapat Diskon 10%!")\nelse:\n    diskon = 0',
+            industryContext: "Sistem e-commerce Shopee/Tokopedia mengecek kupon gratis ongkir menggunakan ribuan baris kondisi if-elif-else secara otomatis.",
+            glossary: [
+              { term: "Indentation", meaning: "Spasi menjorok ke dalam (4 spasi) yang menandai isi blok kode di dalam if/else." },
+              { term: "Boolean Condition", meaning: "Kondisi perbandingan yang menghasilkan nilai True atau False." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -1252,11 +1328,20 @@ export default function LearnModulePage() {
       ],
     },
     M5: {
-      title: "Perulangan",
+      title: "Perulangan Loop Tanpa Pusing",
       slides: [
         {
           title: "Perulangan Terukur dengan for Loop",
           type: "text",
+          tipData: {
+            analogy: "Perulangan for itu kayak kamu disuruh push-up 5 kali (hitungannya pasti dari 1 sampai 5). Sementara while loop kayak makan kerupuk sampai toplesnya kosong!",
+            cheatSheet: '# For Loop & Range(start, stop)\nfor i in range(1, 6):  # Berjalan di angka 1, 2, 3, 4, 5 (angka 6 adalah pembatas pagar)\n    print(f"Putaran ke-{i}")',
+            industryContext: "Fitur playlist putar lagu otomatis di Spotify menggunakan loop untuk memutar antrean lagu berikutnya tanpa henti.",
+            glossary: [
+              { term: "Range(start, stop)", meaning: "Fungsi pembuat deret angka. Angka stop bersifat eksklusif (tidak diikutsertakan)." },
+              { term: "Infinite Loop", meaning: "Loop yang berputar selamanya karena lupa mengubah kondisi batas." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
@@ -1264,7 +1349,7 @@ export default function LearnModulePage() {
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
                 <span style={{ color: "#C586C0" }}>for</span> i <span style={{ color: "#C586C0" }}>in</span> range(<span style={{ color: "#B5CEA8" }}>1</span>, <span style={{ color: "#B5CEA8" }}>6</span>):<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>f"Perulangan ke-{'{i}'}"</span>)
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<span style={{ color: "#CE9178" }}>{`f"Perulangan ke-{i}"`}</span>)
               </div>
               <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "16px", fontSize: "0.85rem" }}>
                 <strong>Fungsi `range(start, stop)`:</strong>
@@ -1401,15 +1486,25 @@ export default function LearnModulePage() {
       ],
     },
     M6: {
-      title: "Fungsi & Prosedur",
+      title: "Resep Fungsi & Dapur Kode",
       slides: [
         {
-          title: "Fungsi: Blok Kode Modular",
+          title: "Fungsi: Blok Kode Modular (Dapur Restoran)",
           type: "text",
+          tipData: {
+            analogy: "Fungsi itu ibarat dapur restoran: Kamu pesan menu (Parameter Input) ➡️ Koki masak di dapur (Proses) ➡️ Koki mengantarkan sepiring makanan jadi ke mejamu (return value). print() cuma pelayan teriak info menu, return benar-benar menyerahkan sepiring makanan!",
+            cheatSheet: '# Membuat Fungsi Mandiri\ndef bikin_kopi(gula, kopi):\n    return f"Kopi dengan {gula} sdt gula dan {kopi} sdt kopi siap!"\n\npesanan = bikin_kopi(2, 1)\nprint(pesanan)',
+            industryContext: "Fungsi adalah blok bangunan utama software modern agar kode tidak ditulis ulang berkali-kali (Prinsip DRY: Don't Repeat Yourself).",
+            glossary: [
+              { term: "def", meaning: "Kata kunci sakti di Python untuk mendefinisikan fungsi baru." },
+              { term: "Parameter", meaning: "Variabel penampung bahan mentah di dalam tanda kurung fungsi saat dibuat." },
+              { term: "Argument", meaning: "Nilai nyata yang kamu kirimkan ke fungsi saat fungsi tersebut dipanggil." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                <strong>Fungsi</strong> adalah sekumpulan instruksi terisolasi yang diberi nama, dirancang untuk melakukan tugas spesifik secara berulang.
+                <strong>Fungsi</strong> adalah sekumpulan instruksi terisolasi yang diberi nama, dirancang untuk melakukan tugas spesifik secara berulang tanpa perlu menulis ulang kodenya.
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
                 <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>sapa_maba</span>(nama):<br />
@@ -1493,79 +1588,40 @@ export default function LearnModulePage() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px", marginTop: "12px", fontSize: "0.85rem" }}>
-                <strong>Prinsip DRY</strong> <span style={{ color: "var(--text-secondary)" }}>(Don't Repeat Yourself): Jika kamu punya kode yang ditulis lebih dari sekali, itu sinyal kuat bahwa kamu perlu membungkusnya dalam sebuah fungsi.</span>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Parameter Default & Keyword Argument",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Python mengizinkan fungsi memiliki <strong>nilai default untuk parameter</strong>-nya. Jika argumen tidak diberikan saat pemanggilan, nilai default tersebut yang digunakan:
-              </p>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "14px", lineHeight: 1.8 }}>
-                <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>sapa</span>(nama, sapaan=<span style={{ color: "#CE9178" }}>"Halo"</span>):<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#DCDCAA" }}>print</span>(<span style={{ color: "#CE9178" }}>{`f"{sapaan}, {nama}!"`}</span>)<br />
-                <br />
-                sapa(<span style={{ color: "#CE9178" }}>"Reza"</span>) <span style={{ color: "#6A9955" }}># Output: Halo, Reza!</span><br />
-                sapa(<span style={{ color: "#CE9178" }}>"Dian"</span>, <span style={{ color: "#CE9178" }}>"Selamat pagi"</span>) <span style={{ color: "#6A9955" }}># Output: Selamat pagi, Dian!</span>
-              </div>
-              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "12px", fontSize: "0.85rem" }}>
-                <strong>Aturan Penting:</strong> <span style={{ color: "var(--text-secondary)" }}>Parameter dengan nilai default harus selalu diletakkan di <em>bagian akhir</em> daftar parameter, setelah semua parameter wajib (yang tidak memiliki nilai default).</span>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Rekursi: Fungsi yang Memanggil Dirinya Sendiri",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                <strong>Rekursi</strong> adalah teknik di mana sebuah fungsi memanggil dirinya sendiri untuk menyelesaikan masalah yang lebih kecil dari masalah aslinya, secara berulang.
-              </p>
-              <div style={{ background: "var(--bg-page-alt)", padding: "12px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", marginTop: "12px", marginBottom: "12px", fontSize: "0.85rem" }}>
-                <strong>Analogi: Boneka Matryoshka</strong>
-                <p style={{ color: "var(--text-secondary)", marginTop: "4px", lineHeight: 1.6 }}>
-                  Boneka Matryoshka adalah boneka kayu yang di dalamnya ada boneka lebih kecil, dan di dalamnya ada boneka lebih kecil lagi... sampai boneka terkecil. Rekursi bekerja persis seperti ini.
-                </p>
-              </div>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", lineHeight: 1.8 }}>
-                <span style={{ color: "#6A9955" }}># Faktorial: 5! = 5 x 4 x 3 x 2 x 1 = 120</span><br />
-                <span style={{ color: "#C586C0" }}>def</span> <span style={{ color: "#DCDCAA" }}>faktorial</span>(n):<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#C586C0" }}>if</span> n == <span style={{ color: "#B5CEA8" }}>1</span>: <span style={{ color: "#C586C0" }}>return</span> <span style={{ color: "#B5CEA8" }}>1</span> <span style={{ color: "#6A9955" }}># Base case (pemberhenti)</span><br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#C586C0" }}>return</span> n * <span style={{ color: "#DCDCAA" }}>faktorial</span>(n - <span style={{ color: "#B5CEA8" }}>1</span>) <span style={{ color: "#6A9955" }}># Rekursi</span><br />
-                <br />
-                <span style={{ color: "#DCDCAA" }}>print</span>(<span style={{ color: "#DCDCAA" }}>faktorial</span>(<span style={{ color: "#B5CEA8" }}>5</span>)) <span style={{ color: "#6A9955" }}># Output: 120</span>
-              </div>
             </div>
           ),
         },
       ],
     },
     M7: {
-      title: "Array & List",
+      title: "Rak Menu Makanan & List Data",
       slides: [
         {
-          title: "Struktur Data List di Python",
+          title: "Struktur Data List di Python (Rak Menu)",
           type: "text",
+          tipData: {
+            analogy: "List itu seperti rak barang atau barisan antrean di kasir warkop. Orang paling depan belum melangkah sejauh apa pun dari garis kasir (Jarak = 0 langkah, Indeks = 0).",
+            cheatSheet: '# Operasi Dasar List\nmenu = ["Kopi Tubruk", "Mie Goreng", "Roti Bakar"]\nmenu.append("Es Teh")  # Tambah menu baru ke urutan paling belakang\nprint(menu[0])         # Cetak "Kopi Tubruk" (indeks pertama)',
+            industryContext: "Feed Instagram dan riwayat chat WhatsApp disimpan dalam bentuk struktur data List/Array yang diurutkan berdasarkan waktu.",
+            glossary: [
+              { term: "Index (0-based)", meaning: "Nomor urut posisi item di dalam list, selalu dimulai dari angka 0." },
+              { term: "append()", meaning: "Perintah untuk menambahkan data baru ke posisi paling belakang list." },
+              { term: "len()", meaning: "Fungsi bawaan untuk menghitung total jumlah item di dalam list." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Bagaimana jika kita ingin menyimpan data berkelompok seperti daftar nilai mahasiswa? Kita bisa menggunakan <strong>List</strong> (struktur data mirip Array).
+                Bagaimana jika kita ingin menyimpan banyak data sekaligus seperti daftar menu makanan di warkop? Kita bisa menggunakan <strong>List</strong> (struktur data penampung array).
               </p>
               <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
-                nilai_ujian = [<span style={{ color: "#B5CEA8" }}>80</span>, <span style={{ color: "#B5CEA8" }}>75</span>, <span style={{ color: "#B5CEA8" }}>90</span>]<br />
+                menu_warkop = [<span style={{ color: "#CE9178" }}>"Kopi Tubruk"</span>, <span style={{ color: "#CE9178" }}>"Mie Goreng"</span>, <span style={{ color: "#CE9178" }}>"Roti Bakar"</span>]<br />
                 <span style={{ color: "#6A9955" }}># Indeks elemen dimulai dari 0</span><br />
-                print(nilai_ujian[<span style={{ color: "#B5CEA8" }}>0</span>]) <span style={{ color: "#6A9955" }}># Output: 80</span><br />
-                print(nilai_ujian[-<span style={{ color: "#B5CEA8" }}>1</span>]) <span style={{ color: "#6A9955" }}># Indeks negatif, output: 90 (terakhir)</span>
+                print(menu_warkop[<span style={{ color: "#B5CEA8" }}>0</span>]) <span style={{ color: "#6A9955" }}># Output: Kopi Tubruk</span><br />
+                print(menu_warkop[-<span style={{ color: "#B5CEA8" }}>1</span>]) <span style={{ color: "#6A9955" }}># Indeks negatif, output: Roti Bakar (paling akhir)</span>
               </div>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
-                List di Python sangat fleksibel: dapat memuat tipe data yang berbeda, ukurannya dinamis, dan kodenya mudah dibaca.
+                List di Python sangat fleksibel: ukurannya bisa bertambah dinamis dan kodenya sangat mudah dibaca.
               </p>
             </div>
           ),
@@ -1580,9 +1636,9 @@ export default function LearnModulePage() {
               </p>
               <div style={{ display: "grid", gap: "10px" }}>
                 {[
-                  { op: "nilai.append(95)", desc: "Menambahkan elemen baru '95' ke bagian paling akhir dari list." },
-                  { op: "nilai.remove(75)", desc: "Mencari dan menghapus elemen pertama bernilai '75' dari list." },
-                  { op: "len(nilai)", desc: "Fungsi bawaan untuk mengembalikan jumlah total elemen di dalam list." },
+                  { op: "menu.append('Es Jeruk')", desc: "Menambahkan elemen baru 'Es Jeruk' ke bagian paling akhir dari list." },
+                  { op: "menu.remove('Mie Goreng')", desc: "Mencari dan menghapus elemen 'Mie Goreng' dari list." },
+                  { op: "len(menu)", desc: "Fungsi bawaan untuk mengembalikan jumlah total item di dalam list." },
                 ].map((item, i) => (
                   <div key={i} style={{ background: "var(--bg-page-alt)", padding: "10px var(--space-4)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.875rem" }}>
                     <code style={{ color: "#CE9178", fontWeight: 700 }}>{item.op}</code>
@@ -1593,108 +1649,10 @@ export default function LearnModulePage() {
             </div>
           ),
         },
-        {
-          title: "Slicing (Pemotongan) List",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Python menyediakan cara mudah memotong list dan mengambil sub-koleksi menggunakan format indeks <code>list[start:stop]</code>:
-              </p>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "16px" }}>
-                abjad = [<span style={{ color: "#CE9178" }}>"A"</span>, <span style={{ color: "#CE9178" }}>"B"</span>, <span style={{ color: "#CE9178" }}>"C"</span>, <span style={{ color: "#CE9178" }}>"D"</span>]<br />
-                sub_abjad = abjad[<span style={{ color: "#B5CEA8" }}>1</span>:<span style={{ color: "#B5CEA8" }}>3</span>]<br />
-                print(sub_abjad) <span style={{ color: "#6A9955" }}># Output: ['B', 'C']</span>
-              </div>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "12px" }}>
-                Ingat bahwa angka batas <code>stop</code> bersifat eksklusif, artinya data pada indeks batas stop tidak akan diikutsertakan ke dalam hasil pemotongan.
-              </p>
-            </div>
-          ),
-        },
-        {
-          title: "Analogi: List adalah Kertas Absensi Kelas",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Cara termudah memahami List: bayangkan sebuah <strong>kertas absensi kelas</strong>.
-                Setiap baris kertas = satu elemen. Nomor urut baris (mulai dari 0) = indeks elemen.
-              </p>
-              <div style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-color)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "14px", fontFamily: "var(--font-code)", fontSize: "0.85rem" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 16px", color: "var(--text-secondary)" }}>
-                  <span style={{ color: "var(--color-primary-500)", fontWeight: 700 }}>Indeks</span><span style={{ fontWeight: 700, color: "var(--text-primary)" }}>Nama</span>
-                  {["Adit", "Budi", "Citra", "Dian"].map((nm, i) => (
-                    <><span key={`i-${i}`} style={{ color: "var(--color-primary-400)", fontWeight: 600 }}>[{i}]</span><span key={`n-${i}`}>{nm}</span></>
-                  ))}
-                </div>
-              </div>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "14px", borderRadius: "var(--radius-md)", marginTop: "12px", lineHeight: 1.8 }}>
-                absen = [<span style={{ color: "#CE9178" }}>"Adit"</span>, <span style={{ color: "#CE9178" }}>"Budi"</span>, <span style={{ color: "#CE9178" }}>"Citra"</span>, <span style={{ color: "#CE9178" }}>"Dian"</span>]<br />
-                <span style={{ color: "#DCDCAA" }}>print</span>(absen[<span style={{ color: "#B5CEA8" }}>2</span>]) <span style={{ color: "#6A9955" }}># Output: Citra</span>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Dictionary: Pasangan Kunci-Nilai",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Selain List, Python memiliki tipe data bernama <strong>Dictionary</strong>. Dictionary menyimpan data dalam format <strong>kunci: nilai</strong> (seperti kamus bahasa).
-              </p>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.875rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "14px", lineHeight: 1.8 }}>
-                mahasiswa = &#123;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#CE9178" }}>"nama"</span>: <span style={{ color: "#CE9178" }}>"Reza"</span>,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#CE9178" }}>"nim"</span>: <span style={{ color: "#CE9178" }}>"22001"</span>,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#CE9178" }}>"ipk"</span>: <span style={{ color: "#B5CEA8" }}>3.85</span><br />
-                &#125;<br />
-                <br />
-                <span style={{ color: "#DCDCAA" }}>print</span>(mahasiswa[<span style={{ color: "#CE9178" }}>"nama"</span>]) <span style={{ color: "#6A9955" }}># Output: Reza</span><br />
-                <span style={{ color: "#DCDCAA" }}>print</span>(mahasiswa[<span style={{ color: "#CE9178" }}>"ipk"</span>]) <span style={{ color: "#6A9955" }}># Output: 3.85</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px", fontSize: "0.85rem" }}>
-                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  <strong style={{ color: "var(--color-primary-500)" }}>List</strong>
-                  <p style={{ color: "var(--text-secondary)", marginTop: "4px" }}>Diakses pakai indeks angka. <code>[0]</code>, <code>[1]</code>, ...</p>
-                </div>
-                <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  <strong style={{ color: "var(--color-primary-500)" }}>Dictionary</strong>
-                  <p style={{ color: "var(--text-secondary)", marginTop: "4px" }}>Diakses pakai nama kunci. <code>["nama"]</code>, ...</p>
-                </div>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "List of Dictionaries: Data Mahasiswa Nyata",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Dalam program nyata, kita sering menggabungkan <strong>List berisi Dictionary</strong> untuk menyimpan banyak objek data sekaligus:
-              </p>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.8rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "14px", lineHeight: 1.8 }}>
-                daftar = [<br />
-                &nbsp;&nbsp;&#123;<span style={{ color: "#CE9178" }}>"nama"</span>: <span style={{ color: "#CE9178" }}>"Adit"</span>, <span style={{ color: "#CE9178" }}>"ipk"</span>: <span style={{ color: "#B5CEA8" }}>3.5</span>&#125;,<br />
-                &nbsp;&nbsp;&#123;<span style={{ color: "#CE9178" }}>"nama"</span>: <span style={{ color: "#CE9178" }}>"Budi"</span>, <span style={{ color: "#CE9178" }}>"ipk"</span>: <span style={{ color: "#B5CEA8" }}>3.8</span>&#125;,<br />
-                ]<br />
-                <br />
-                <span style={{ color: "#C586C0" }}>for</span> mhs <span style={{ color: "#C586C0" }}>in</span> daftar:<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#DCDCAA" }}>print</span>(<span style={{ color: "#CE9178" }}>{`f"{mhs['nama']}: IPK {mhs['ipk']}"`}</span>)<br />
-                <span style={{ color: "#6A9955" }}># Adit: IPK 3.5  &nbsp; Budi: IPK 3.8</span>
-              </div>
-              <div style={{ background: "rgba(34, 197, 94, 0.08)", border: "1px solid rgba(34, 197, 94, 0.25)", borderRadius: "var(--radius-md)", padding: "10px 12px", marginTop: "12px", fontSize: "0.85rem" }}>
-                <strong>Integrasi konsep:</strong> <span style={{ color: "var(--text-secondary)" }}>List + Dictionary + for Loop bekerja bersama. Inilah pola data paling umum dalam dunia programming profesional!</span>
-              </div>
-            </div>
-          ),
-        },
       ],
     },
     M8: {
-      title: "Mini Project",
+      title: "Mini Project Kasir Warkop TRPL",
       slides: [
         {
           title: "Rekap Perjalanan Belajarmu!",
@@ -1702,17 +1660,17 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "14px" }}>
-                Kamu sudah melewati perjalanan panjang! Sebelum mulai Mini Project, mari kita rekap semua ilmu yang sudah kamu kuasai:
+                Kamu sudah melewati perjalanan yang luar biasa! Sebelum merakit Mini Project, mari kita rekap senjata koding yang sudah kamu kuasai:
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 {[
-                  { modul: "M1", topik: "Dasar Komputer & Workspace", icon: "OS, file system, VS Code, terminal" },
-                  { modul: "M2", topik: "Logika & Algoritma", icon: "Algoritma, flowchart, pseudocode" },
-                  { modul: "M3", topik: "Variabel & Tipe Data", icon: "str, int, float, bool, input()" },
-                  { modul: "M4", topik: "Percabangan", icon: "if, elif, else, nested if, ternary" },
-                  { modul: "M5", topik: "Perulangan", icon: "for, while, break, continue, nested" },
-                  { modul: "M6", topik: "Fungsi & Prosedur", icon: "def, return, scope, parameter default" },
-                  { modul: "M7", topik: "Array & List", icon: "list, slicing, dict, append, len" },
+                  { modul: "M1", topik: "Dasar Komputer & Workspace", icon: "OS, path folder, VS Code, terminal" },
+                  { modul: "M2", topik: "Logika & Algoritma Naratif", icon: "Alur berpikir, flowchart, pseudocode" },
+                  { modul: "M3", topik: "Toples Variabel & Tipe Data", icon: "str, int, float, bool, input()" },
+                  { modul: "M4", topik: "Percabangan & Keputusan", icon: "if, elif, else, operator ==" },
+                  { modul: "M5", topik: "Perulangan Loop", icon: "for loop, while loop, range()" },
+                  { modul: "M6", topik: "Resep Fungsi Mandiri", icon: "def, parameter, return value" },
+                  { modul: "M7", topik: "Rak Menu & List Data", icon: "list, append, len(), indeks 0" },
                 ].map((item) => (
                   <div key={item.modul} style={{ background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "10px 12px", fontSize: "0.8rem" }}>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "4px" }}>
@@ -1723,118 +1681,57 @@ export default function LearnModulePage() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: "rgba(34, 197, 94, 0.08)", border: "1px solid rgba(34, 197, 94, 0.25)", borderRadius: "var(--radius-md)", padding: "10px 14px", marginTop: "12px", fontSize: "0.85rem" }}>
-                Kamu sudah siap! Semua konsep di atas akan kamu gunakan bersama-sama dalam Mini Project ini.
+            </div>
+          ),
+        },
+        {
+          title: "Spesifikasi 3 Babak: Mini Project Kasir Warkop TRPL",
+          type: "text",
+          tipData: {
+            analogy: "Membangun program kasir warkop ini menggabungkan semua kekuatanmu: Toples variabel harga (M3), Logika diskon 10% (M4), dan Cetak struk rapi (M5 & M7)!",
+            cheatSheet: '# Panduan 3 Babak Mini Project Kasir\n# 1. Harga & Jumlah\nharga_kopi = 5000\nharga_mie = 10000\n# 2. Total & Diskon 10%\ntotal = (qty_kopi * 5000) + (qty_mie * 10000)\nif total >= 30000: total_bayar = total * 0.90\n# 3. Cetak Struk\nprint("Total Bayar:", int(total_bayar))',
+            industryContext: "Aplikasi POS kasir modern bernilai triliunan rupiah seperti Moka POS dan Pawoon bekerja menggunakan pondasi logika yang persis seperti proyek ini!",
+            glossary: [
+              { term: "Scaffolding", meaning: "Membagi pengerjaan proyek besar menjadi babak-babak kecil yang teratur dan mudah dikerjakan." },
+              { term: "Clean Code", meaning: "Format penulisan kode yang rapi, mudah dibaca manusia, dan terstruktur." }
+            ]
+          },
+          content: (
+            <div>
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
+                Selamat! Sekarang saatnya merakit <strong>Mini Project: Sistem Kasir Warkop TRPL 2026</strong>. 
+                Pengerjaan dibagi ke dalam 3 Babak terstruktur:
+              </p>
+              <div style={{ background: "var(--bg-card)", border: "2px solid var(--color-primary-400)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "14px" }}>
+                <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>📋 3 Babak Pengerjaan Kasir Warkop:</h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <div><strong>☕ Babak 1 (Menu & Input):</strong> Tentukan harga menu (Kopi: Rp 5.000, Mie: Rp 10.000) dan jumlah pesanan pembeli.</div>
+                  <div><strong>🏷️ Babak 2 (Hitung & Diskon):</strong> Hitung total belanja. Jika total belanja $\ge$ Rp 30.000, berikan potongan diskon 10%!</div>
+                  <div><strong>🧾 Babak 3 (Cetak Struk):</strong> Tampilkan rincian Total Belanja dan Total Bayar ke layar konsol dengan rapi.</div>
+                </div>
               </div>
             </div>
           ),
         },
         {
-          title: "Latihan Integratif Akhir",
+          title: "Tips Debugging & Alur Kerja Profesional",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Selamat! Kamu telah membaca seluruh konsep dasar pemrograman. Sekarang saatnya menguji pemahaman kamu secara integratif dengan menyelesaikan <strong>Mini Project: Kalkulator Sederhana</strong>.
-              </p>
-              <div style={{ background: "var(--bg-card)", border: "2px solid var(--color-primary-400)", borderRadius: "var(--radius-lg)", padding: "var(--space-4)", marginTop: "16px" }}>
-                <h4 style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>📋 Spesifikasi Proyek Kalkulator:</h4>
-                <ul style={{ color: "var(--text-secondary)", fontSize: "0.875rem", display: "flex", flexDirection: "column", gap: "6px", paddingLeft: "20px" }}>
-                  <li>Meminta input angka pertama dari user.</li>
-                  <li>Meminta input angka kedua dari user.</li>
-                  <li>Mencetak hasil penjumlahan kedua angka tersebut ke konsol output.</li>
-                </ul>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Tips Debugging & Alur Kerja",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Sebelum mulai menulis kode di editor praktek, perhatikan tips berikut agar proses pengerjaan berjalan mulus:
-              </p>
-              <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
-                <li>💡 <strong>Rancang logika</strong>: Tuliskan pseudocode sederhana terlebih dahulu di kertas atau komentar kode.</li>
-                <li>🛠️ <strong>Ketik bertahap</strong>: Tulis variabel input terlebih dahulu, jalankan kode untuk memastikan tidak ada error sintaksis.</li>
-                <li>🎯 <strong>Jalankan sebelum kirim</strong>: Klik tombol <em>Jalankan Kode</em> untuk memvalidasi output sebelum mengeklik tombol <em>Kirim Jawaban</em>.</li>
-              </ul>
-            </div>
-          ),
-        },
-        {
-          title: "Tips Debugging & Alur Kerja yang Benar",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Sebelum mulai menulis kode, ikuti alur kerja profesional ini agar kodemu rapi dan minim error:
+                Sebelum mulai menulis kode di editor praktek, ikuti tips senior berikut agar pengerjaanmu lancar dan menyenangkan:
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "14px" }}>
                 {[
-                  { step: "1", judul: "Rencanakan dengan pseudocode", desc: "Tulis langkah-langkah program secara alami sebelum membuka editor kode." },
-                  { step: "2", judul: "Tulis kode bertahap", desc: "Tulis variabel input dulu, jalankan. Lalu tambahkan logika, jalankan lagi. Jangan langsung tulis semua sekaligus." },
-                  { step: "3", judul: "Baca pesan error dengan teliti", desc: "Python selalu memberitahu di baris mana error terjadi. Baca pesannya, jangan panik!" },
-                  { step: "4", judul: "Jalankan sebelum kirim", desc: "Klik 'Jalankan Kode' untuk memvalidasi output sebelum mengklik 'Kirim Jawaban'." },
+                  { step: "1", judul: "Ketik Bertahap", desc: "Tulis variabel harga dan jumlah pesanan terlebih dahulu, lalu klik Jalankan Kode untuk memastikan tidak ada typo." },
+                  { step: "2", judul: "Cek Rumus Diskon", desc: "Pastikan percabangan `if total >= 30000:` menghitung diskon `total * 0.10` dengan benar." },
+                  { step: "3", judul: "Uji Sebelum Kirim", desc: "Klik tombol 'Jalankan Kode' di editor. Jika output sudah sesuai dengan format struk, langsung klik 'Kirim Jawaban'!" },
                 ].map((item) => (
                   <div key={item.step} style={{ display: "flex", gap: "12px", background: "var(--bg-page-alt)", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem", alignItems: "flex-start" }}>
                     <span style={{ background: "var(--color-primary-500)", color: "white", width: "22px", height: "22px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 800, flexShrink: 0 }}>{item.step}</span>
                     <div><strong style={{ color: "var(--text-primary)" }}>{item.judul}:</strong><span style={{ color: "var(--text-secondary)", marginLeft: "4px" }}>{item.desc}</span></div>
                   </div>
                 ))}
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Skeleton Code: Kerangka Kalkulator Kamu",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Gunakan kerangka kode di bawah ini sebagai titik awal. Isi bagian yang kosong sesuai logikamu:
-              </p>
-              <div style={{ fontFamily: "var(--font-code)", fontSize: "0.825rem", background: "#1E1E1E", color: "#D4D4D4", padding: "16px", borderRadius: "var(--radius-md)", marginTop: "14px", lineHeight: 1.8 }}>
-                <span style={{ color: "#6A9955" }}># Langkah 1: Ambil input dari pengguna</span><br />
-                angka1 = <span style={{ color: "#DCDCAA" }}>int</span>(<span style={{ color: "#DCDCAA" }}>input</span>(<span style={{ color: "#CE9178" }}>"Masukkan angka pertama: "</span>))<br />
-                angka2 = <span style={{ color: "#DCDCAA" }}>int</span>(<span style={{ color: "#DCDCAA" }}>input</span>(<span style={{ color: "#CE9178" }}>"Masukkan angka kedua: "</span>))<br />
-                <br />
-                <span style={{ color: "#6A9955" }}># Langkah 2: Hitung hasil (tulis operasimu di sini!)</span><br />
-                hasil = <span style={{ color: "#CE9178" }}>???</span> <span style={{ color: "#6A9955" }}># Ganti ??? dengan operasi matematika</span><br />
-                <br />
-                <span style={{ color: "#6A9955" }}># Langkah 3: Tampilkan hasil</span><br />
-                <span style={{ color: "#DCDCAA" }}>print</span>(<span style={{ color: "#CE9178" }}>{`f"Hasil: {hasil}"`}</span>)
-              </div>
-              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "10px 12px", marginTop: "12px", fontSize: "0.85rem" }}>
-                <strong>Penting:</strong> <span style={{ color: "var(--text-secondary)" }}>Ganti <code>???</code> dengan operasi yang sesuai tantangan. Misalnya untuk penjumlahan: <code>angka1 + angka2</code></span>
-              </div>
-            </div>
-          ),
-        },
-        {
-          title: "Tantangan Lanjutan (Bonus!)",
-          type: "text",
-          content: (
-            <div>
-              <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Sudah selesai lebih awal? Coba tantangan bonus ini untuk mengasah kemampuanmu lebih jauh:
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
-                {[
-                  { level: "Mudah", color: "#22C55E", soal: "Tambahkan operasi pengurangan: tampilkan juga hasil angka1 - angka2." },
-                  { level: "Menengah", color: "#FF9D00", soal: "Buat kalkulator 4 operasi (+, -, *, /) menggunakan if-elif-else untuk memilih operasi berdasarkan input karakter dari pengguna." },
-                  { level: "Sulit", color: "#EF4444", soal: "Bungkus seluruh logika kalkulator di dalam sebuah fungsi bernama hitung(a, b, op) yang menerima dua angka dan satu operasi sebagai argumen." },
-                ].map((item) => (
-                  <div key={item.level} style={{ background: "var(--bg-page-alt)", padding: "12px 14px", borderRadius: "var(--radius-md)", border: `1.5px solid ${item.color}44`, fontSize: "0.85rem" }}>
-                    <span style={{ display: "inline-block", background: item.color, color: "white", padding: "1px 10px", borderRadius: "var(--radius-full)", fontSize: "0.75rem", fontWeight: 700, marginBottom: "6px" }}>{item.level}</span>
-                    <p style={{ color: "var(--text-secondary)", margin: 0 }}>{item.soal}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: "rgba(255, 107, 0, 0.08)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "10px 12px", marginTop: "12px", fontSize: "0.85rem" }}>
-                Selamat telah menyelesaikan seluruh modul matrikulasi! Kamu sudah memiliki fondasi yang kuat untuk memulai perkuliahan Pemrograman Dasar.
               </div>
             </div>
           ),
@@ -1976,6 +1873,15 @@ export default function LearnModulePage() {
             </h3>
 
             <div style={{ flex: 1 }}>{currentSlide.content}</div>
+
+            {currentSlide.tipData && (
+              <SeniorTipCard data={currentSlide.tipData} />
+            )}
+
+            {/* Contextual In-Line Discussion & Senior Notes */}
+            <div style={{ marginTop: "16px", borderTop: "1px solid var(--border-color)", paddingTop: "10px" }}>
+              <InlineAnnotationThread snippetTitle={currentSlide.title} />
+            </div>
           </motion.div>
         </AnimatePresence>
 
