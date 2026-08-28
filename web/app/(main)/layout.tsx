@@ -9,6 +9,8 @@ import { Code, SignOut, User, Trophy, BookOpen, ShieldCheck } from "@phosphor-ic
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { BroadcastBanner } from "@/components/ui/BroadcastBanner";
+import { useSessionTimeout } from "@/lib/auth/useSessionTimeout";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -17,6 +19,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const logout = useUserStore((s) => s.logout);
   const { checkDailyStreak } = useGameStore();
   const [mounted, setMounted] = useState(false);
+
+  // Activate 1-hour inactivity auto-logout protection
+  useSessionTimeout();
 
   useEffect(() => {
     setMounted(true);
@@ -133,6 +138,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
       </header>
+
+      {/* Live Push Broadcast Announcement Banner */}
+      <BroadcastBanner />
 
       {/* Main Content Area */}
       <main style={{ flex: 1, padding: "var(--space-6) 0" }}>
