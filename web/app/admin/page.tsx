@@ -9,10 +9,12 @@ import {
   ShieldCheck, Users, Trophy, MagnifyingGlass,
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
   Student, ChartBar, CheckCircle, LockKey, SignOut, Code,
-  PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft,
+  PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft, PlayCircle,
 } from "@phosphor-icons/react";
 
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { StruggleHeatmap } from "@/components/admin/StruggleHeatmap";
+import { CodePlaybackPlayer } from "@/components/editor/CodePlaybackPlayer";
 
 const MODULE_LABELS: Record<string, string> = {
   M0: "Pre-Test", M1: "Workspace", M2: "Logika",
@@ -42,6 +44,7 @@ export default function AdminPage() {
   const [awardAmount, setAwardAmount] = useState(50);
   const [addModal, setAddModal] = useState(false);
   const [editUser, setEditUser] = useState<string | null>(null);
+  const [playbackUser, setPlaybackUser] = useState<any | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
 
   useEffect(() => {
@@ -251,7 +254,10 @@ export default function AdminPage() {
         </div>
 
         {viewMode === "analytics" ? (
-          <AnalyticsDashboard users={allUsers} />
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <AnalyticsDashboard users={allUsers} />
+            <StruggleHeatmap />
+          </div>
         ) : (
           <>
             {/* Header */}
@@ -375,6 +381,16 @@ export default function AdminPage() {
                     })}
                     <td style={{ padding: "8px 12px", textAlign: "center" }}>
                       <div style={{ display: "flex", gap: "4px", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => {
+                            setPlaybackUser(u);
+                          }}
+                          className="btn btn-sm"
+                          style={{ padding: "4px 8px", fontSize: "0.7rem", background: "rgba(59,130,246,0.15)", border: "1px solid #3B82F6", borderRadius: "var(--radius-md)", cursor: "pointer", color: "#60A5FA" }}
+                          title="Putar Ulang Ketikan (Replay)"
+                        >
+                          <PlayCircle size={13} weight="fill" /> Replay
+                        </button>
                         <button
                           onClick={() => { setAwardModal(u.uid); setAwardAmount(50); }}
                           className="btn btn-sm"
@@ -585,6 +601,44 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Code Playback Player Modal */}
+        {playbackUser && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(0,0,0,0.7)",
+              backdropFilter: "blur(6px)",
+              padding: "20px",
+            }}
+          >
+            <CodePlaybackPlayer
+              studentName={playbackUser.name}
+              session={{
+                sessionId: `sess-${playbackUser.uid}`,
+                studentId: playbackUser.uid,
+                moduleId: "M4",
+                startTime: Date.now() - 60000,
+                totalEvents: 6,
+                hasPasteBurst: false,
+                events: [
+                  { timestamp: 1, deltaMs: 0, code: "# Mengerjakan Latihan Percabangan\n", charCount: 35 },
+                  { timestamp: 2, deltaMs: 400, code: "# Mengerjakan Latihan Percabangan\nnilai = int(input(\"Nilai: \"))\n", charCount: 65 },
+                  { timestamp: 3, deltaMs: 600, code: "# Mengerjakan Latihan Percabangan\nnilai = int(input(\"Nilai: \"))\nif nilai >= 80:\n    print(\"Lulus\")\n", charCount: 110 },
+                  { timestamp: 4, deltaMs: 500, code: "# Mengerjakan Latihan Percabangan\nnilai = int(input(\"Nilai: \"))\nif nilai >= 80:\n    print(\"Lulus dengan pujian\")\n", charCount: 125 },
+                  { timestamp: 5, deltaMs: 450, code: "# Mengerjakan Latihan Percabangan\nnilai = int(input(\"Nilai: \"))\nif nilai >= 80:\n    print(\"Lulus dengan pujian\")\nelse:\n    print(\"Semangat coba lagi!\")\n", charCount: 175 },
+                  { timestamp: 6, deltaMs: 300, code: "# Mengerjakan Latihan Percabangan TRPL 2026\nnilai = int(input(\"Nilai: \"))\nif nilai >= 80:\n    print(\"Lulus dengan pujian!\")\nelse:\n    print(\"Semangat coba lagi!\")\n", charCount: 186 },
+                ],
+              }}
+              onClose={() => setPlaybackUser(null)}
+            />
           </div>
         )}
         </>
