@@ -6,6 +6,8 @@ import "./globals.css";
 const SmoothScroll = dynamic(() => import("@/components/SmoothScroll").then((m) => m.SmoothScroll));
 
 const OverlayEffects = dynamic(() => import("@/components/gamification/OverlayEffects").then((m) => m.OverlayEffects));
+const CommandPalette = dynamic(() => import("@/components/ui/CommandPalette").then((m) => m.CommandPalette));
+const KeyboardShortcutsHelp = dynamic(() => import("@/components/ui/KeyboardShortcutsHelp").then((m) => m.KeyboardShortcutsHelp));
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -102,6 +104,8 @@ export default function RootLayout({
         <SmoothScroll>
           {children}
           <OverlayEffects />
+          <CommandPalette />
+          <KeyboardShortcutsHelp />
         </SmoothScroll>
       </body>
     </html>

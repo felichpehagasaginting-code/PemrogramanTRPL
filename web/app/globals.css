@@ -1169,22 +1169,34 @@ code, pre {
 @media (max-width: 768px) {
 
   /* Hero */
-  .hero-grid { grid-template-columns: 1fr !important; }
-  .hero-visual { display: none !important; }
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-8) !important;
+  }
+  .hero-visual {
+    margin-top: var(--space-4);
+    width: 100%;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
   section > .section-container {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 
-  /* Trust bar — stack stats */
+  /* Trust bar — responsive wrap */
   .trustbar-grid {
-    flex-direction: column !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
     gap: 12px !important;
+    justify-content: center !important;
     align-items: center !important;
   }
   .trustbar-grid > div {
-    width: 100% !important;
-    max-width: 280px !important;
+    flex: 1 1 200px !important;
+    max-width: 320px !important;
+    justify-content: center !important;
   }
 
   /* Features — single column */
@@ -1206,28 +1218,31 @@ code, pre {
     gap: var(--space-6) !important;
   }
   .badge-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
   }
 
   /* CTA — full width buttons */
   .cta-buttons {
     flex-direction: column !important;
     align-items: center !important;
+    gap: 12px !important;
   }
   .cta-buttons > * {
     width: 100% !important;
-    max-width: 320px !important;
+    max-width: 340px !important;
+    text-align: center !important;
+    justify-content: center !important;
   }
 
-  /* Hide floating decorations on small screens */
+  /* Hide floating background decorations on small screens */
   .float-text { display: none !important; }
 
-  /* Reduce spacing */
-  .section-padding { padding: var(--space-12) 0 !important; }
+  /* Fluid spacing */
+  .section-padding { padding: clamp(2.5rem, 6vw, 4.5rem) 0 !important; }
 }
 
 @media (max-width: 480px) {
-  .badge-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .badge-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .curriculum-stats { grid-template-columns: 1fr 1fr !important; }
 }
 
@@ -1253,3 +1268,44 @@ code, pre {
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
+
+/* ══════════════════════════════════════════
+   ACCESSIBILITY & DYSLEXIA-FRIENDLY MODE
+   ══════════════════════════════════════════ */
+.dyslexia-mode {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+  line-height: 1.8 !important;
+}
+
+.dyslexia-mode p,
+.dyslexia-mode span,
+.dyslexia-mode h1,
+.dyslexia-mode h2,
+.dyslexia-mode h3,
+.dyslexia-mode h4,
+.dyslexia-mode li {
+  letter-spacing: 0.06em !important;
+  line-height: 1.8 !important;
+}
+
+/* Print Certificate Optimization */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificate-print-area,
+  #certificate-print-area * {
+    visibility: visible;
+  }
+  #certificate-print-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+
