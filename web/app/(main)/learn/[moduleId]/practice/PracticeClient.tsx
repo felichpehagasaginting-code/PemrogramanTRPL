@@ -15,15 +15,24 @@ import {
   Bug,
   Lightbulb,
   Lightning,
+  Lifebuoy,
+  Cpu,
+  GitCommit,
+  Flask,
 } from "@phosphor-icons/react";
 import { QuizEngine, QuizQuestion } from "@/components/quiz/QuizEngine";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
 import { gradeSubmission, GradingResult } from "@/lib/grader/autoGrader";
 import { VisualDebugger } from "@/components/editor/VisualDebugger";
+import { MemoryGraph } from "@/components/editor/MemoryGraph";
+import { FlowchartBuilder } from "@/components/editor/FlowchartBuilder";
+import { TddTestBuilder } from "@/components/editor/TddTestBuilder";
+import { AskHelpModal } from "@/components/learning/AskHelpModal";
 import { explainPythonError, generateHint, ExplainedError } from "@/lib/ai/errorExplainer";
 import { ParsonsProblem, ParsonsBlock } from "@/components/learning/ParsonsProblem";
 import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
+import { KeystrokeRecorder } from "@/lib/recorder/keystrokeRecorder";
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -174,13 +183,31 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M8: {
     mode: "coding",
-    description: "Mini Project: Buat program penjumlahan dua angka (a = 5, b = 10) dan cetak hasilnya.",
-    initialCode: "a = 5\nb = 10\nhasil = a + b\nprint('Hasil:', hasil)\n",
+    description: "Mini Project: Sistem Kasir Warkop TRPL 2026. Hitung total pesanan kopi dan mie, berikan diskon 10% jika total >= Rp 30.000, lalu cetak Total Bayar.",
+    initialCode: `# Mini Project: Kasir Warkop TRPL 2026
+harga_kopi = 5000
+harga_mie = 10000
+
+jumlah_kopi = 2
+jumlah_mie = 3
+
+total = (jumlah_kopi * harga_kopi) + (jumlah_mie * harga_mie)
+
+if total >= 30000:
+    diskon = total * 0.10
+    total_bayar = total - diskon
+else:
+    diskon = 0
+    total_bayar = total
+
+print("Total Belanja:", total)
+print("Total Bayar:", int(total_bayar))
+`,
     testCases: [
       {
         id: "tc1",
-        description: "Mencetak Hasil: 15",
-        expectedOutput: "Hasil: 15",
+        description: "Mencetak Total Belanja dan Total Bayar",
+        expectedOutput: ["Total Belanja: 40000", "Total Bayar: 36000"],
       },
     ],
   },
@@ -195,7 +222,8 @@ export default function PracticeClient() {
   const [code, setCode] = useState("");
   const [output, setOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [activeTab, setActiveTab] = useState<"terminal" | "debugger" | "grader">("terminal");
+  const [activeTab, setActiveTab] = useState<"terminal" | "debugger" | "ram" | "grader" | "flowchart" | "tdd">("terminal");
+  const [askHelpOpen, setAskHelpOpen] = useState(false);
 
   // Grading & AI states
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null);
@@ -211,11 +239,36 @@ export default function PracticeClient() {
 
   const content = PRACTICE_CONTENT[moduleId as string];
 
+  const recorderRef = useRef<KeystrokeRecorder | null>(null);
+
   useEffect(() => {
-    if (content?.initialCode) {
-      setCode(content.initialCode);
+    if (typeof window !== "undefined") {
+      recorderRef.current = new KeystrokeRecorder(moduleId as string, user?.uid || "maba-user");
     }
-  }, [content]);
+  }, [moduleId, user?.uid]);
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && e.key === "Enter") {
+        e.preventDefault();
+        runCode();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "S" || e.key === "s")) {
+        e.preventDefault();
+        handleRunAutoGrader();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "H" || e.key === "h")) {
+        e.preventDefault();
+        handleShowHint();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "B" || e.key === "b")) {
+        e.preventDefault();
+        setAskHelpOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [code, isRunning]);
 
   if (!user) return <LoadingSpinner text="Memuat latihan..." fullPage />;
 
@@ -516,7 +569,11 @@ export default function PracticeClient() {
               language="python"
               theme="vs-dark"
               value={code}
-              onChange={(val) => setCode(val || "")}
+              onChange={(val) => {
+                const newCode = val || "";
+                setCode(newCode);
+                recorderRef.current?.recordChange(newCode);
+              }}
               options={{
                 minimap: { enabled: false },
                 fontSize: 14,
@@ -548,10 +605,20 @@ export default function PracticeClient() {
               <CheckCircle size={18} color="var(--success-color)" />
               Submit & Auto-Grade
             </button>
+
+            <button
+              onClick={() => setAskHelpOpen(true)}
+              className="btn btn-secondary"
+              style={{ display: "flex", alignItems: "center", gap: "8px", color: "#38BDF8" }}
+              title="Minta Bantuan ke Mentor atau Teman"
+            >
+              <Lifebuoy size={18} weight="fill" />
+              Minta Bantuan
+            </button>
           </div>
 
-          {/* Tabs header: Terminal | Visual Debugger | Auto-Grader */}
-          <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border-color)" }}>
+          {/* Tabs header: Terminal | Visual Debugger | Visual RAM | Auto-Grader */}
+          <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border-color)", flexWrap: "wrap" }}>
             <button
               onClick={() => setActiveTab("terminal")}
               style={{
@@ -589,6 +656,60 @@ export default function PracticeClient() {
               <Bug size={16} /> Visual Debugger
             </button>
             <button
+              onClick={() => setActiveTab("ram")}
+              style={{
+                padding: "8px 16px",
+                background: activeTab === "ram" ? "var(--bg-card)" : "transparent",
+                border: "none",
+                borderBottom: activeTab === "ram" ? "2px solid var(--primary-color)" : "none",
+                color: activeTab === "ram" ? "var(--primary-color)" : "var(--text-secondary)",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Cpu size={16} /> Visual Memory RAM
+            </button>
+            <button
+              onClick={() => setActiveTab("flowchart")}
+              style={{
+                padding: "8px 16px",
+                background: activeTab === "flowchart" ? "var(--bg-card)" : "transparent",
+                border: "none",
+                borderBottom: activeTab === "flowchart" ? "2px solid var(--primary-color)" : "none",
+                color: activeTab === "flowchart" ? "var(--primary-color)" : "var(--text-secondary)",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <GitCommit size={16} /> Flowchart Builder
+            </button>
+            <button
+              onClick={() => setActiveTab("tdd")}
+              style={{
+                padding: "8px 16px",
+                background: activeTab === "tdd" ? "var(--bg-card)" : "transparent",
+                border: "none",
+                borderBottom: activeTab === "tdd" ? "2px solid var(--primary-color)" : "none",
+                color: activeTab === "tdd" ? "var(--primary-color)" : "var(--text-secondary)",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Flask size={16} /> Mini TDD Explorer
+            </button>
+            <button
               onClick={() => setActiveTab("grader")}
               style={{
                 padding: "8px 16px",
@@ -618,29 +739,45 @@ export default function PracticeClient() {
                 <div
                   style={{
                     marginTop: "12px",
-                    padding: "12px",
-                    background: "rgba(239, 68, 68, 0.15)",
-                    border: "1px solid var(--error-color)",
-                    borderRadius: "var(--radius-md)",
-                    fontFamily: "sans-serif",
-                    color: "var(--text-primary)",
+                    background: "rgba(239, 68, 68, 0.08)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    borderRadius: "var(--radius-lg)",
+                    padding: "16px",
                   }}
                 >
-                  <div style={{ fontWeight: 700, color: "var(--error-color)", marginBottom: "4px" }}>
-                    {explainedError.icon} {explainedError.title}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--error-color)", fontWeight: 700, fontSize: "0.95rem" }}>
+                    <span>{explainedError.icon}</span>
+                    <span>{explainedError.title}</span>
                   </div>
-                  <p style={{ fontSize: "0.8125rem", margin: "0 0 6px 0", color: "var(--text-secondary)" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", margin: "8px 0", lineHeight: 1.6 }}>
                     {explainedError.explanation}
                   </p>
-                  <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary-color)" }}>
-                    💡 Saran perbaikan: {explainedError.suggestion}
+                  <div style={{ background: "rgba(0,0,0,0.2)", padding: "10px", borderRadius: "var(--radius-md)", fontSize: "0.8125rem", color: "var(--text-primary)" }}>
+                    💡 <strong>Saran perbaikan:</strong> {explainedError.suggestion}
                   </div>
+                  {explainedError.mentorNote && (
+                    <div style={{ marginTop: "8px", fontSize: "0.8rem", color: "#38BDF8", fontStyle: "italic" }}>
+                      {explainedError.mentorNote}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
 
           {activeTab === "debugger" && <VisualDebugger code={code} />}
+
+          {activeTab === "ram" && (
+            <MemoryGraph variables={{ x: 10, total: 25.5, items: ["Python", "TRPL"], aktif: true }} />
+          )}
+
+          {activeTab === "flowchart" && (
+            <FlowchartBuilder onCodeGenerated={(py) => setCode(py)} />
+          )}
+
+          {activeTab === "tdd" && (
+            <TddTestBuilder studentCode={code} />
+          )}
 
           {activeTab === "grader" && (
             <div
@@ -723,6 +860,16 @@ export default function PracticeClient() {
           )}
         </div>
       )}
+
+      {/* Ask Help Modal */}
+      <AskHelpModal
+        isOpen={askHelpOpen}
+        onClose={() => setAskHelpOpen(false)}
+        code={code}
+        moduleId={moduleId as string}
+        lastError={explainedError?.title}
+        userName={user.name}
+      />
     </div>
   );
 }
