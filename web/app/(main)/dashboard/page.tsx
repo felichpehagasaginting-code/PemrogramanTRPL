@@ -39,10 +39,52 @@ export default function DashboardPage() {
   ).length;
   const percentage = Math.round((completedCount / moduleKeys.length) * 100);
 
-  // Find user rank
-  const sortedLeaderboard = [...leaderboard].sort((a, b) => b.xp - a.xp);
-  const userRankIndex = sortedLeaderboard.findIndex((u) => u.uid === user.uid);
-  const userRank = userRankIndex !== -1 ? userRankIndex + 1 : leaderboard.length + 1;
+  // Find user rank and sync leaderboard list
+  const baseLeaderboard = leaderboard.filter(
+    (u) => !u.email?.includes("dosen.penguji") && u.uid !== "dosen-penguji-trpl"
+  );
+  const syncedLeaderboard = baseLeaderboard.map((item) => {
+    if (
+      user &&
+      (item.uid === user.uid ||
+        (item.email && user.email && item.email.toLowerCase() === user.email.toLowerCase()) ||
+        (isCreator(user) && isCreator(item)))
+    ) {
+      return {
+        ...item,
+        xp: Math.max(item.xp, user.xp),
+        level: user.level,
+        name: user.name,
+        avatar: user.avatar,
+        isCreator: true,
+      };
+    }
+    return item;
+  });
+
+  if (
+    !user.isDosenPenguji &&
+    !syncedLeaderboard.some(
+      (u) =>
+        u.uid === user.uid ||
+        (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()) ||
+        (isCreator(user) && isCreator(u))
+    )
+  ) {
+    syncedLeaderboard.push({
+      uid: user.uid,
+      name: user.name,
+      avatar: user.avatar,
+      xp: user.xp,
+      level: user.level,
+      email: user.email,
+      isCreator: user.isCreator,
+    });
+  }
+
+  const sortedLeaderboard = syncedLeaderboard.sort((a, b) => b.xp - a.xp).slice(0, 5);
+  const userRankIndex = syncedLeaderboard.findIndex((u) => u.uid === user.uid);
+  const userRank = user.isDosenPenguji ? "Dosen" : userRankIndex !== -1 ? userRankIndex + 1 : 1;
 
   return (
     <div className="section-container" style={{ paddingTop: "var(--space-4)" }}>
