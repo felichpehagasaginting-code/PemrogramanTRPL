@@ -18,15 +18,48 @@ export default function LeaderboardPage() {
 
   if (!user) return null;
 
-  // Add active user into leaderboard list to display ranks correctly
-  const fullLeaderboardList = [...leaderboard];
-  if (!fullLeaderboardList.some((u) => u.uid === user.uid)) {
+  // Add active user into leaderboard list to display ranks correctly (exclude Dosen Penguji)
+  const baseList = leaderboard.filter(
+    (u) => !u.email?.includes("dosen.penguji") && u.uid !== "dosen-penguji-trpl"
+  );
+
+  // Sync active user's latest XP into leaderboard list
+  const fullLeaderboardList = baseList.map((item) => {
+    if (
+      user &&
+      (item.uid === user.uid ||
+        (item.email && user.email && item.email.toLowerCase() === user.email.toLowerCase()) ||
+        (isCreator(user) && isCreator(item)))
+    ) {
+      return {
+        ...item,
+        xp: Math.max(item.xp, user.xp),
+        level: user.level,
+        name: user.name,
+        avatar: user.avatar,
+        isCreator: true,
+      };
+    }
+    return item;
+  });
+
+  if (
+    !user.isDosenPenguji &&
+    !fullLeaderboardList.some(
+      (u) =>
+        u.uid === user.uid ||
+        (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()) ||
+        (isCreator(user) && isCreator(u))
+    )
+  ) {
     fullLeaderboardList.push({
       uid: user.uid,
       name: user.name,
       avatar: user.avatar,
       xp: user.xp,
       level: user.level,
+      email: user.email,
+      isCreator: user.isCreator,
     });
   }
 
@@ -35,7 +68,10 @@ export default function LeaderboardPage() {
 
   // Stats calculation
   const totalXP = sortedList.reduce((sum, item) => sum + item.xp, 0);
-  const avgXP = Math.round(totalXP / sortedList.length);
+  const avgXP = sortedList.length > 0 ? Math.round(totalXP / sortedList.length) : 0;
+  const userRank = user.isDosenPenguji
+    ? "Mode Dosen"
+    : `#${sortedList.findIndex((u) => u.uid === user.uid) + 1}`;
 
   return (
     <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-4)" }}>
@@ -62,7 +98,7 @@ export default function LeaderboardPage() {
         }}
       >
         {[
-          { label: "Peringkat Kamu", value: `#${sortedList.findIndex((u) => u.uid === user.uid) + 1}`, color: "var(--color-primary-500)" },
+          { label: "Peringkat Kamu", value: userRank, color: "var(--color-primary-500)" },
           { label: "Rata-rata XP Kelas", value: `${avgXP} XP`, color: "#FF9D00" },
           { label: "Total Mahasiswa", value: sortedList.length.toString(), color: "#22C55E" },
         ].map((stat, idx) => (
@@ -91,112 +127,115 @@ export default function LeaderboardPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1.2fr 1fr",
-          gap: "12px",
+          gridTemplateColumns: "1fr 1.15fr 1fr",
+          gap: "14px",
           alignItems: "end",
           marginBottom: "var(--space-8)",
         }}
         className="podium-grid"
       >
-        {/* Rank 2 */}
+        {/* Rank 2 (Silver) */}
         {sortedList[1] && (
           <div
             style={{
               background: "var(--bg-card)",
               border: "1px solid var(--border-color)",
-              borderRadius: "var(--radius-lg)",
-              padding: "var(--space-4)",
+              borderRadius: "var(--radius-xl)",
+              padding: "20px 14px",
               textAlign: "center",
               boxShadow: "var(--shadow-sm)",
-              height: "140px",
+              minHeight: "155px",
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "4px" }}>
-              <Medal size={32} weight="fill" color="#9E9E9E" aria-hidden="true" />
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", marginBottom: "6px" }}>
+              <Medal size={36} weight="fill" color="#A0AEC0" aria-hidden="true" />
             </div>
-            <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[1].name}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[1].level}
             </div>
-            <div style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--color-primary-600)", marginTop: "4px" }}>
+            <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--color-primary-600)", marginTop: "6px" }}>
               ⚡ {sortedList[1].xp} XP
             </div>
           </div>
         )}
 
-        {/* Rank 1 */}
+        {/* Rank 1 (Champion Gold) */}
         {sortedList[0] && (
           <div
             style={{
               background: "var(--bg-card)",
               border: "2px solid #FFD93D",
-              borderRadius: "var(--radius-lg)",
-              padding: "var(--space-5)",
+              borderRadius: "var(--radius-xl)",
+              padding: "24px 16px",
               textAlign: "center",
-              boxShadow: "var(--shadow-md), var(--shadow-glow-soft)",
-              height: "170px",
+              boxShadow: "0 10px 25px rgba(255, 217, 61, 0.15), var(--shadow-md)",
+              minHeight: "180px",
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
               justifyContent: "center",
               position: "relative",
             }}
           >
-            <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", background: "#FFD93D", color: "#1C0A00", fontSize: "0.7rem", fontWeight: 900, padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+            <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", background: "#FFD93D", color: "#1C0A00", fontSize: "0.7rem", fontWeight: 900, padding: "3px 12px", borderRadius: "var(--radius-full)", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" }}>
               CHAMPION
             </div>
-            <div style={{ fontSize: "2.5rem", marginBottom: "4px" }}>
-              <Trophy size={40} weight="fill" color="#FFD93D" aria-hidden="true" />
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", marginBottom: "6px" }}>
+              <Trophy size={44} weight="fill" color="#FFD93D" aria-hidden="true" />
             </div>
-            <div style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <div style={{ fontSize: "0.975rem", fontWeight: 900, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[0].name}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[0].level}
             </div>
-            <div style={{ fontSize: "0.875rem", fontWeight: 900, color: "var(--color-primary-600)", marginTop: "6px" }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "var(--color-primary-600)", marginTop: "6px" }}>
               ⚡ {sortedList[0].xp} XP
             </div>
           </div>
         )}
 
-        {/* Rank 3 */}
+        {/* Rank 3 (Bronze) */}
         {sortedList[2] && (
           <div
             style={{
               background: "var(--bg-card)",
               border: "1px solid var(--border-color)",
-              borderRadius: "var(--radius-lg)",
-              padding: "var(--space-4)",
+              borderRadius: "var(--radius-xl)",
+              padding: "20px 14px",
               textAlign: "center",
               boxShadow: "var(--shadow-sm)",
-              height: "120px",
+              minHeight: "155px",
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: "1.75rem", marginBottom: "4px" }}>
-              <Medal size={28} weight="fill" color="#CD7F32" aria-hidden="true" />
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", marginBottom: "6px" }}>
+              <Medal size={36} weight="fill" color="#CD7F32" aria-hidden="true" />
             </div>
-            <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[2].name}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[2].level}
             </div>
-            <div style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--color-primary-600)", marginTop: "4px" }}>
+            <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--color-primary-600)", marginTop: "6px" }}>
               ⚡ {sortedList[2].xp} XP
             </div>
           </div>
         )}
       </div>
 
-      {/* Leaderboard List */}
+      {/* Leaderboard List (Rank #4 and below) */}
       <div
         style={{
           background: "var(--bg-card)",
@@ -207,88 +246,103 @@ export default function LeaderboardPage() {
           overflow: "hidden",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {sortedList.map((item, idx) => {
-            const isSelf = item.uid === user.uid;
-            return (
-              <motion.div
-                key={item.uid}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px var(--space-6)",
-                  background: isSelf ? "rgba(255,107,0,0.06)" : "transparent",
-                  borderBottom: "1px solid var(--border-color)",
-                  borderLeft: isSelf ? "4px solid var(--color-primary-500)" : "none",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-heading)",
-                      fontWeight: 800,
-                      fontSize: "0.875rem",
-                      color: idx === 0 ? "#FFD93D" : idx === 1 ? "#9E9E9E" : idx === 2 ? "#CD7F32" : "var(--text-muted)",
-                      width: "24px",
-                    }}
-                  >
-                    #{idx + 1}
-                  </span>
-                  <div
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      background: "var(--bg-page-alt)",
-                      border: "1.5px solid var(--border-color)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <AvatarIcon id={item.avatar} size={26} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "0.9375rem", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
-                      <span>{item.name}</span>
-                      {isSelf && <span style={{ fontSize: "0.7rem", background: "var(--color-primary-500)", color: "white", padding: "1px 6px", borderRadius: "var(--radius-full)" }}>KAMU</span>}
-                      {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
-                        <span
-                          style={{
-                            fontSize: "0.68rem",
-                            fontWeight: 800,
-                            background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)",
-                            color: "#000",
-                            padding: "2px 8px",
-                            borderRadius: "var(--radius-full)",
-                            boxShadow: "0 0 10px rgba(245,158,11,0.5)",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "3px",
-                          }}
-                        >
-                          👑 Platform Creator
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{item.level}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Sparkle size={16} color="var(--color-primary-500)" weight="fill" />
-                  <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, color: "var(--color-primary-600)", fontSize: "0.9375rem" }}>
-                    {item.xp} XP
-                  </span>
-                </div>
-              </motion.div>
-            );
-          })}
+        <div style={{ padding: "0 var(--space-6) 12px", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Peringkat #4 dan Seterusnya
+          </span>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            Top 3 ditampilkan di Podium Atas
+          </span>
         </div>
+
+        {sortedList.slice(3).length === 0 ? (
+          <div style={{ padding: "32px 20px", textAlign: "center", color: "var(--text-muted)" }}>
+            <Trophy size={28} color="var(--text-muted)" style={{ margin: "0 auto 8px" }} />
+            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem" }}>Belum ada mahasiswa lain di peringkat #4 ke bawah.</p>
+            <span style={{ fontSize: "0.75rem" }}>Selesaikan kuis dan modul untuk masuk ke papan peringkat!</span>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {sortedList.slice(3).map((item, idx) => {
+              const rankNumber = idx + 4;
+              const isSelf = item.uid === user.uid;
+              return (
+                <motion.div
+                  key={item.uid}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px var(--space-6)",
+                    background: isSelf ? "rgba(255,107,0,0.06)" : "transparent",
+                    borderBottom: "1px solid var(--border-color)",
+                    borderLeft: isSelf ? "4px solid var(--color-primary-500)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontWeight: 800,
+                        fontSize: "0.875rem",
+                        color: "var(--text-muted)",
+                        width: "28px",
+                      }}
+                    >
+                      #{rankNumber}
+                    </span>
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: "var(--bg-page-alt)",
+                        border: "1.5px solid var(--border-color)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <AvatarIcon id={item.avatar} size={26} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "0.9375rem", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+                        <span>{item.name}</span>
+                        {isSelf && <span style={{ fontSize: "0.7rem", background: "var(--color-primary-500)", color: "white", padding: "1px 6px", borderRadius: "var(--radius-full)" }}>KAMU</span>}
+                        {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              fontWeight: 800,
+                              background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)",
+                              color: "#000",
+                              padding: "1px 6px",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            👑 Creator
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                        {item.level}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: "right" }}>
+                    <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, color: "var(--color-primary-600)", fontSize: "0.9375rem" }}>
+                      ⚡ {item.xp} XP
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <style jsx>{`
         @media (max-width: 640px) {
