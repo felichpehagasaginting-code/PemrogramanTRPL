@@ -7,7 +7,11 @@ const setAuthCookie = () => { document.cookie = "matrikulasi-auth=true; path=/; 
 const clearAuthCookie = () => { document.cookie = "matrikulasi-auth=; path=/; max-age=0"; };
 
 const ADMIN_EMAILS = ["felich@mhs.cwe.ac.id", "felichpehagasa@gmail.com"];
-export const isAdmin = (user: UserProfile | null): boolean => user?.email ? ADMIN_EMAILS.includes(user.email.toLowerCase()) : false;
+export const isAdmin = (user: UserProfile | null): boolean => {
+  if (!user) return false;
+  if (user.isDosenPenguji) return true;
+  return user.email ? ADMIN_EMAILS.includes(user.email.toLowerCase()) : false;
+};
 
 export const isCreator = (user: { email?: string; name?: string } | null): boolean => {
   if (!user) return false;
@@ -39,6 +43,7 @@ export interface UserProfile {
   streak: number;
   progress: UserProgress;
   isCreator?: boolean;
+  isDosenPenguji?: boolean;
 }
 
 export interface BadgeInfo {
@@ -139,6 +144,7 @@ interface UserState {
 
   login: (name: string, email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginAsDosenPenguji: (pin: string) => boolean;
   handleRedirectResult: () => Promise<boolean>;
   fetchLeaderboard: () => Promise<void>;
   fetchAllUsers: () => Promise<void>;
@@ -186,9 +192,9 @@ export const useUserStore = create<UserState>()(
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const data = userDoc.data() as UserProfile;
-            // If Felich has reset progress, restore full completed curriculum
-            if (isFelich && (data.xp === 0 || Object.values(data.progress || {}).filter(p => p.status === "completed").length < 8)) {
-              const restored = { ...data, ...tempProfile, uid };
+            if (isFelich) {
+              const updatedXP = Math.max(data.xp || 0, 1550);
+              const restored = { ...data, ...tempProfile, uid, xp: updatedXP, level: "TRPL Legend" };
               await setDoc(userRef, restored, { merge: true });
               set({ user: restored });
             } else {
@@ -238,7 +244,8 @@ export const useUserStore = create<UserState>()(
             if (userDoc.exists()) {
               const data = userDoc.data() as UserProfile;
               if (isFelich) {
-                const restored = { ...data, ...mockProfile };
+                const updatedXP = Math.max(data.xp || 0, 1550);
+                const restored = { ...data, ...mockProfile, xp: updatedXP, level: "TRPL Legend" };
                 await setDoc(userRef, restored, { merge: true });
                 set({ user: restored });
               } else {
@@ -257,6 +264,28 @@ export const useUserStore = create<UserState>()(
         set({ user: mockProfile });
         setAuthCookie();
         await get().fetchLeaderboard();
+      },
+
+      loginAsDosenPenguji: (pin: string) => {
+        if (pin === "1213") {
+          const dosenProfile: UserProfile = {
+            uid: "dosen-penguji-trpl",
+            name: "Dosen Penguji TRPL",
+            email: "dosen.penguji@polsri.ac.id",
+            avatar: "avatar_1",
+            xp: 0,
+            level: "Script Kiddie",
+            badges: ["langkah_pertama"],
+            streak: 1,
+            progress: INITIAL_PROGRESS,
+            isCreator: true,
+            isDosenPenguji: true,
+          };
+          set({ user: dosenProfile });
+          setAuthCookie();
+          return true;
+        }
+        return false;
       },
 
       restoreCreatorProgress: async () => {
@@ -316,14 +345,18 @@ export const useUserStore = create<UserState>()(
           const list: LeaderboardUser[] = [];
           snapshot.forEach((doc) => {
             const d = doc.data();
+            if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
+              return;
+            }
+            const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
             list.push({
               uid: d.uid || doc.id,
               name: d.name || "Anonymous",
               email: d.email || "",
               avatar: d.avatar || "avatar_default",
-              xp: d.xp || 0,
-              level: d.level || "Script Kiddie",
-              isCreator: Boolean(d.isCreator || isCreator({ email: d.email, name: d.name })),
+              xp: isCreatorUser ? Math.max(d.xp || 0, 1550) : (d.xp || 0),
+              level: isCreatorUser ? "TRPL Legend" : (d.level || "Script Kiddie"),
+              isCreator: isCreatorUser,
             });
           });
           set({ leaderboard: list });
@@ -332,27 +365,35 @@ export const useUserStore = create<UserState>()(
 
       fetchAllUsers: async () => {
         if (isMockFirebase) {
-          const mockUsers: UserProfile[] = DEFAULT_MOCK_LEADERBOARD.map((lb) => ({
-            uid: lb.uid, name: lb.name,
-            email: `${lb.name.toLowerCase().replace(/\s/g, ".")}@student.polsri.ac.id`,
-            avatar: lb.avatar, xp: lb.xp, level: lb.level,
-            badges: (lb.xp > 800 ? BADGES.slice(0, 5) : BADGES.slice(0, 3)).map((b) => b.id),
-            streak: Math.floor(Math.random() * 10) + 1,
-            progress: Object.keys(INITIAL_PROGRESS).reduce((acc, key, idx) => {
-              acc[key] = {
-                completedSubModules: [],
-                status: idx === 0 ? "completed" : lb.xp > idx * 100 ? "completed" : lb.xp > (idx - 1) * 100 ? "active" : "locked",
-              } as any;
-              return acc;
-            }, {} as UserProgress),
-          }));
+          const mockUsers: UserProfile[] = DEFAULT_MOCK_LEADERBOARD
+            .filter((lb) => lb.uid !== "dosen-penguji-trpl" && !lb.email?.includes("dosen.penguji"))
+            .map((lb) => ({
+              uid: lb.uid, name: lb.name,
+              email: `${lb.name.toLowerCase().replace(/\s/g, ".")}@student.polsri.ac.id`,
+              avatar: lb.avatar, xp: lb.xp, level: lb.level,
+              badges: (lb.xp > 800 ? BADGES.slice(0, 5) : BADGES.slice(0, 3)).map((b) => b.id),
+              streak: Math.floor(Math.random() * 10) + 1,
+              progress: Object.keys(INITIAL_PROGRESS).reduce((acc, key, idx) => {
+                acc[key] = {
+                  completedSubModules: [],
+                  status: idx === 0 ? "completed" : lb.xp > idx * 100 ? "completed" : lb.xp > (idx - 1) * 100 ? "active" : "locked",
+                } as any;
+                return acc;
+              }, {} as UserProgress),
+            }));
           set({ allUsers: mockUsers });
           return;
         }
         try {
           const snapshot = await getDocs(collection(db, "users"));
           const list: UserProfile[] = [];
-          snapshot.forEach((doc) => list.push(doc.data() as UserProfile));
+          snapshot.forEach((doc) => {
+            const d = doc.data() as UserProfile;
+            if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
+              return;
+            }
+            list.push(d);
+          });
           set({ allUsers: list });
         } catch {}
       },
