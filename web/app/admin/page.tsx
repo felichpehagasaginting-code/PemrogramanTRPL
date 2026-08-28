@@ -14,7 +14,15 @@ import {
 
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { StruggleHeatmap } from "@/components/admin/StruggleHeatmap";
+import { HelpDeskQueue } from "@/components/admin/HelpDeskQueue";
+import { PlagiarismDetector } from "@/components/admin/PlagiarismDetector";
+import { BroadcastManager } from "@/components/admin/BroadcastManager";
+import { TestCaseEditor } from "@/components/admin/TestCaseEditor";
+import { AcademicGradebookModal } from "@/components/admin/AcademicGradebookModal";
 import { CodePlaybackPlayer } from "@/components/editor/CodePlaybackPlayer";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { useSessionTimeout } from "@/lib/auth/useSessionTimeout";
+import { DosenPinDialpadModal } from "@/components/auth/DosenPinDialpadModal";
 
 const MODULE_LABELS: Record<string, string> = {
   M0: "Pre-Test", M1: "Workspace", M2: "Logika",
@@ -27,6 +35,7 @@ const INITIAL_FORM = { name: "", email: "", xp: 0 };
 export default function AdminPage() {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
+  useSessionTimeout();
   const leaderboard = useUserStore((s) => s.leaderboard);
   const allUsers = useUserStore((s) => s.allUsers);
   const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
@@ -38,7 +47,9 @@ export default function AdminPage() {
   const deleteUser = useUserStore((s) => s.deleteUser);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [viewMode, setViewMode] = useState<"users" | "analytics">("users");
+  const [viewMode, setViewMode] = useState<"users" | "analytics" | "helpdesk" | "plagiarism" | "broadcast" | "testcases">("users");
+  const [academicModalOpen, setAcademicModalOpen] = useState(false);
+  const [dosenGateModalOpen, setDosenGateModalOpen] = useState(false);
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [awardModal, setAwardModal] = useState<string | null>(null);
   const [awardAmount, setAwardAmount] = useState(50);
@@ -46,16 +57,6 @@ export default function AdminPage() {
   const [editUser, setEditUser] = useState<string | null>(null);
   const [playbackUser, setPlaybackUser] = useState<any | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.setAttribute("data-theme", "purple");
-    root.classList.add("dark");
-    return () => {
-      root.classList.remove("dark");
-      root.removeAttribute("data-theme");
-    };
-  }, []);
 
   useEffect(() => {
     Promise.all([fetchLeaderboard(), fetchAllUsers()]).finally(() => setLoading(false));
@@ -68,7 +69,7 @@ export default function AdminPage() {
     await addUser({
       name: formData.name.trim(),
       email: formData.email.trim(),
-      xp: formData.xp || 0,
+      xp: Number(formData.xp) || 0,
     });
     resetForm();
     setAddModal(false);
@@ -76,18 +77,24 @@ export default function AdminPage() {
 
   const handleEdit = async () => {
     if (!editUser || !formData.name.trim() || !formData.email.trim()) return;
-    const target = allUsers.find((u) => u.uid === editUser);
-    if (!target) return;
-    const delta: Record<string, any> = {};
-    if (formData.name.trim() !== target.name) delta.name = formData.name.trim();
-    if (formData.email.trim() !== target.email) delta.email = formData.email.trim();
-    if (formData.xp !== target.xp) {
-      delta.xp = formData.xp;
-      delta.level = (LEVELS.find((l) => formData.xp >= l.minXP && formData.xp <= l.maxXP) || LEVELS[0]).name;
-    }
-    if (Object.keys(delta).length > 0) await updateUser(editUser, delta);
+    await updateUser(editUser, {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      xp: Number(formData.xp) || 0,
+    });
     setEditUser(null);
     resetForm();
+  };
+
+  const handleAward = async () => {
+    if (!awardModal) return;
+    await awardXP(awardModal, awardAmount);
+    setAwardModal(null);
+  };
+
+  const handleReset = async (uid: string, name: string) => {
+    if (!confirm(`Reset semua progres mahasiswa "${name}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+    await resetUserProgress(uid);
   };
 
   const handleDelete = async (uid: string, name: string) => {
@@ -123,16 +130,46 @@ export default function AdminPage() {
   if (!isAdmin(user)) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-page)", padding: "20px" }}>
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl)", padding: "var(--space-8)", maxWidth: "380px", width: "100%", textAlign: "center" }}>
-          <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <ShieldCheck size={28} color="white" weight="fill" />
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl)", padding: "var(--space-8)", maxWidth: "420px", width: "100%", textAlign: "center" }}>
+          <div style={{ width: "60px", height: "60px", borderRadius: "20px", background: "rgba(168, 85, 247, 0.15)", color: "#A855F7", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <ShieldCheck size={32} weight="fill" />
           </div>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>Akses Ditolak</h2>
-          <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "var(--space-6)" }}>
-            Hanya pemilik akun <strong>felich@mhs.cwe.ac.id</strong> dan <strong>felichpehagasa@gmail.com</strong> yang dapat mengakses halaman ini.
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>
+            Akses Dosen Penguji / Admin TRPL
+          </h2>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "var(--space-6)", lineHeight: 1.5 }}>
+            Halaman ini khusus untuk evaluasi dosen penguji. Masukkan 4-digit PIN khusus Dosen Penguji untuk membuka akses panel admin.
           </p>
-          <Link href="/dashboard" className="btn btn-secondary" style={{ width: "100%", display: "block" }}>Kembali ke Dashboard</Link>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
+              onClick={() => setDosenGateModalOpen(true)}
+              className="btn btn-primary"
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                padding: "12px",
+                fontWeight: 800,
+                fontSize: "0.9rem",
+              }}
+            >
+              <ShieldCheck size={18} weight="fill" />
+              <span>Masukkan PIN Dosen Penguji</span>
+            </button>
+
+            <Link href="/dashboard" className="btn btn-secondary" style={{ width: "100%", display: "block" }}>
+              Kembali ke Dashboard
+            </Link>
+          </div>
         </div>
+
+        <DosenPinDialpadModal
+          isOpen={dosenGateModalOpen}
+          onClose={() => setDosenGateModalOpen(false)}
+        />
       </div>
     );
   }
@@ -193,6 +230,7 @@ export default function AdminPage() {
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
               {totalStudents} mahasiswa
             </span>
+            <ThemeToggle />
             <Link
               href="/dashboard"
               style={{
@@ -214,46 +252,132 @@ export default function AdminPage() {
 
       <div className="section-container" style={{ paddingTop: "var(--space-4)" }}>
         {/* Navigation Mode Tabs */}
-        <div style={{ display: "flex", gap: "12px", borderBottom: "1px solid var(--border-color)", marginBottom: "var(--space-6)" }}>
+        <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border-color)", marginBottom: "var(--space-6)", overflowX: "auto", paddingBottom: "2px" }}>
           <button
             onClick={() => setViewMode("users")}
             style={{
-              padding: "10px 20px",
+              padding: "8px 16px",
               background: "transparent",
               border: "none",
-              borderBottom: viewMode === "users" ? "3px solid var(--primary-color)" : "none",
-              color: viewMode === "users" ? "var(--primary-color)" : "var(--text-secondary)",
+              borderBottom: viewMode === "users" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "users" ? "var(--color-primary-500)" : "var(--text-secondary)",
               fontWeight: 700,
-              fontSize: "0.95rem",
+              fontSize: "0.875rem",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
+              whiteSpace: "nowrap",
             }}
           >
-            <Users size={18} /> Manajemen Mahasiswa
+            <Users size={16} /> Mahasiswa
           </button>
           <button
             onClick={() => setViewMode("analytics")}
             style={{
-              padding: "10px 20px",
+              padding: "8px 16px",
               background: "transparent",
               border: "none",
-              borderBottom: viewMode === "analytics" ? "3px solid var(--primary-color)" : "none",
-              color: viewMode === "analytics" ? "var(--primary-color)" : "var(--text-secondary)",
+              borderBottom: viewMode === "analytics" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "analytics" ? "var(--color-primary-500)" : "var(--text-secondary)",
               fontWeight: 700,
-              fontSize: "0.95rem",
+              fontSize: "0.875rem",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
+              whiteSpace: "nowrap",
             }}
           >
-            <ChartBar size={18} /> Analytics & Laporan Dosen
+            <ChartBar size={16} /> Analytics & Laporan
+          </button>
+          <button
+            onClick={() => setViewMode("helpdesk")}
+            style={{
+              padding: "8px 16px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "helpdesk" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "helpdesk" ? "var(--color-primary-500)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <ShieldCheck size={16} /> 🆘 Help Desk
+          </button>
+          <button
+            onClick={() => setViewMode("plagiarism")}
+            style={{
+              padding: "8px 16px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "plagiarism" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "plagiarism" ? "var(--color-primary-500)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <ShieldCheck size={16} /> 🔍 Plagiarisme (AST)
+          </button>
+          <button
+            onClick={() => setViewMode("broadcast")}
+            style={{
+              padding: "8px 16px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "broadcast" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "broadcast" ? "var(--color-primary-500)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <ShieldCheck size={16} /> 📢 Broadcast Siaran
+          </button>
+          <button
+            onClick={() => setViewMode("testcases")}
+            style={{
+              padding: "8px 16px",
+              background: "transparent",
+              border: "none",
+              borderBottom: viewMode === "testcases" ? "3px solid var(--color-primary-500)" : "none",
+              color: viewMode === "testcases" ? "var(--color-primary-500)" : "var(--text-secondary)",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Code size={16} /> 🧪 Test Cases Grader
           </button>
         </div>
 
-        {viewMode === "analytics" ? (
+        {viewMode === "plagiarism" ? (
+          <PlagiarismDetector users={allUsers} />
+        ) : viewMode === "broadcast" ? (
+          <BroadcastManager />
+        ) : viewMode === "testcases" ? (
+          <TestCaseEditor />
+        ) : viewMode === "helpdesk" ? (
+          <HelpDeskQueue />
+        ) : viewMode === "analytics" ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             <AnalyticsDashboard users={allUsers} />
             <StruggleHeatmap />
@@ -271,7 +395,10 @@ export default function AdminPage() {
               Total {totalStudents} mahasiswa terdaftar
             </p>
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <button onClick={() => setAcademicModalOpen(true)} className="btn btn-sm btn-secondary" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <DownloadSimple size={16} /> 📄 Rekap Nilai & CPL Resmi
+            </button>
             <button onClick={() => { resetForm(); setAddModal(true); }} className="btn btn-primary btn-sm" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <UserPlus size={16} /> Tambah Mahasiswa
             </button>
@@ -643,6 +770,13 @@ export default function AdminPage() {
         )}
         </>
         )}
+
+        {/* Academic Gradebook & CPL Modal */}
+        <AcademicGradebookModal
+          isOpen={academicModalOpen}
+          onClose={() => setAcademicModalOpen(false)}
+          users={allUsers}
+        />
       </div>
     </div>
   );
