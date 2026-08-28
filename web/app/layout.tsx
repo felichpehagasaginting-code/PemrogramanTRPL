@@ -99,7 +99,41 @@ export default function RootLayout({
     <html
       lang="id"
       className={`${spaceGrotesk.variable} ${inter.variable} ${firaCode.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('matrikulasi-theme');
+                var colors = {
+                  orange: ['#FF6B00','#FF9D00'],
+                  purple: ['#7C3AED','#A855F7'],
+                  blue: ['#0284C7','#38BDF8'],
+                  emerald: ['#059669','#10B981']
+                };
+                var fam = 'orange';
+                var mode = 'light';
+                if (t) {
+                  var p = JSON.parse(t);
+                  if (p && p.family && colors[p.family]) fam = p.family;
+                  if (p && p.mode) mode = p.mode;
+                }
+                document.documentElement.setAttribute('data-theme', fam);
+                if (mode === 'dark') document.documentElement.classList.add('dark');
+                var c = colors[fam] || colors.orange;
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="' + c[0] + '"/><stop offset="100%" stop-color="' + c[1] + '"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#g)"/><path d="M11 11L6 16L11 21M21 11L26 16L21 21M18 9L14 23" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                var link = document.createElement('link');
+                link.rel = 'icon';
+                link.type = 'image/svg+xml';
+                link.href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+                document.head.appendChild(link);
+              } catch(e) {}
+            `,
+          }}
+        />
+      </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <SmoothScroll>
           {children}
