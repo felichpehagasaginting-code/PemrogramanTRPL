@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
 import Editor from "@monaco-editor/react";
@@ -29,10 +29,14 @@ import { MemoryGraph } from "@/components/editor/MemoryGraph";
 import { FlowchartBuilder } from "@/components/editor/FlowchartBuilder";
 import { TddTestBuilder } from "@/components/editor/TddTestBuilder";
 import { AskHelpModal } from "@/components/learning/AskHelpModal";
+import { ScaffoldedHintDrawer } from "@/components/learning/ScaffoldedHintDrawer";
 import { explainPythonError, generateHint, ExplainedError } from "@/lib/ai/errorExplainer";
 import { ParsonsProblem, ParsonsBlock } from "@/components/learning/ParsonsProblem";
 import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
 import { KeystrokeRecorder } from "@/lib/recorder/keystrokeRecorder";
+import { MONACO_CUSTOM_THEMES, defineMonacoThemes } from "@/lib/editorThemes";
+import { lintPythonCode, LintWarning } from "@/lib/linter/simplePythonLinter";
+import { PaintBrush } from "@phosphor-icons/react";
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -225,11 +229,18 @@ export default function PracticeClient() {
   const [activeTab, setActiveTab] = useState<"terminal" | "debugger" | "ram" | "grader" | "flowchart" | "tdd">("terminal");
   const [askHelpOpen, setAskHelpOpen] = useState(false);
 
-  // Grading & AI states
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null);
   const [explainedError, setExplainedError] = useState<ExplainedError | null>(null);
   const [aiHint, setAiHint] = useState<string | null>(null);
+  const [showHintDrawer, setShowHintDrawer] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<string>("dracula");
+  const [showPasteToast, setShowPasteToast] = useState(false);
   const editorRef = useRef(null);
+
+  // Real-time Python linting
+  const lintWarnings = useMemo(() => {
+    return lintPythonCode(code);
+  }, [code]);
 
   // Interactive Terminal Input States
   const [interactivePrompts, setInteractivePrompts] = useState<string[]>([]);
@@ -238,6 +249,20 @@ export default function PracticeClient() {
   const [currentInputValue, setCurrentInputValue] = useState("");
 
   const content = PRACTICE_CONTENT[moduleId as string];
+
+  const handleEditorWillMount = (monaco: any) => {
+    defineMonacoThemes(monaco);
+  };
+
+  const handleEditorCodeChange = (newVal?: string) => {
+    const nextVal = newVal || "";
+    if (nextVal.length - code.length > 40) {
+      setShowPasteToast(true);
+      setTimeout(() => setShowPasteToast(false), 5000);
+    }
+    setCode(nextVal);
+    recorderRef.current?.recordChange(nextVal);
+  };
 
   const recorderRef = useRef<KeystrokeRecorder | null>(null);
 
@@ -515,7 +540,7 @@ export default function PracticeClient() {
             <ArrowLeft size={16} /> Kembali ke materi
           </button>
 
-          {/* Description */}
+          {/* Description & Theme Switcher Toolbar */}
           <div
             style={{
               background: "var(--bg-card)",
@@ -525,33 +550,105 @@ export default function PracticeClient() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              flexWrap: "wrap",
               gap: "12px",
             }}
           >
-            <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+            <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: 0, flex: 1 }}>
               {content.description}
             </p>
-            <button onClick={handleShowHint} className="btn btn-sm btn-ghost focus-ring" style={{ color: "var(--color-primary-600)" }} aria-label="Dapatkan hint AI">
-              <Lightbulb size={16} /> Hint
-            </button>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {/* Monaco Theme Switcher */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <PaintBrush size={16} color="var(--text-muted)" />
+                <select
+                  value={selectedTheme}
+                  onChange={(e) => setSelectedTheme(e.target.value)}
+                  style={{
+                    background: "var(--bg-secondary)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "4px 8px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="vs-dark">VS Dark</option>
+                  <option value="dracula">🧛 Dracula Pro</option>
+                  <option value="one-dark-pro">✨ One Dark Pro</option>
+                  <option value="monokai">🌴 Monokai Classic</option>
+                  <option value="github-dark">🐙 GitHub Dark</option>
+                </select>
+              </div>
+
+              <button
+                onClick={() => setShowHintDrawer(true)}
+                className="btn btn-sm btn-ghost focus-ring"
+                style={{
+                  color: "var(--color-primary-600)",
+                  background: "rgba(245, 158, 11, 0.1)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 700,
+                }}
+                aria-label="Buka Petunjuk Bertingkat (3-Tier Hint)"
+              >
+                <Lightbulb size={16} weight="fill" color="#F59E0B" /> 💡 3-Tier Hint
+              </button>
+            </div>
           </div>
 
-          {/* AI Hint Notification */}
-          {aiHint && (
+          {/* Anti-Paste Muscle-Memory Alert */}
+          {showPasteToast && (
             <div
               style={{
-                background: "rgba(255, 157, 0, 0.1)",
-                border: "1px solid var(--color-primary-500)",
-                color: "var(--color-primary-600)",
-                padding: "10px 14px",
+                background: "rgba(245, 158, 11, 0.12)",
+                border: "1px solid rgba(245, 158, 11, 0.35)",
                 borderRadius: "var(--radius-md)",
-                fontSize: "0.875rem",
-                fontWeight: 600,
+                padding: "8px 12px",
+                fontSize: "0.8rem",
+                color: "var(--text-primary)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
-              role="note"
-              aria-live="polite"
             >
-              <Lightbulb size={16} weight="fill" style={{ marginRight: "6px", verticalAlign: "middle" }} aria-hidden="true" /> {aiHint}
+              <Sparkle size={16} color="#F59E0B" weight="fill" />
+              <span>
+                <strong>Tips Senior Mentor:</strong> Kamu baru saja paste kode dalam jumlah besar! Coba ketik manual per baris ya biar logikanya nempel di <em>muscle memory</em> kamu. 🧠✨
+              </span>
+            </div>
+          )}
+
+          {/* Real-time Syntax Lint Warning Banner */}
+          {lintWarnings.length > 0 && (
+            <div
+              style={{
+                background: "rgba(239, 68, 68, 0.08)",
+                border: "1px solid rgba(239, 68, 68, 0.25)",
+                borderRadius: "var(--radius-md)",
+                padding: "8px 12px",
+                fontSize: "0.8rem",
+                color: "#EF4444",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Warning size={16} weight="fill" />
+                <span>{lintWarnings[0].message} • <em>{lintWarnings[0].fixSuggestion}</em></span>
+              </div>
+              {lintWarnings.length > 1 && (
+                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>
+                  (+{lintWarnings.length - 1} peringatan lain)
+                </span>
+              )}
             </div>
           )}
 
@@ -567,16 +664,15 @@ export default function PracticeClient() {
             <Editor
               height="100%"
               language="python"
-              theme="vs-dark"
+              theme={selectedTheme}
               value={code}
-              onChange={(val) => {
-                const newCode = val || "";
-                setCode(newCode);
-                recorderRef.current?.recordChange(newCode);
-              }}
+              beforeMount={handleEditorWillMount}
+              onChange={handleEditorCodeChange}
               options={{
                 minimap: { enabled: false },
                 fontSize: 14,
+                fontFamily: "Fira Code, JetBrains Mono, monospace",
+                fontLigatures: true,
                 lineNumbers: "on",
                 scrollBeyondLastLine: false,
                 padding: { top: 12 },
@@ -869,6 +965,13 @@ export default function PracticeClient() {
         moduleId={moduleId as string}
         lastError={explainedError?.title}
         userName={user.name}
+      />
+
+      {/* 3-Tier Scaffolding Hint Drawer */}
+      <ScaffoldedHintDrawer
+        isOpen={showHintDrawer}
+        onClose={() => setShowHintDrawer(false)}
+        moduleTitle={`Latihan Modul ${moduleId}`}
       />
     </div>
   );
