@@ -15,9 +15,11 @@ import {
   Paperclip,
   Bookmark,
   Sparkle,
+  Printer,
 } from "@phosphor-icons/react";
 import { InlineAnnotationThread } from "@/components/learning/InlineAnnotationThread";
 import { SeniorTipCard, SeniorTipData } from "@/components/learning/SeniorTipCard";
+import { PrintableSummaryModal } from "@/components/learning/PrintableSummaryModal";
 
 interface Slide {
   title: string;
@@ -220,6 +222,7 @@ export default function LearnModulePage() {
   const { user, completeSubModule, completeModule } = useUserStore();
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
   const [dragLocation, setDragLocation] = useState<"none" | "desktop" | "downloads" | "proper">("none");
   const [cliInput, setCliInput] = useState("");
   const [cliOutput, setCliOutput] = useState<string[]>([
@@ -1827,6 +1830,25 @@ export default function LearnModulePage() {
             {currentModule.title}
           </h2>
         </div>
+
+        <button
+          onClick={() => setPrintModalOpen(true)}
+          className="btn btn-sm btn-ghost no-print"
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "0.75rem",
+            border: "1px solid var(--border-color)",
+            borderRadius: "var(--radius-full)",
+            padding: "6px 14px",
+            color: "var(--text-secondary)",
+          }}
+          title="Pratinjau / Cetak Rangkuman Modul"
+        >
+          <Printer size={14} /> Cetak / PDF Binder
+        </button>
       </div>
 
       {/* Progress indicators */}
@@ -1956,6 +1978,14 @@ export default function LearnModulePage() {
           </button>
         </div>
       </div>
+      <PrintableSummaryModal
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        moduleId={moduleId as string}
+        moduleTitle={currentModule.title}
+        moduleAnalogy={currentModule.slides.find((s) => s.tipData?.analogy)?.tipData?.analogy}
+        cheatSheetContent={currentModule.slides.find((s) => s.tipData?.cheatSheet)?.tipData?.cheatSheet}
+      />
       <style jsx>{`
         @media (max-width: 640px) {
           .learn-slide-card { padding: var(--space-4) !important; }
