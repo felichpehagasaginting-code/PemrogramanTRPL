@@ -124,8 +124,6 @@ function HeroSandbox() {
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        maxWidth: "560px",
-        margin: "0 auto",
       }}
     >
       {/* Chrome Top Bar */}
@@ -431,8 +429,8 @@ export function HeroSection() {
       <div style={{ position: "absolute", top: "-200px", right: "-150px", width: "600px", height: "600px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.08, pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: "-150px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.06, pointerEvents: "none" }} />
 
-      <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1, margin: "auto 0" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.08fr 0.92fr", gap: "clamp(2rem, 4vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
+      <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem, 4vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
           <motion.div style={{ opacity: heroOpacity, display: "flex", flexDirection: "column" }}>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "16px" }}>
               <span className="badge badge-primary" style={{ padding: "6px 14px", fontSize: "0.8rem", gap: "6px" }}>
