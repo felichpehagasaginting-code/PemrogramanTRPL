@@ -3,7 +3,7 @@
 import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
+import { User, Medal, Calendar, ShieldCheck, GameController, Star, SignOut } from "@phosphor-icons/react";
 import { AvatarIcon, BadgeIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PROFILE_FEATURES } from "@/lib/features";
@@ -240,6 +240,41 @@ export default function ProfilePage() {
       {/* Skill Radar Competency Polygon */}
       <div style={{ marginTop: "var(--space-6)" }}>
         <SkillRadarChart studentLevel={user.level || "TRPL Cadet"} />
+      </div>
+
+      {/* Account Settings / Logout */}
+      <div style={{ marginTop: "var(--space-8)", textAlign: "center" }}>
+        <button
+          onClick={() => {
+            const { logout } = useUserStore.getState();
+            logout();
+            window.location.href = "/login";
+          }}
+          className="focus-ring"
+          style={{
+            background: "rgba(239, 68, 68, 0.08)",
+            border: "1.5px solid rgba(239, 68, 68, 0.3)",
+            color: "#EF4444",
+            padding: "12px 24px",
+            borderRadius: "var(--radius-full)",
+            fontWeight: 700,
+            fontSize: "0.9rem",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)";
+          }}
+        >
+          <SignOut size={20} weight="bold" />
+          Keluar dari Akun (Logout)
+        </button>
       </div>
 
       <style jsx>{`
