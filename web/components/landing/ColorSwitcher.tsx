@@ -102,6 +102,29 @@ export function ColorSwitcher() {
           </motion.button>
         ))}
       </div>
+
+      {/* Dyslexia-friendly Font Toggle */}
+      <button
+        onClick={() => {
+          const isDyslexia = document.body.classList.toggle("dyslexia-mode");
+          localStorage.setItem("dyslexia-mode", isDyslexia ? "true" : "false");
+        }}
+        title="Mode Font Ramah Disleksia"
+        aria-label="Mode Font Ramah Disleksia"
+        style={{
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: "var(--radius-full)",
+          padding: "2px 8px",
+          color: "#F8FAFC",
+          fontSize: "0.68rem",
+          fontWeight: 700,
+          cursor: "pointer",
+          marginLeft: "4px",
+        }}
+      >
+        Aa
+      </button>
     </motion.div>
   );
 }

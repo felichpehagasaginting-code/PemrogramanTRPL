@@ -231,11 +231,23 @@ export function HeroSection() {
   const sandboxScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
 
   return (
-    <section ref={heroRef} style={{ minHeight: "100dvh", display: "flex", alignItems: "center", position: "relative", overflow: "hidden", paddingTop: "6rem", background: "var(--bg-page)" }}>
+    <section
+      id="hero"
+      ref={heroRef}
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        padding: "clamp(6.5rem, 13vh, 8.5rem) 0 clamp(3.5rem, 8vh, 5rem)",
+        background: "var(--bg-page)",
+      }}
+    >
       {/* Dot-grid texture */}
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
 
-      {/* Floating decorative text — pure CSS, no JS scroll listener */}
+      {/* Floating decorative text */}
       <div className="float-text" style={{ position: "absolute", top: "15%", right: "5%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-500)", opacity: 0.06, fontFamily: "var(--font-code)", lineHeight: 1, letterSpacing: "0.3em", pointerEvents: "none", userSelect: "none" }}>Hello World!</div>
       <div className="float-text" style={{ position: "absolute", bottom: "25%", left: "3%", fontSize: "0.95rem", fontWeight: 600, color: "var(--color-primary-400)", opacity: 0.05, fontFamily: "var(--font-code)", lineHeight: 1, animationDelay: "-2.5s", pointerEvents: "none", userSelect: "none" }}>print("Halo TRPL!")</div>
 
@@ -244,9 +256,9 @@ export function HeroSection() {
       <div style={{ position: "absolute", bottom: "-200px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.035, pointerEvents: "none" }} />
 
       <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-12)", alignItems: "center" }} className="hero-grid">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem, 5vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
           <motion.div style={{ opacity: heroOpacity }}>
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "var(--space-6)" }}>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "var(--space-4)" }}>
               <span className="badge badge-primary">
                 <Sparkle size={12} weight="fill" />
                 Matrikulasi TRPL 2026
@@ -258,49 +270,49 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
             >
-              <h1 className="headline-float" style={{ fontSize: "clamp(2.25rem, 5vw, 3.75rem)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-6)", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
-              Coding itu{" "}
-              <motion.span
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.25 }}
-                className="rgb-text"
-                style={{
-                  display: "inline-block",
-                  fontStyle: "italic",
-                  letterSpacing: "-0.02em",
-                  filter: "drop-shadow(0 0 24px rgba(255,107,0,0.3))",
-                }}
-              >
-                seru
-              </motion.span>
-              .{" "}
-              <span className="gradient-text" style={{ display: "block" }}>Percaya deh.</span>
-            </h1>
+              <h1 className="headline-float" style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: "var(--space-5)", color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
+                Coding itu{" "}
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.25 }}
+                  className="rgb-text"
+                  style={{
+                    display: "inline-block",
+                    fontStyle: "italic",
+                    letterSpacing: "-0.02em",
+                    filter: "drop-shadow(0 0 24px rgba(255,107,0,0.3))",
+                  }}
+                >
+                  seru
+                </motion.span>
+                .{" "}
+                <span className="gradient-text" style={{ display: "block" }}>Percaya deh.</span>
+              </h1>
             </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.25 }}
-              style={{ fontSize: "1.125rem", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "var(--space-8)", maxWidth: "480px" }}
+              style={{ fontSize: "clamp(0.95rem, 2vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: "var(--space-6)", maxWidth: "480px" }}
             >
-              Platform belajar pemrograman interaktif untuk maba TRPL yang{" "}
-              <strong className="rgb-text" style={{ fontWeight: 700, display: "inline-block" }}>anti-boring</strong>.
-              Live coding, gamifikasi, kuis seru, dan meme yang not-cringe.
+              Belajar koding dari nol bareng senior TRPL yang{" "}
+              <strong className="rgb-text" style={{ fontWeight: 700, display: "inline-block" }}>suportif & anti-ribet</strong>.
+              Panduan ramah pemula, live coding di browser, memory visualizer, dan tanpa rasa takut salah.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.35 }}
-              style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap", marginBottom: "var(--space-5)" }}
+              style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap", marginBottom: "var(--space-5)" }}
             >
               <Button href="/login" variant="primary" size="lg">
-                Mulai Belajar <ArrowRight size={18} weight="bold" />
+                Mulai Belajar Bareng Senior <ArrowRight size={18} weight="bold" />
               </Button>
               <Button href="#kurikulum" variant="secondary" size="lg">
-                Lihat Kurikulum
+                Lihat 9 Modul Seru
               </Button>
             </motion.div>
 
@@ -316,11 +328,31 @@ export function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        style={{ position: "absolute", bottom: "32px", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "var(--text-muted)", fontSize: "0.62rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" }}
+        transition={{ delay: 0.8 }}
+        style={{
+          position: "absolute",
+          bottom: "16px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "4px",
+          color: "var(--text-muted)",
+          fontSize: "0.75rem",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          document.getElementById("fitur")?.scrollIntoView({ behavior: "smooth" });
+        }}
       >
-        <span>Scroll</span>
-        <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} style={{ width: "1.5px", height: "24px", background: "linear-gradient(to bottom, var(--color-primary-500), transparent)" }} />
+        <span style={{ letterSpacing: "0.05em", textTransform: "uppercase", fontSize: "0.68rem" }}>Eksplor Modul</span>
+        <motion.div
+          animate={{ y: [0, 4, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          ↓
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -340,9 +372,9 @@ export function TrustBarSection() {
       <div className="section-container">
         <motion.div className="trustbar-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: false }} style={{ display: "flex", justifyContent: "center", gap: "var(--space-12)", flexWrap: "wrap" }}>
           {[
-            { icon: <Code size={14} />, label: "7 Modul Coding" },
-            { icon: <Trophy size={14} />, label: "13 Badge Eksklusif" },
-            { icon: <Lightning size={14} />, label: "Live Code Editor" },
+            { icon: <Code size={14} />, label: "9 Modul Koding Lengkap" },
+            { icon: <Trophy size={14} />, label: "13 Badge & Sertifikat Resmi" },
+            { icon: <Lightning size={14} />, label: "WASM Python 0ms Latency" },
           ].map((item) => (
             <motion.div key={item.label} variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: 500 }}>
               <span style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--color-primary-500)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</span>
@@ -360,23 +392,23 @@ export function TrustBarSection() {
    ============================================================ */
 const features = [
   {
-    icon: <Code size={24} weight="duotone" />, title: "Live Code Editor",
-    desc: "Tulis dan jalankan kode Python langsung di browser. Lengkap dengan console output real-time dan preview.",
+    icon: <Code size={24} weight="duotone" />, title: "Live Sandbox & Anti-Loop",
+    desc: "Tulis dan jalankan kode Python langsung di browser tanpa instalasi berat. Aman dari freeze berkat Web Worker sandbox.",
     color: "var(--color-primary-500)", gradient: "linear-gradient(135deg, rgba(123,31,162,0.06), transparent)",
   },
   {
-    icon: <GameController size={24} weight="duotone" />, title: "Gamifikasi Seru",
-    desc: "Kumpulkan XP, unlock 13 badge eksklusif, naiki 6 level, dan bersaing di leaderboard kelas. Setiap modul adalah quest.",
+    icon: <GameController size={24} weight="duotone" />, title: "Gamifikasi & Quest Seru",
+    desc: "Kumpulkan XP, unlock 13 badge prestasi eksklusif, kuis interaktif, dan bersaing sehat di leaderboard satu angkatan.",
     color: "var(--color-secondary-500)", gradient: "linear-gradient(135deg, rgba(126,87,194,0.06), transparent)",
   },
   {
-    icon: <Brain size={24} weight="duotone" />, title: "Adaptive Learning",
-    desc: "Platform menyesuaikan dengan kecepatan belajarmu. Sudah paham? Langsung skip. Masih bingung? Ada penjelasan ulang otomatis.",
+    icon: <Brain size={24} weight="duotone" />, title: "Friendly Senior AI Explainer",
+    desc: "Pesan error teknis diterjemahkan ke analogi kehidupan nyata yang ramah maba lengkap dengan tombol Minta Bantuan langsung.",
     color: "#22C55E", gradient: "linear-gradient(135deg, rgba(34,197,94,0.06), transparent)",
   },
   {
-    icon: <Rocket size={24} weight="duotone" />, title: "Meme Integration",
-    desc: "Dapatkan meme pemrograman relevan setiap kali menyelesaikan tantangan. Belajar coding sambil terkekeh.",
+    icon: <Rocket size={24} weight="duotone" />, title: "Mini Project & Sertifikat Resmi",
+    desc: "Rancang aplikasi kasir atau kalkulator di modul akhir, lalu klaim sertifikat kelulusan resmi TRPL dengan QR Code verifikasi.",
     color: "#FF8C42", gradient: "linear-gradient(135deg, rgba(255,140,66,0.06), transparent)",
   },
 ];
@@ -399,11 +431,12 @@ export function FeaturesSection() {
 
   return (
     <motion.section
+      id="fitur"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
       className="section-padding"
-      style={{ padding: "var(--space-20) 0", background: "var(--bg-page)", position: "relative", overflow: "hidden" }}
+      style={{ padding: "clamp(3.5rem, 8vw, 6rem) 0", background: "var(--bg-page)", position: "relative", overflow: "hidden" }}
     >
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
 
@@ -418,29 +451,29 @@ export function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.5 }}
-          style={{ textAlign: "center", marginBottom: "var(--space-14)" }}
+          style={{ textAlign: "center", marginBottom: "var(--space-12)" }}
         >
-          <span className="badge badge-primary" style={{ marginBottom: "var(--space-4)" }}>
+          <span className="badge badge-primary" style={{ marginBottom: "var(--space-3)" }}>
             <Sparkle size={12} weight="fill" />
             Fitur Interaktif
           </span>
-          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
+          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-2)", fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)" }}>
             Bukan sekedar <span className="gradient-text">baca materi doang</span>
           </h2>
-          <p style={{ color: "var(--text-secondary)", maxWidth: "560px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
-            Kamu bisa langsung praktek kode Python dan simulasi folder workspace tanpa install apa-apa.
+          <p style={{ color: "var(--text-secondary)", maxWidth: "560px", margin: "var(--space-3) auto 0", fontSize: "0.95rem", lineHeight: 1.7 }}>
+            Kamu bisa langsung praktek koding Python interaktif dan simulasi tata letak folder workspace tanpa install software apapun.
           </p>
         </motion.div>
 
-        <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-4)" }}>
+        <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-5)" }}>
           {features.map((f, i) => (
             <motion.div
               key={f.title}
               variants={featureVariants(i)}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: false, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: i * 0.08 }}
+              viewport={{ once: false, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
             >
               <motion.div
                 whileHover={{ y: -4, scale: 1.01, boxShadow: "0 16px 48px rgba(0,0,0,0.08)" }}
@@ -454,15 +487,14 @@ export function FeaturesSection() {
                   cursor: "default",
                   position: "relative",
                   overflow: "hidden",
-                  perspective: "800px",
                 }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: f.color, opacity: 0.3 }} />
-                <div style={{ width: "52px", height: "52px", borderRadius: "var(--radius-md)", background: `${f.color}10`, display: "flex", alignItems: "center", justifyContent: "center", color: f.color, marginBottom: "var(--space-4)", border: `1px solid ${f.color}15` }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: f.color, opacity: 0.4 }} />
+                <div style={{ width: "48px", height: "48px", borderRadius: "var(--radius-md)", background: `${f.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.color, marginBottom: "var(--space-4)", border: `1px solid ${f.color}25` }}>
                   {f.icon}
                 </div>
                 <h3 style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "var(--space-2)" }}>{f.title}</h3>
-                <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>{f.desc}</p>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>{f.desc}</p>
 
                 {f.title === "Meme Integration" && memePool.length > 0 && (
                   <motion.div
@@ -470,7 +502,7 @@ export function FeaturesSection() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ marginTop: "var(--space-4)", padding: "var(--space-3) var(--space-4)", background: "#0F172A", borderRadius: "var(--radius-md)", border: "1px solid rgba(255,255,255,0.06)", color: "white", fontSize: "0.82rem", fontWeight: 600, textAlign: "center" }}
+                    style={{ marginTop: "var(--space-4)", padding: "var(--space-3) var(--space-4)", background: "var(--bg-page-alt)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", color: "var(--text-primary)", fontSize: "0.82rem", fontWeight: 600, textAlign: "center" }}
                   >
                     <span style={{ fontSize: "1.2rem", display: "block", marginBottom: "2px" }}>{memePool[memeIdx].emoji}</span>
                     {memePool[memeIdx].caption}
@@ -491,17 +523,18 @@ export function FeaturesSection() {
 export function CurriculumSection() {
   const [previewModuleId, setPreviewModuleId] = useState<string | null>(null);
 
-  const mods = MODULES_META.map((m, i) => ({
-    ...m, num: parseInt(m.code.replace("M", "")),
-    desc: m.id === "M0" ? "Kenalan sama platform dan test kemampuan awal" :
+  const mods = MODULES_META.map((m) => ({
+    ...m,
+    num: parseInt(m.code.replace("M", "")),
+    desc: m.id === "M0" ? "Kenalan sama platform dan uji kemampuan pemula" :
           m.id === "M1" ? "Manajemen File System, path, setup Python & VS Code" :
           m.id === "M2" ? "Berpikir kayak programmer dengan flowchart & pseudo-code" :
           m.id === "M3" ? "Variabel, integer, string, boolean di Python" :
-          m.id === "M4" ? "if, elif, else - buat program yang bisa berpikir" :
-          m.id === "M5" ? "for loop, while loop - otomasi yang mengubah segalanya" :
-          m.id === "M6" ? "DRY principle - tulis sekali, pakai berkali-kali" :
-          m.id === "M7" ? "Simpan banyak data dalam satu variabel" :
-          "Integrasikan semua yang dipelajari jadi program nyata",
+          m.id === "M4" ? "if, elif, else - buat program yang bisa mengambil keputusan" :
+          m.id === "M5" ? "for loop, while loop - otomasi tugas berulang dengan cepat" :
+          m.id === "M6" ? "DRY principle & Function - tulis sekali, pakai berkali-kali" :
+          m.id === "M7" ? "List, Dictionary - simpan banyak data terstruktur" :
+          "Integrasikan seluruh materi menjadi aplikasi nyata Mini Project",
   }));
 
   const totalHours = MODULES_META.reduce((acc, m) => {
@@ -514,12 +547,12 @@ export function CurriculumSection() {
 
   return (
     <motion.section
-       id="kurikulum"
+      id="kurikulum"
       className="section-padding"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
-      style={{ padding: "var(--space-20) 0", background: "var(--bg-page-alt)", position: "relative", overflow: "hidden" }}
+      style={{ padding: "clamp(3.5rem, 8vw, 6rem) 0", background: "var(--bg-page-alt)", position: "relative", overflow: "hidden" }}
     >
       <ModulePreviewModal
         moduleId={previewModuleId}
@@ -532,46 +565,64 @@ export function CurriculumSection() {
 
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "700px", height: "700px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.03, pointerEvents: "none" }} />
 
-      <div className="section-container" style={{ position: "relative", zIndex: 1, maxWidth: "800px", margin: "0 auto" }}>
+      <div className="section-container" style={{ position: "relative", zIndex: 1, maxWidth: "860px", margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
-          style={{ textAlign: "center", marginBottom: "var(--space-12)" }}
+          style={{ textAlign: "center", marginBottom: "var(--space-10)" }}
         >
-          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
+          <span className="badge badge-primary" style={{ marginBottom: "var(--space-3)" }}>
+            <Books size={12} weight="fill" />
+            Alur Pembelajaran
+          </span>
+          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-2)", fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)" }}>
             Dari nol hingga <span className="gradient-text">bikin program sendiri</span>
           </h2>
-          <p style={{ color: "var(--text-muted)", maxWidth: "480px", margin: "var(--space-3) auto 0", fontSize: "0.9rem", lineHeight: 1.6 }}>
-            {MODULES_META.length} modul &middot; ~{totalHours.toFixed(1)} jam &middot; {totalXP} XP tersedia (Klik modul untuk preview!)
+          <p style={{ color: "var(--text-muted)", maxWidth: "520px", margin: "var(--space-3) auto 0", fontSize: "0.9rem", lineHeight: 1.6 }}>
+            {MODULES_META.length} modul terstruktur &middot; ~{totalHours.toFixed(1)} jam estimasi &middot; {totalXP} XP tersedia
           </p>
         </motion.div>
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {mods.map((m, i) => (
             <motion.div
               key={m.code}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
+              whileHover={{ x: 4 }}
               onClick={() => setPreviewModuleId(m.id)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewModuleId(m.id); } }}
               role="button"
               tabIndex={0}
               aria-label={`Preview modul ${m.code}: ${m.title}`}
-              transition={{ duration: 0.35, delay: i * 0.04 }}
-              style={{ display: "flex", gap: "var(--space-5)", padding: "var(--space-4) 0", borderBottom: i < mods.length - 1 ? "1px solid var(--border-color)" : "none", cursor: "pointer" }}
+              transition={{ duration: 0.25, delay: i * 0.03 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-4)",
+                padding: "var(--space-4) var(--space-5)",
+                background: "var(--bg-card)",
+                border: "1px solid var(--border-color)",
+                borderRadius: "var(--radius-lg)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
             >
-              <div style={{ width: "48px", flexShrink: 0, paddingTop: "2px" }}>
-                <div style={{ fontFamily: "var(--font-code)", fontSize: "1.15rem", fontWeight: 700, color: m.color, lineHeight: 1 }}>{String(m.num).padStart(2, "0")}</div>
+              <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: `${m.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ fontFamily: "var(--font-code)", fontSize: "1rem", fontWeight: 800, color: m.color }}>{String(m.num).padStart(2, "0")}</span>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", marginBottom: "2px" }}>
-                  <h4 style={{ fontSize: "1rem", color: "var(--text-primary)", fontWeight: 600 }}>{m.title}</h4>
-                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.duration}</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
+                  <h4 style={{ fontSize: "0.95rem", color: "var(--text-primary)", fontWeight: 700, margin: 0 }}>{m.title}</h4>
+                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", padding: "2px 8px", borderRadius: "var(--radius-full)", whiteSpace: "nowrap" }}>
+                    {m.duration}
+                  </span>
                 </div>
-                <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>{m.desc}</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>{m.desc}</p>
               </div>
+              <ArrowRight size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
             </motion.div>
           ))}
         </div>
@@ -611,15 +662,16 @@ const badges = [
 export function GamificationSection() {
   return (
     <motion.section
-       className="section-padding"
-       initial={{ opacity: 0 }}
-       whileInView={{ opacity: 1 }}
-       viewport={{ once: false }}
-       style={{ padding: "var(--space-20) 0", background: "var(--bg-page-alt)", position: "relative", overflow: "hidden" }}
-     >
-       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.025 }} />
+      id="gamifikasi"
+      className="section-padding"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false }}
+      style={{ padding: "clamp(3.5rem, 8vw, 6rem) 0", background: "var(--bg-page-alt)", position: "relative", overflow: "hidden" }}
+    >
+      <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.025 }} />
 
-       <div className="float-text" style={{ position: "absolute", top: "10%", right: "6%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-400)", opacity: 0.06, fontFamily: "var(--font-code)", lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>Level UP!</div>
+      <div className="float-text" style={{ position: "absolute", top: "10%", right: "6%", fontSize: "1.1rem", fontWeight: 700, color: "var(--color-primary-400)", opacity: 0.06, fontFamily: "var(--font-code)", lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>Level UP!</div>
 
       <div style={{ position: "absolute", top: "30%", left: "-5%", width: "400px", height: "400px", background: "radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)", opacity: 0.025, pointerEvents: "none" }} />
 
@@ -628,28 +680,29 @@ export function GamificationSection() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
-          style={{ textAlign: "center", marginBottom: "var(--space-12)" }}
+          style={{ textAlign: "center", marginBottom: "var(--space-10)" }}
         >
-          <span className="badge badge-primary" style={{ marginBottom: "var(--space-4)" }}>
+          <span className="badge badge-primary" style={{ marginBottom: "var(--space-3)" }}>
             <GameController size={12} weight="fill" />
             Sistem Gamifikasi
           </span>
-          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-3)" }}>
+          <h2 style={{ color: "var(--text-primary)", marginTop: "var(--space-2)", fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)" }}>
             Belajar itu kayak <span className="gradient-text">main game. Serius.</span>
           </h2>
-          <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "var(--space-4) auto 0", fontSize: "1.0625rem", lineHeight: 1.7 }}>
-            Setiap modul selesai = poin naik, badge unlock, level naik. Ada leaderboard buat kompetisi sehat antar maba.
+          <p style={{ color: "var(--text-secondary)", maxWidth: "520px", margin: "var(--space-3) auto 0", fontSize: "0.95rem", lineHeight: 1.7 }}>
+            Setiap modul selesai = poin XP bertambah, badge unlock, level naik. Tersedia leaderboard kelas untuk pacu semangat bersama.
           </p>
         </motion.div>
 
-        <div className="gamification-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "start" }}>
+        <div className="gamification-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "var(--space-8)", alignItems: "start" }}>
+          {/* Level list */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.45 }}
           >
-            <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-5)", fontSize: "1.0625rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
+            <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-4)", fontSize: "1.0625rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
               <Rocket size={18} color="var(--color-primary-500)" weight="fill" />
               Level Progression
             </h3>
@@ -665,23 +718,23 @@ export function GamificationSection() {
                   <motion.div
                     whileHover={{ x: 4 }}
                     style={{
-                      background: lv.active ? "linear-gradient(135deg, rgba(123,31,162,0.06), rgba(126,87,194,0.03))" : "var(--bg-card)",
-                      borderRadius: "var(--radius-md)",
+                      background: lv.active ? "linear-gradient(135deg, rgba(255,107,0,0.08), rgba(255,157,0,0.04))" : "var(--bg-card)",
+                      borderRadius: "var(--radius-lg)",
                       border: lv.active ? "1.5px solid var(--color-primary-500)" : "1px solid var(--border-color)",
                       padding: "var(--space-3) var(--space-4)",
                       display: "flex", alignItems: "center", gap: "var(--space-3)",
-                      boxShadow: lv.active ? "0 4px 16px rgba(123,31,162,0.08)" : "none",
+                      boxShadow: lv.active ? "0 4px 16px rgba(255,107,0,0.12)" : "none",
                       transition: "all 0.2s ease",
                     }}
                   >
-                    <span style={{ display: "flex", width: "24px", height: "24px", flexShrink: 0, alignItems: "center", justifyContent: "center" }}>{lv.icon}</span>
+                    <span style={{ display: "flex", width: "28px", height: "28px", flexShrink: 0, alignItems: "center", justifyContent: "center" }}>{lv.icon}</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, color: lv.active ? "var(--color-primary-600)" : "var(--text-primary)", fontSize: "0.875rem" }}>{lv.name}</div>
-                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>{lv.range}</div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>{lv.range}</div>
                     </div>
                     {lv.active && (
-                      <span style={{ fontSize: "0.58rem", background: "var(--gradient-hero)", color: "white", padding: "2px 8px", borderRadius: "var(--radius-full)", fontWeight: 700, fontFamily: "var(--font-heading)" }}>
-                        LIVE
+                      <span style={{ fontSize: "0.62rem", background: "var(--gradient-hero)", color: "white", padding: "2px 8px", borderRadius: "var(--radius-full)", fontWeight: 700, fontFamily: "var(--font-heading)" }}>
+                        CURRENT
                       </span>
                     )}
                   </motion.div>
@@ -690,13 +743,14 @@ export function GamificationSection() {
             </div>
           </motion.div>
 
+          {/* Badge grid */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.45, delay: 0.1 }}
           >
-            <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-5)", fontSize: "1.0625rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
+            <h3 style={{ color: "var(--text-primary)", marginBottom: "var(--space-4)", fontSize: "1.0625rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
               <Trophy size={18} color="var(--color-primary-500)" weight="fill" />
               Badge Collection ({badges.length})
             </h3>
@@ -706,18 +760,18 @@ export function GamificationSection() {
               whileInView="visible"
               viewport={{ once: false }}
               className="badge-grid"
-              style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-2)" }}
+              style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))", gap: "8px" }}
             >
-              {badges.map((b, i) => (
+              {badges.map((b) => (
                 <motion.div key={b.name} variants={fadeUp}>
                   <motion.div
-                    whileHover={{ y: -3, boxShadow: `0 6px 20px ${b.color}15` }}
-                    style={{ background: "var(--bg-card)", borderRadius: "var(--radius-md)", border: `1px solid ${b.color}15`, padding: "var(--space-3)", textAlign: "center", cursor: "default", transition: "all 0.2s ease" }}
+                    whileHover={{ y: -3, boxShadow: `0 6px 20px ${b.color}20` }}
+                    style={{ background: "var(--bg-card)", borderRadius: "var(--radius-md)", border: `1px solid ${b.color}25`, padding: "10px 6px", textAlign: "center", cursor: "default", transition: "all 0.2s ease" }}
                   >
-                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "3px" }}>
-                      <BadgeIcon id={b.id} color={b.color} size={34} />
+                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+                      <BadgeIcon id={b.id} color={b.color} size={32} />
                     </div>
-                    <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", lineHeight: 1.3, fontWeight: 500 }}>{b.name}</div>
+                    <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", lineHeight: 1.25, fontWeight: 600 }}>{b.name}</div>
                   </motion.div>
                 </motion.div>
               ))}
@@ -735,18 +789,19 @@ export function GamificationSection() {
 export function CTASection() {
   return (
     <motion.section
-       className="section-padding"
-       initial={{ opacity: 0 }}
-       whileInView={{ opacity: 1 }}
-       viewport={{ once: false }}
-       style={{ padding: "var(--space-20) 0", position: "relative", overflow: "hidden", background: "var(--bg-dark)" }}
-     >
-       {/* Animated gradient orbs */}
-      <div className="orb-slow" style={{ position: "absolute", top: "20%", right: "15%", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle, rgba(123,31,162,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div className="orb-slow" style={{ position: "absolute", bottom: "10%", left: "10%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div className="orb-slow" style={{ position: "absolute", top: "50%", left: "50%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(206,147,216,0.06) 0%, transparent 70%)", pointerEvents: "none", transform: "translate(-50%,-50%)" }} />
+      id="cta"
+      className="section-padding"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false }}
+      style={{ padding: "clamp(4rem, 10vw, 7rem) 0", position: "relative", overflow: "hidden", background: "var(--bg-dark)" }}
+    >
+      {/* Animated gradient orbs */}
+      <div className="orb-slow" style={{ position: "absolute", top: "20%", right: "15%", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div className="orb-slow" style={{ position: "absolute", bottom: "10%", left: "10%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,157,0,0.10) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div className="orb-slow" style={{ position: "absolute", top: "50%", left: "50%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%)", pointerEvents: "none", transform: "translate(-50%,-50%)" }} />
 
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(123,31,162,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,107,0,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "var(--gradient-hero)" }} />
 
       <div className="section-container" style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
@@ -759,19 +814,19 @@ export function CTASection() {
           <motion.div
             animate={{ scale: [1, 1.04, 1] }}
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-            style={{ display: "flex", justifyContent: "center", marginBottom: "var(--space-5)" }}
+            style={{ display: "flex", justifyContent: "center", marginBottom: "var(--space-4)" }}
           >
-            <div style={{ width: "68px", height: "68px", borderRadius: "var(--radius-lg)", background: "linear-gradient(135deg, rgba(123,31,162,0.2), rgba(255,107,0,0.08))", border: "1.5px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", color: "#E1BEE7" }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "var(--radius-xl)", background: "linear-gradient(135deg, rgba(255,107,0,0.25), rgba(255,157,0,0.1))", border: "1.5px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFAB76" }}>
               <Rocket size={32} weight="fill" />
             </div>
           </motion.div>
 
-          <h2 style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", color: "#FFFAF6", marginBottom: "var(--space-4)" }}>
+          <h2 style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", color: "#FFFAF6", marginBottom: "var(--space-3)", fontWeight: 800 }}>
             Matrikulasi tahun ini,{" "}
             <span className="gradient-text">beda.</span>
           </h2>
-          <p style={{ color: "rgba(255,250,246,0.6)", maxWidth: "520px", margin: "0 auto var(--space-8)", fontSize: "1.0625rem", lineHeight: 1.75 }}>
-            Izinkan kami mengubah matrikulasi TRPL menjadi pengalaman yang diingat seumur hidup. Mulai sekarang, gratis.
+          <p style={{ color: "rgba(255,250,246,0.7)", maxWidth: "540px", margin: "0 auto var(--space-8)", fontSize: "clamp(0.95rem, 2vw, 1.0625rem)", lineHeight: 1.75 }}>
+            Pengalaman belajar pemrograman yang seru, interaktif, dan penuh prestasi. Mulai petualangan kodingmu sekarang!
           </p>
 
           <motion.div
@@ -785,13 +840,13 @@ export function CTASection() {
             <Button href="/login" variant="primary" size="lg">
               Daftar Sekarang &mdash; Gratis <ArrowRight size={18} weight="bold" />
             </Button>
-            <a href="#tentang" style={{ display: "inline-flex", alignItems: "center", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--radius-full)", border: "1.5px solid rgba(255,250,246,0.2)", color: "rgba(255,250,246,0.85)", textDecoration: "none", fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "1.0625rem", transition: "all 0.25s ease" }}>
-              Pelajari Lebih Lanjut
+            <a href="#kurikulum" style={{ display: "inline-flex", alignItems: "center", padding: "var(--space-4) var(--space-8)", borderRadius: "var(--radius-full)", border: "1.5px solid rgba(255,250,246,0.25)", color: "rgba(255,250,246,0.9)", textDecoration: "none", fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "1rem", transition: "all 0.25s ease" }}>
+              Lihat Materi
             </a>
           </motion.div>
 
-          <p style={{ marginTop: "var(--space-6)", color: "rgba(255,250,246,0.35)", fontSize: "0.85rem" }}>
-            Login dengan SSO kampus &bull; Tidak perlu buat akun baru &bull; 100% gratis
+          <p style={{ marginTop: "var(--space-6)", color: "rgba(255,250,246,0.45)", fontSize: "0.82rem" }}>
+            Login dengan SSO / Email kampus &bull; Tidak perlu install tools rumit &bull; 100% gratis
           </p>
         </motion.div>
       </div>
@@ -804,23 +859,23 @@ export function CTASection() {
    ============================================================ */
 export function EngineerSection() {
   return (
-    <section style={{ padding: "var(--space-14) 0 var(--space-10)", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 80%, rgba(123,31,162,0.03) 0%, transparent 60%)", pointerEvents: "none" }} />
+    <section id="tentang" style={{ padding: "clamp(3rem, 6vw, 4.5rem) 0 clamp(2.5rem, 5vw, 3.5rem)", position: "relative", overflow: "hidden", background: "var(--bg-page)" }}>
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 80%, rgba(255,107,0,0.04) 0%, transparent 60%)", pointerEvents: "none" }} />
 
       <div className="section-container" style={{ position: "relative", zIndex: 1 }}>
-        <div style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}>
-          <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: false }} style={{ width: "48px", height: "1.5px", background: "var(--gradient-hero)", margin: "0 auto var(--space-5)", borderRadius: "2px", transformOrigin: "center" }} />
+        <div style={{ maxWidth: "480px", margin: "0 auto", textAlign: "center" }}>
+          <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: false }} style={{ width: "48px", height: "2px", background: "var(--gradient-hero)", margin: "0 auto var(--space-4)", borderRadius: "2px", transformOrigin: "center" }} />
 
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} style={{ color: "var(--text-muted)", fontSize: "0.68rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "var(--space-2)" }}>Dibuat Oleh</motion.p>
-          <motion.h3 initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.375rem)", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-heading)" }}>Felich Pehagasa Ginting</motion.h3>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} transition={{ delay: 0.08 }} style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "2px" }}>Software Engineer &bull; AI Enthusiast &bull; D4 TRPL</motion.p>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} style={{ color: "var(--text-muted)", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "var(--space-1)" }}>Dibuat Oleh</motion.p>
+          <motion.h3 initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} style={{ fontSize: "clamp(1.2rem, 3vw, 1.45rem)", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)" }}>Felich Pehagasa Ginting</motion.h3>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} transition={{ delay: 0.08 }} style={{ color: "var(--text-secondary)", fontSize: "0.82rem", marginTop: "2px" }}>Software Engineer &bull; AI Enthusiast &bull; D4 TRPL</motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ delay: 0.12 }}
-            style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "var(--space-5)" }}
+            style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "var(--space-4)" }}
           >
             {[
               { href: "https://github.com/felichpehagasaginting-code", label: "GitHub", path: "M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" },
@@ -828,8 +883,8 @@ export function EngineerSection() {
               { href: "https://www.instagram.com/fel.comp", label: "Instagram", path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" },
               { href: "https://felich.dev", label: "Portfolio", path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" },
             ].map(({ href, label, path }) => (
-              <motion.a key={label} whileHover={{ y: -3 }} href={href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "34px", height: "34px", borderRadius: "50%", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", color: "var(--text-muted)", textDecoration: "none", cursor: "pointer", transition: "all 0.2s ease" }} title={label}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d={path} /></svg>
+              <motion.a key={label} whileHover={{ y: -3 }} href={href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "36px", height: "36px", borderRadius: "50%", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", color: "var(--text-secondary)", textDecoration: "none", cursor: "pointer", transition: "all 0.2s ease" }} title={label}>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d={path} /></svg>
               </motion.a>
             ))}
           </motion.div>
@@ -839,20 +894,21 @@ export function EngineerSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: false }}
             transition={{ delay: 0.18 }}
-            style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "var(--space-6)" }}
+            style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "var(--space-5)" }}
           >
             {[1, 2].map((i) => (
-              <div key={i} style={{ width: "110px", padding: "var(--space-3) var(--space-2)", borderRadius: "var(--radius-md)", border: "1.5px dashed var(--border-color)", background: "var(--bg-page-alt)", textAlign: "center", opacity: 0.5 }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--color-neutral-150)", margin: "0 auto var(--space-2)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)" }}>?</div>
-                <p style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)" }}>Anggota {i}</p>
-                <p style={{ fontSize: "0.58rem", color: "var(--text-muted)", marginTop: "1px", opacity: 0.6 }}>Data menyusul</p>
+              <div key={i} style={{ width: "110px", padding: "var(--space-3) var(--space-2)", borderRadius: "var(--radius-md)", border: "1.5px dashed var(--border-color)", background: "var(--bg-page-alt)", textAlign: "center", opacity: 0.6 }}>
+                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,107,0,0.1)", margin: "0 auto var(--space-2)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: 700 }}>?</div>
+                <p style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", margin: 0 }}>Anggota {i}</p>
+                <p style={{ fontSize: "0.58rem", color: "var(--text-muted)", marginTop: "2px", opacity: 0.7, margin: 0 }}>Data menyusul</p>
               </div>
             ))}
           </motion.div>
 
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} style={{ color: "var(--text-muted)", fontSize: "0.62rem", marginTop: "var(--space-5)", opacity: 0.4 }}>Projek Himpunan Mahasiswa TRPL</motion.p>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: false }} style={{ color: "var(--text-muted)", fontSize: "0.68rem", marginTop: "var(--space-4)", opacity: 0.6 }}>Projek Himpunan Mahasiswa TRPL 2026</motion.p>
         </div>
       </div>
     </section>
   );
 }
+

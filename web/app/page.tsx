@@ -23,26 +23,26 @@ export default function HomePage() {
     <>
       <CyberBackground />
       <Navbar />
-      <main style={{ flex: 1, position: "relative", zIndex: 1 }}>
+      <main style={{ flex: 1, position: "relative", zIndex: 1, overflowX: "hidden" }}>
         <HeroSection />
         <TrustBarSection />
         <FeaturesSection />
 
-        <div style={{ padding: "var(--space-12) 0", background: "var(--bg-page-alt)" }}>
+        <section id="transformasi" className="section-padding" style={{ background: "var(--bg-page-alt)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
           <BeforeAfterSlider />
-        </div>
+        </section>
 
         <CurriculumSection />
 
-        <div style={{ padding: "var(--space-12) 0", background: "var(--bg-page)" }}>
+        <section id="kalkulator" className="section-padding" style={{ background: "var(--bg-page)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
           <XPCalculator />
-        </div>
+        </section>
 
         <GamificationSection />
 
-        <div style={{ padding: "var(--space-12) 0", background: "var(--bg-page-alt)" }}>
+        <section id="faq" className="section-padding" style={{ background: "var(--bg-page-alt)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
           <FAQSection />
-        </div>
+        </section>
 
         <CTASection />
         <EngineerSection />
@@ -54,3 +54,4 @@ export default function HomePage() {
     </>
   );
 }
+
