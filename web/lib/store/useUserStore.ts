@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from "firebase/firestore";
 
 const setAuthCookie = () => { document.cookie = "matrikulasi-auth=true; path=/; max-age=86400; SameSite=Lax"; };
 const clearAuthCookie = () => { document.cookie = "matrikulasi-auth=; path=/; max-age=0"; };
@@ -147,6 +147,7 @@ interface UserState {
   loginAsDosenPenguji: (pin: string) => boolean;
   handleRedirectResult: () => Promise<boolean>;
   fetchLeaderboard: () => Promise<void>;
+  subscribeLeaderboardRealtime: () => () => void;
   fetchAllUsers: () => Promise<void>;
   logout: () => void;
   addXP: (amount: number) => Promise<void>;
@@ -174,17 +175,20 @@ export const useUserStore = create<UserState>()(
         const uid = fbUser.uid;
         const userRef = doc(db, "users", uid);
         const isFelich = isCreator({ email: fbUser.email, name: fbUser.displayName });
+        const existingLocalUser = get().user;
+        const localXP = existingLocalUser && existingLocalUser.uid === uid ? (existingLocalUser.xp || 0) : 0;
         
+        const baseXP = isFelich ? Math.max(1550, localXP) : localXP;
         const tempProfile: UserProfile = {
           uid,
           name: fbUser.displayName || (isFelich ? "Felich Pehagasa Ginting" : "Maba TRPL"),
           email: fbUser.email || (isFelich ? "felich@mhs.cwe.ac.id" : ""),
-          avatar: "avatar_default",
-          xp: isFelich ? 1550 : 0,
-          level: isFelich ? "TRPL Legend" : "Script Kiddie",
-          badges: isFelich ? ALL_BADGE_IDS : ["langkah_pertama"],
-          streak: isFelich ? 7 : 1,
-          progress: isFelich ? COMPLETED_FULL_PROGRESS : INITIAL_PROGRESS,
+          avatar: existingLocalUser?.avatar || "avatar_default",
+          xp: baseXP,
+          level: isFelich ? "TRPL Legend" : getLevelName(baseXP),
+          badges: isFelich ? ALL_BADGE_IDS : (existingLocalUser?.badges && existingLocalUser.badges.length > 0 ? existingLocalUser.badges : ["langkah_pertama"]),
+          streak: isFelich ? 7 : (existingLocalUser?.streak || 1),
+          progress: isFelich ? COMPLETED_FULL_PROGRESS : (existingLocalUser?.progress || INITIAL_PROGRESS),
           isCreator: isFelich,
         };
 
@@ -192,23 +196,32 @@ export const useUserStore = create<UserState>()(
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const data = userDoc.data() as UserProfile;
-            if (isFelich) {
-              const updatedXP = Math.max(data.xp || 0, 1550);
-              const restored = { ...data, ...tempProfile, uid, xp: updatedXP, level: "TRPL Legend" };
-              await setDoc(userRef, restored, { merge: true });
-              set({ user: restored });
-            } else {
-              set({ user: { ...data, isCreator: isFelich || data.isCreator } });
-            }
+            const combinedXP = Math.max(data.xp || 0, tempProfile.xp);
+            const combinedBadges = Array.from(new Set([...(data.badges || []), ...(tempProfile.badges || [])]));
+            const combinedLevel = isFelich ? "TRPL Legend" : getLevelName(combinedXP);
+            const combinedProgress = isFelich ? COMPLETED_FULL_PROGRESS : (data.progress || tempProfile.progress);
+
+            const finalProfile: UserProfile = {
+              ...data,
+              ...tempProfile,
+              xp: combinedXP,
+              level: combinedLevel,
+              badges: combinedBadges,
+              progress: combinedProgress,
+              isCreator: isFelich || Boolean(data.isCreator),
+            };
+
+            await setDoc(userRef, finalProfile, { merge: true });
+            set({ user: finalProfile });
             setAuthCookie();
           } else {
-            await setDoc(userRef, tempProfile);
+            await setDoc(userRef, tempProfile, { merge: true });
             set({ user: tempProfile });
             setAuthCookie();
           }
           await get().fetchLeaderboard();
-        } catch {
-          console.warn("Firestore sync failed");
+        } catch (e) {
+          console.warn("Firestore sync failed on login:", e);
           set({ user: tempProfile });
           setAuthCookie();
         }
@@ -273,11 +286,11 @@ export const useUserStore = create<UserState>()(
             name: "Dosen Penguji TRPL",
             email: "dosen.penguji@polsri.ac.id",
             avatar: "avatar_1",
-            xp: 0,
-            level: "Script Kiddie",
-            badges: ["langkah_pertama"],
-            streak: 1,
-            progress: INITIAL_PROGRESS,
+            xp: 1550,
+            level: "TRPL Legend",
+            badges: ALL_BADGE_IDS,
+            streak: 7,
+            progress: COMPLETED_FULL_PROGRESS,
             isCreator: true,
             isDosenPenguji: true,
           };
@@ -340,27 +353,68 @@ export const useUserStore = create<UserState>()(
       fetchLeaderboard: async () => {
         if (isMockFirebase) return;
         try {
-          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20));
+          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
           const snapshot = await getDocs(q);
           const list: LeaderboardUser[] = [];
           snapshot.forEach((doc) => {
-            const d = doc.data();
+            const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean };
             if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
               return;
             }
             const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+            const userXP = Number(d.xp) || 0;
             list.push({
               uid: d.uid || doc.id,
               name: d.name || "Anonymous",
               email: d.email || "",
               avatar: d.avatar || "avatar_default",
-              xp: isCreatorUser ? Math.max(d.xp || 0, 1550) : (d.xp || 0),
-              level: isCreatorUser ? "TRPL Legend" : (d.level || "Script Kiddie"),
+              xp: userXP,
+              level: d.level || getLevelName(userXP),
               isCreator: isCreatorUser,
             });
           });
           set({ leaderboard: list });
-        } catch {}
+        } catch (e) {
+          console.warn("fetchLeaderboard error:", e);
+        }
+      },
+
+      subscribeLeaderboardRealtime: () => {
+        if (isMockFirebase) return () => {};
+        try {
+          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
+          const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+              const list: LeaderboardUser[] = [];
+              snapshot.forEach((doc) => {
+                const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean };
+                if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
+                  return;
+                }
+                const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+                const userXP = Number(d.xp) || 0;
+                list.push({
+                  uid: d.uid || doc.id,
+                  name: d.name || "Anonymous",
+                  email: d.email || "",
+                  avatar: d.avatar || "avatar_default",
+                  xp: userXP,
+                  level: d.level || getLevelName(userXP),
+                  isCreator: isCreatorUser,
+                });
+              });
+              set({ leaderboard: list });
+            },
+            (err) => {
+              console.warn("subscribeLeaderboardRealtime error:", err);
+            }
+          );
+          return unsubscribe;
+        } catch (e) {
+          console.warn("Failed to subscribe to realtime leaderboard:", e);
+          return () => {};
+        }
       },
 
       fetchAllUsers: async () => {
@@ -410,10 +464,15 @@ export const useUserStore = create<UserState>()(
         const newXP = user.xp + amount;
         const oldLevel = user.level;
         const newLevel = getLevelName(newXP);
-        set({ user: { ...user, xp: newXP, level: newLevel } });
+        const updatedUser = { ...user, xp: newXP, level: newLevel };
+        set({ user: updatedUser });
         if (oldLevel !== newLevel) set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
-        if (!isMockFirebase) {
-          try { await updateDoc(doc(db, "users", user.uid), { xp: newXP, level: newLevel }); } catch {}
+        if (!isMockFirebase && user.uid) {
+          try {
+            await setDoc(doc(db, "users", user.uid), { xp: newXP, level: newLevel }, { merge: true });
+          } catch (err) {
+            console.warn("Failed to sync addXP to Firestore:", err);
+          }
         }
       },
 
@@ -422,10 +481,15 @@ export const useUserStore = create<UserState>()(
         if (!user || user.badges.includes(badgeId)) return;
         const badge = BADGES.find((b) => b.id === badgeId);
         if (!badge) return;
-        set({ user: { ...user, badges: [...user.badges, badgeId] }, badgePopup: { isOpen: true, badge } });
-        get().addXP(50);
-        if (!isMockFirebase) {
-          try { await updateDoc(doc(db, "users", user.uid), { badges: [...user.badges, badgeId] }); } catch {}
+        const updatedBadges = [...user.badges, badgeId];
+        set({ user: { ...user, badges: updatedBadges }, badgePopup: { isOpen: true, badge } });
+        await get().addXP(50);
+        if (!isMockFirebase && user.uid) {
+          try {
+            await setDoc(doc(db, "users", user.uid), { badges: updatedBadges }, { merge: true });
+          } catch (err) {
+            console.warn("Failed to sync unlockBadge to Firestore:", err);
+          }
         }
       },
 
@@ -437,8 +501,12 @@ export const useUserStore = create<UserState>()(
         const updated = { ...user.progress, [moduleId]: { ...currentModule, completedSubModules: [...currentModule.completedSubModules, subModuleId] } };
         set({ user: { ...user, progress: updated } });
         await get().addXP(15);
-        if (!isMockFirebase) {
-          try { await updateDoc(doc(db, "users", user.uid), { progress: updated }); } catch {}
+        if (!isMockFirebase && user.uid) {
+          try {
+            await setDoc(doc(db, "users", user.uid), { progress: updated }, { merge: true });
+          } catch (err) {
+            console.warn("Failed to sync completeSubModule to Firestore:", err);
+          }
         }
       },
 
@@ -459,8 +527,12 @@ export const useUserStore = create<UserState>()(
         const badgeMap: Record<string, string> = { M1: "workspace_master", M2: "pemikir_logis", M3: "penampung_data", M4: "pembuat_keputusan", M5: "master_loop", M6: "function_wizard", M7: "data_collector" };
         if (badgeMap[moduleId]) await get().unlockBadge(badgeMap[moduleId]);
         if (moduleId === "M8") { await get().unlockBadge("junior_developer"); await get().unlockBadge("graduated"); }
-        if (!isMockFirebase) {
-          try { await updateDoc(doc(db, "users", user.uid), { progress: updatedProgress }); } catch {}
+        if (!isMockFirebase && user.uid) {
+          try {
+            await setDoc(doc(db, "users", user.uid), { progress: updatedProgress }, { merge: true });
+          } catch (err) {
+            console.warn("Failed to sync completeModule to Firestore:", err);
+          }
         }
       },
 
