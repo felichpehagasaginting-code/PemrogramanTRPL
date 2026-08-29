@@ -10,46 +10,32 @@ import { LEADERBOARD_FEATURES } from "@/lib/features";
 import { soundFX } from "@/lib/audio";
 
 export default function LeaderboardPage() {
-  const { user, leaderboard, fetchLeaderboard } = useUserStore();
+  const { user, leaderboard, fetchLeaderboard, subscribeLeaderboardRealtime } = useUserStore();
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [fetchLeaderboard]);
+    const unsub = subscribeLeaderboardRealtime();
+    return () => {
+      unsub();
+    };
+  }, [fetchLeaderboard, subscribeLeaderboardRealtime]);
 
   if (!user) return null;
 
-  // Add active user into leaderboard list to display ranks correctly (exclude Dosen Penguji)
+  // Filter out Dosen Penguji from public student leaderboard
   const baseList = leaderboard.filter(
     (u) => !u.email?.includes("dosen.penguji") && u.uid !== "dosen-penguji-trpl"
   );
 
-  // Sync active user's latest XP into leaderboard list
-  const fullLeaderboardList = baseList.map((item) => {
-    if (
-      user &&
-      (item.uid === user.uid ||
-        (item.email && user.email && item.email.toLowerCase() === user.email.toLowerCase()) ||
-        (isCreator(user) && isCreator(item)))
-    ) {
-      return {
-        ...item,
-        xp: Math.max(item.xp, user.xp),
-        level: user.level,
-        name: user.name,
-        avatar: user.avatar,
-        isCreator: true,
-      };
-    }
-    return item;
-  });
+  // Use the synchronized real-time Firestore list
+  const fullLeaderboardList = [...baseList];
 
   if (
     !user.isDosenPenguji &&
     !fullLeaderboardList.some(
       (u) =>
         u.uid === user.uid ||
-        (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()) ||
-        (isCreator(user) && isCreator(u))
+        (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase())
     )
   ) {
     fullLeaderboardList.push({
@@ -69,9 +55,14 @@ export default function LeaderboardPage() {
   // Stats calculation
   const totalXP = sortedList.reduce((sum, item) => sum + item.xp, 0);
   const avgXP = sortedList.length > 0 ? Math.round(totalXP / sortedList.length) : 0;
+  const userRankIndex = sortedList.findIndex(
+    (u) => u.uid === user.uid || (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase())
+  );
   const userRank = user.isDosenPenguji
     ? "Mode Dosen"
-    : `#${sortedList.findIndex((u) => u.uid === user.uid) + 1}`;
+    : userRankIndex !== -1
+    ? `#${userRankIndex + 1}`
+    : "#1";
 
   return (
     <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-4)" }}>
