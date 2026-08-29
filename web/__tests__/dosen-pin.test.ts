@@ -14,7 +14,7 @@ describe("Dosen Penguji PIN Dial Pad & Access Gate", () => {
     expect(success).toBe(false);
   });
 
-  it("authenticates as Dosen Penguji with full access but progress starting from 0", () => {
+  it("authenticates as Dosen Penguji with full access and full progress matching creator", () => {
     const store = useUserStore.getState();
     const success = store.loginAsDosenPenguji("1213");
     expect(success).toBe(true);
@@ -25,10 +25,11 @@ describe("Dosen Penguji PIN Dial Pad & Access Gate", () => {
     expect(currentUser?.isCreator).toBe(true); // Full access like felich@mhs.cwe.ac.id
     expect(isAdmin(currentUser)).toBe(true); // Full admin access
 
-    // Progress starts from 0 for genuine module walkthrough testing
-    expect(currentUser?.xp).toBe(0);
-    expect(currentUser?.level).toBe("Script Kiddie");
-    expect(currentUser?.progress.M0.status).toBe("active");
-    expect(currentUser?.progress.M1.status).toBe("locked");
+    // Progress and stats match creator (felich@mhs.cwe.ac.id)
+    expect(currentUser?.xp).toBe(1550);
+    expect(currentUser?.level).toBe("TRPL Legend");
+    expect(currentUser?.progress.M0.status).toBe("completed");
+    expect(currentUser?.progress.M1.status).toBe("completed");
+    expect(currentUser?.progress.M8.status).toBe("completed");
   });
 });
