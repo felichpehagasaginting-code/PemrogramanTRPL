@@ -7,23 +7,27 @@ import { MagnifyingGlass, CaretDown, Question, XCircle, Sparkle } from "@phospho
 const FAQ_LIST = [
   {
     q: "Apakah platform ini gratis untuk seluruh mahasiswa baru TRPL?",
-    a: "Ya! Platform Matrikulasi Pemrograman TRPL 100% gratis untuk seluruh mahasiswa baru angkatan 2026. Program ini didedikasikan oleh Divisi Pemrograman HIMA TRPL untuk mendukung transisi belajar koding yang menyenangkan.",
+    a: "Ya! Platform Matrikulasi Pemrograman TRPL 100% gratis untuk seluruh mahasiswa baru angkatan 2026. Program ini didedikasikan oleh Divisi Pemrograman Panitia Matrikulasi TRPL untuk mendukung transisi belajar koding yang menyenangkan.",
+  },
+  {
+    q: "Bagaimana skema pelaksanaan kegiatan matrikulasi pemrograman ini?",
+    a: "Kegiatan dibagi ke dalam 2 Fase terarah: Fase 1 adalah Live Interactive Workshop tatap muka selama 4–6 jam (Modul M0 s.d. M4) yang dipandu langsung oleh Ketua Divisi Pemrograman bersama Staff Divisi Pemrograman. Fase 2 adalah Guided Independent Mastery (Modul M5 s.d. M8) yang dikerjakan secara mandiri di asrama/rumah dengan dukungan penuh Auto-Grader dan sistem asistensi.",
   },
   {
     q: "Apakah saya membutuhkan laptop dengan spesifikasi tinggi?",
-    a: "Tidak sama sekali! Seluruh modul, kuis, dan eksekusi kode Python berjalan langsung di browser kamu (berbasis WebAssembly / Pyodide), sehingga laptop standar, notebook, atau bahkan tablet dapat menggunakannya dengan lancar.",
+    a: "Tidak sama sekali! Seluruh modul, kuis, dan eksekusi kode Python berjalan langsung di browser kamu (berbasis WebAssembly / Pyodide), sehingga laptop standar, notebook, atau bahkan tablet dapat menggunakannya dengan lancar tanpa perlu install Python lokal terlebih dahulu.",
   },
   {
-    q: "Bagaimana jika saya belum pernah koding sama sekali sebelumnya?",
-    a: "Jangan khawatir! Kurikulum dirancang bertahap dari level nol (M0 Pre-test & M1 Workspace) hingga mampu membuat Mini Project nyata. AI Mentor siap membantu menjelaskan penyebab error jika kamu bingung.",
+    q: "Bagaimana jika saya mengalami error atau kebuntuan saat belajar mandiri di asrama?",
+    a: "Jangan khawatir! Di setiap lembar koding tersedia tombol 'Minta Bantuan'. Sistem akan otomatis membuat tautan snapshot kode dan pesan error terminal kamu secara instan, sehingga kamu bisa langsung berkonsultasi ke grup mentoring atau forum asisten tanpa perlu repot screenshot layar.",
   },
   {
-    q: "Berapa lama waktu yang dibutuhkan untuk menyelesaikan seluruh modul?",
-    a: "Rata-rata mahasiswa menyelesaikan seluruh 9 modul dalam rentang 5-7 hari dengan meluangkan waktu sekitar 30 menit per hari secara santai dan konsisten.",
+    q: "Berapa lama waktu pengerjaan untuk modul mandiri (M5–M8)?",
+    a: "Setelah sesi live workshop tatap muka selesai, mahasiswa diberikan rentang waktu pengerjaan fleksibel sekitar 5–7 hari kalender untuk menuntaskan modul perulangan, fungsi, list, hingga proyek akhir Kasir Warkop TRPL.",
   },
   {
     q: "Apakah saya mendapatkan sertifikat atau badge kelulusan?",
-    a: "Ya! Mahasiswa yang berhasil menyelesaikan Modul M8 akan membuka Badge 'Matrikulasi Graduate' eksklusif serta rekapitulasi poin XP dan portofolio proyek mini.",
+    a: "Ya! Mahasiswa yang berhasil menyelesaikan seluruh modul (M0 sampai M8) berhak mengklaim Sertifikat Digital Resmi Kelulusan Matrikulasi TRPL 2026 yang dilengkapi QR Code verifikasi, serta membuka Badge prestasi eksklusif.",
   },
 ];
 

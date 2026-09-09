@@ -613,7 +613,7 @@ export function FeaturesSection() {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
-      className="section-padding"
+      className="section-padding content-visibility-auto"
       style={{ padding: "clamp(3.5rem, 8vw, 6rem) 0", background: "var(--bg-page)", position: "relative", overflow: "hidden" }}
     >
       <div className="dot-grid" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
@@ -762,47 +762,132 @@ export function CurriculumSection() {
           </p>
         </motion.div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {mods.map((m, i) => (
-            <motion.div
-              key={m.code}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false }}
-              whileHover={{ x: 4 }}
-              onClick={() => setPreviewModuleId(m.id)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewModuleId(m.id); } }}
-              role="button"
-              tabIndex={0}
-              aria-label={`Preview modul ${m.code}: ${m.title}`}
-              transition={{ duration: 0.25, delay: i * 0.03 }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--space-4)",
-                padding: "var(--space-4) var(--space-5)",
-                background: "var(--bg-card)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "var(--radius-lg)",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-            >
-              <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: `${m.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <span style={{ fontFamily: "var(--font-code)", fontSize: "1rem", fontWeight: 800, color: m.color }}>{String(m.num).padStart(2, "0")}</span>
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
-                  <h4 style={{ fontSize: "0.95rem", color: "var(--text-primary)", fontWeight: 700, margin: 0 }}>{m.title}</h4>
-                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", padding: "2px 8px", borderRadius: "var(--radius-full)", whiteSpace: "nowrap" }}>
-                    {m.duration}
-                  </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          {/* Group Fase 1 */}
+          <div style={{ background: "rgba(255, 107, 0, 0.03)", border: "1.5px solid rgba(255, 107, 0, 0.2)", borderRadius: "var(--radius-xl)", padding: "var(--space-5)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)", flexWrap: "wrap", gap: "10px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-primary-500)" }}></span>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                    FASE 1: Live Interactive Workshop (4–6 Jam)
+                  </h3>
                 </div>
-                <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>{m.desc}</p>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", margin: "4px 0 0 16px" }}>
+                  Sesi tatap muka intensif dipandu langsung oleh <strong>Ketua Divisi Pemrograman</strong> dan <strong>Staff Divisi Pemrograman</strong>.
+                </p>
               </div>
-              <ArrowRight size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
-            </motion.div>
-          ))}
+              <span className="badge badge-primary" style={{ fontSize: "0.75rem", padding: "4px 10px" }}>
+                Modul M0 &ndash; M4
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {mods.filter((m) => m.phase === "live").map((m, i) => (
+                <motion.div
+                  key={m.code}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  whileHover={{ x: 4 }}
+                  onClick={() => setPreviewModuleId(m.id)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewModuleId(m.id); } }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Preview modul ${m.code}: ${m.title}`}
+                  transition={{ duration: 0.25, delay: i * 0.03 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-4)",
+                    padding: "var(--space-3) var(--space-4)",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "var(--radius-lg)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: `${m.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontFamily: "var(--font-code)", fontSize: "0.9rem", fontWeight: 800, color: m.color }}>{String(m.num).padStart(2, "0")}</span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
+                      <h4 style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontWeight: 700, margin: 0 }}>{m.title}</h4>
+                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", padding: "1px 7px", borderRadius: "var(--radius-full)", whiteSpace: "nowrap" }}>
+                        {m.duration}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.45, margin: 0 }}>{m.desc}</p>
+                  </div>
+                  <ArrowRight size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Group Fase 2 */}
+          <div style={{ background: "rgba(34, 197, 94, 0.02)", border: "1.5px dashed rgba(34, 197, 94, 0.25)", borderRadius: "var(--radius-xl)", padding: "var(--space-5)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)", flexWrap: "wrap", gap: "10px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: "#22C55E" }}></span>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                    FASE 2: Guided Independent Mastery
+                  </h3>
+                </div>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", margin: "4px 0 0 16px" }}>
+                  Belajar mandiri di asrama / rumah didukung <strong>Auto-Grader</strong> &amp; fitur <strong>Minta Bantuan Snapshot</strong>.
+                </p>
+              </div>
+              <span style={{ fontSize: "0.75rem", padding: "4px 10px", borderRadius: "var(--radius-full)", background: "rgba(34, 197, 94, 0.1)", color: "#22C55E", fontWeight: 700, border: "1px solid rgba(34, 197, 94, 0.3)" }}>
+                Modul M5 &ndash; M8 (Proyek Kasir)
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {mods.filter((m) => m.phase === "independent").map((m, i) => (
+                <motion.div
+                  key={m.code}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  whileHover={{ x: 4 }}
+                  onClick={() => setPreviewModuleId(m.id)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewModuleId(m.id); } }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Preview modul ${m.code}: ${m.title}`}
+                  transition={{ duration: 0.25, delay: i * 0.03 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-4)",
+                    padding: "var(--space-3) var(--space-4)",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "var(--radius-lg)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: `${m.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontFamily: "var(--font-code)", fontSize: "0.9rem", fontWeight: 800, color: m.color }}>{String(m.num).padStart(2, "0")}</span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
+                      <h4 style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontWeight: 700, margin: 0 }}>{m.title}</h4>
+                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", padding: "1px 7px", borderRadius: "var(--radius-full)", whiteSpace: "nowrap" }}>
+                        {m.duration}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.45, margin: 0 }}>{m.desc}</p>
+                  </div>
+                  <ArrowRight size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </motion.section>
