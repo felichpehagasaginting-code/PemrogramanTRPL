@@ -15,7 +15,14 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+  compress: true,
   headers: async () => [
+    {
+      source: "/workers/(.*)",
+      headers: [
+        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+      ],
+    },
     {
       source: "/(.*)",
       headers: [
