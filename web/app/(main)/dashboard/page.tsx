@@ -222,98 +222,221 @@ export default function DashboardPage() {
           </div>
 
           {/* Module list heading */}
-          <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "var(--space-4)" }}>
-            Daftar Modul Matrikulasi
-          </h3>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)", flexWrap: "wrap", gap: "8px" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+              Daftar Modul Matrikulasi
+            </h3>
+            <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "4px 10px", borderRadius: "var(--radius-full)" }}>
+              2 Fase Pembelajaran Terarah
+            </span>
+          </div>
 
-          {/* Modules Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "var(--space-4)", marginBottom: "var(--space-12)" }}>
-            {MODULES_META.map((mod, index) => {
-              const prog: { status: "locked" | "active" | "completed" } = user.progress[mod.id] || { status: "locked" };
-              const isLocked = prog.status === "locked";
-              const isCompleted = prog.status === "completed";
+          {/* Group Fase 1 */}
+          <div style={{ marginBottom: "var(--space-6)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-3)", flexWrap: "wrap", gap: "6px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-primary-500)" }}></span>
+                <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Fase 1: Live Interactive Workshop (4–6 Jam)
+                </span>
+              </div>
+              <span style={{ fontSize: "0.72rem", color: "var(--color-primary-500)", fontWeight: 700 }}>
+                Dipandu Ketua &amp; Staff Divisi
+              </span>
+            </div>
 
-              return (
-                <div key={mod.id} className="fade-in">
-                  <div
-                    style={{
-                      background: "var(--bg-card)",
-                      border: isLocked
-                        ? "1px dashed var(--border-color)"
-                        : isCompleted
-                        ? "1px solid rgba(34, 197, 94, 0.25)"
-                        : "2px solid var(--color-primary-400)",
-                      borderRadius: "var(--radius-lg)",
-                      padding: "var(--space-4) var(--space-5)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      boxShadow: isLocked ? "none" : "var(--shadow-sm)",
-                      filter: isLocked ? "grayscale(100%) opacity(60%)" : "none",
-                      transition: "transform var(--transition-base), box-shadow var(--transition-base)",
-                    }}
-                    className={"module-card" + (!isLocked ? " hover-scale-card" : "")}
-                  >
-                    <div className="module-card-inner" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", minWidth: 0 }}>
-                      {/* Icon container */}
-                      <div
-                        style={{
-                          width: "46px",
-                          height: "46px",
-                          borderRadius: "var(--radius-md)",
-                          background: isLocked ? "var(--color-neutral-150)" : `${mod.color}15`,
-                          color: isLocked ? "var(--text-muted)" : mod.color,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                          border: isLocked ? "none" : `1px solid ${mod.color}35`,
-                        }}
-                      >
-                        {moduleIconMap[mod.id] || <Lightning size={22} weight="fill" />}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "var(--space-3)" }}>
+              {MODULES_META.filter((m) => m.phase === "live").map((mod) => {
+                const prog: { status: "locked" | "active" | "completed" } = user.progress[mod.id] || { status: "locked" };
+                const isLocked = prog.status === "locked";
+                const isCompleted = prog.status === "completed";
+
+                return (
+                  <div key={mod.id} className="fade-in">
+                    <div
+                      style={{
+                        background: "var(--bg-card)",
+                        border: isLocked
+                          ? "1px dashed var(--border-color)"
+                          : isCompleted
+                          ? "1px solid rgba(34, 197, 94, 0.25)"
+                          : "2px solid var(--color-primary-400)",
+                        borderRadius: "var(--radius-lg)",
+                        padding: "var(--space-4) var(--space-5)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        boxShadow: isLocked ? "none" : "var(--shadow-sm)",
+                        filter: isLocked ? "grayscale(100%) opacity(60%)" : "none",
+                        transition: "transform var(--transition-base), box-shadow var(--transition-base)",
+                      }}
+                      className={"module-card" + (!isLocked ? " hover-scale-card" : "")}
+                    >
+                      <div className="module-card-inner" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: "46px",
+                            height: "46px",
+                            borderRadius: "var(--radius-md)",
+                            background: isLocked ? "var(--color-neutral-150)" : `${mod.color}15`,
+                            color: isLocked ? "var(--text-muted)" : mod.color,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            border: isLocked ? "none" : `1px solid ${mod.color}35`,
+                          }}
+                        >
+                          {moduleIconMap[mod.id] || <Lightning size={22} weight="fill" />}
+                        </div>
+
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                            <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", color: mod.color, fontWeight: 700 }}>
+                              {mod.code}
+                            </span>
+                            <span style={{ fontSize: "0.7rem", color: "var(--color-primary-500)", background: "rgba(255, 107, 0, 0.08)", padding: "1px 6px", borderRadius: "4px", fontWeight: 600 }}>
+                              Live Sesi
+                            </span>
+                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                              ⏱ {mod.duration}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--text-primary)", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {mod.title}
+                          </h4>
+                        </div>
                       </div>
 
-                      {/* Info */}
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                          <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", color: mod.color, fontWeight: 700 }}>
-                            {mod.code}
-                          </span>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                            ⏱ {mod.duration}
-                          </span>
-                        </div>
-                        <h4 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--text-primary)", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {mod.title}
-                        </h4>
+                      <div>
+                        {isLocked ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: 600 }}>
+                            <LockKey size={16} /> Terkunci
+                          </div>
+                        ) : isCompleted ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--color-accent-green)", fontSize: "0.8rem", fontWeight: 700 }}>
+                              <CheckCircle size={16} weight="fill" /> Selesai
+                            </span>
+                            <Link href={`/learn/${mod.id}`} className="btn btn-secondary btn-sm focus-ring" aria-label={`Ulangi modul ${mod.code}`}>
+                              Ulangi
+                            </Link>
+                          </div>
+                        ) : (
+                          <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm focus-ring" aria-label={`Mulai belajar modul ${mod.code}: ${mod.title}`}>
+                            Mulai Belajar <Lightning size={14} weight="fill" />
+                          </Link>
+                        )}
                       </div>
                     </div>
-
-                    {/* Action button */}
-                    <div>
-                      {isLocked ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: 600 }}>
-                          <LockKey size={16} /> Terkunci
-                        </div>
-                      ) : isCompleted ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--color-accent-green)", fontSize: "0.8rem", fontWeight: 700 }}>
-                            <CheckCircle size={16} weight="fill" /> Selesai
-                          </span>
-                          <Link href={`/learn/${mod.id}`} className="btn btn-secondary btn-sm focus-ring" aria-label={`Ulangi modul ${mod.code}`}>
-                            Ulangi
-                          </Link>
-                        </div>
-                      ) : (
-                        <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm focus-ring" aria-label={`Mulai belajar modul ${mod.code}: ${mod.title}`}>
-                          Mulai Belajar <Lightning size={14} weight="fill" />
-                        </Link>
-                    )}
                   </div>
-                </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Group Fase 2 */}
+          <div style={{ marginBottom: "var(--space-12)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-3)", flexWrap: "wrap", gap: "6px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22C55E" }}></span>
+                <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Fase 2: Guided Independent Mastery
+                </span>
               </div>
-              );
-            })}
+              <span style={{ fontSize: "0.72rem", color: "#22C55E", fontWeight: 700 }}>
+                Mandiri di Asrama + Auto-Grader
+              </span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "var(--space-3)" }}>
+              {MODULES_META.filter((m) => m.phase === "independent").map((mod) => {
+                const prog: { status: "locked" | "active" | "completed" } = user.progress[mod.id] || { status: "locked" };
+                const isLocked = prog.status === "locked";
+                const isCompleted = prog.status === "completed";
+
+                return (
+                  <div key={mod.id} className="fade-in">
+                    <div
+                      style={{
+                        background: "var(--bg-card)",
+                        border: isLocked
+                          ? "1px dashed var(--border-color)"
+                          : isCompleted
+                          ? "1px solid rgba(34, 197, 94, 0.25)"
+                          : "2px solid var(--color-primary-400)",
+                        borderRadius: "var(--radius-lg)",
+                        padding: "var(--space-4) var(--space-5)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        boxShadow: isLocked ? "none" : "var(--shadow-sm)",
+                        filter: isLocked ? "grayscale(100%) opacity(60%)" : "none",
+                        transition: "transform var(--transition-base), box-shadow var(--transition-base)",
+                      }}
+                      className={"module-card" + (!isLocked ? " hover-scale-card" : "")}
+                    >
+                      <div className="module-card-inner" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: "46px",
+                            height: "46px",
+                            borderRadius: "var(--radius-md)",
+                            background: isLocked ? "var(--color-neutral-150)" : `${mod.color}15`,
+                            color: isLocked ? "var(--text-muted)" : mod.color,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            border: isLocked ? "none" : `1px solid ${mod.color}35`,
+                          }}
+                        >
+                          {moduleIconMap[mod.id] || <Lightning size={22} weight="fill" />}
+                        </div>
+
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                            <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", color: mod.color, fontWeight: 700 }}>
+                              {mod.code}
+                            </span>
+                            <span style={{ fontSize: "0.7rem", color: "#22C55E", background: "rgba(34, 197, 94, 0.08)", padding: "1px 6px", borderRadius: "4px", fontWeight: 600 }}>
+                              Tugas Asrama
+                            </span>
+                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                              ⏱ {mod.duration}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--text-primary)", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {mod.title}
+                          </h4>
+                        </div>
+                      </div>
+
+                      <div>
+                        {isLocked ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: 600 }}>
+                            <LockKey size={16} /> Terkunci
+                          </div>
+                        ) : isCompleted ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--color-accent-green)", fontSize: "0.8rem", fontWeight: 700 }}>
+                              <CheckCircle size={16} weight="fill" /> Selesai
+                            </span>
+                            <Link href={`/learn/${mod.id}`} className="btn btn-secondary btn-sm focus-ring" aria-label={`Ulangi modul ${mod.code}`}>
+                              Ulangi
+                            </Link>
+                          </div>
+                        ) : (
+                          <Link href={`/learn/${mod.id}`} className="btn btn-primary btn-sm focus-ring" aria-label={`Mulai belajar modul ${mod.code}: ${mod.title}`}>
+                            Mulai Belajar <Lightning size={14} weight="fill" />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
