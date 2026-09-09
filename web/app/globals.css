@@ -1373,4 +1373,51 @@ code, pre {
   }
 }
 
+/* ══════════════════════════════════════════
+   LOW-END DEVICE & PERFORMANCE OPTIMIZATIONS
+   ══════════════════════════════════════════ */
+
+/* Content visibility optimization for off-screen landing content */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* Hardware-acceleration helper */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Respect user's battery / system-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .dot-grid {
+    background-image: none !important;
+  }
+
+  .glass-shimmer::after {
+    animation: none !important;
+    display: none !important;
+  }
+
+  .rgb-text {
+    animation: none !important;
+  }
+
+  .float-card-bob,
+  .hero-float-icon {
+    animation: none !important;
+  }
+}
+
+
 
