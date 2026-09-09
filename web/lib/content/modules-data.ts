@@ -236,14 +236,25 @@ print("Terima kasih sudah jajan di Warkop TRPL!")
   },
 };
 
-export const MODULES_META = [
-  { id: "M0", code: "M0", title: "Kuis Pemetaan & Orientasi", duration: "10 mnt", icon: "Star", color: "#FF9D00" },
-  { id: "M1", code: "M1", title: "Dasar Komputer & Workspace", duration: "15 mnt", icon: "FolderOpen", color: "#FF8C42" },
-  { id: "M2", code: "M2", title: "Logika & Algoritma Naratif", duration: "10 mnt", icon: "Brain", color: "#FF6B00" },
-  { id: "M3", code: "M3", title: "Toples Variabel & Tipe Data", duration: "10 mnt", icon: "SquaresFour", color: "#06B6D4" },
-  { id: "M4", code: "M4", title: "Percabangan & Diskon", duration: "10 mnt", icon: "GitBranch", color: "#EF4444" },
-  { id: "M5", code: "M5", title: "Perulangan Tanpa Pusing", duration: "10 mnt", icon: "ArrowsClockwise", color: "#22C55E" },
-  { id: "M6", code: "M6", title: "Resep Fungsi & Dapur Kode", duration: "10 mnt", icon: "Function", color: "#D45900" },
-  { id: "M7", code: "M7", title: "Rak Menu & List Data", duration: "10 mnt", icon: "ListNumbers", color: "#FF8C42" },
-  { id: "M8", code: "M8", title: "Mini Project Kasir Warkop", duration: "15 mnt", icon: "Rocket", color: "#FF6B00" },
+export interface ModuleMetaItem {
+  id: string;
+  code: string;
+  title: string;
+  duration: string;
+  icon: string;
+  color: string;
+  phase: "live" | "independent";
+  phaseLabel: string;
+}
+
+export const MODULES_META: ModuleMetaItem[] = [
+  { id: "M0", code: "M0", title: "Kuis Pemetaan & Orientasi", duration: "10 mnt", icon: "Star", color: "#FF9D00", phase: "live", phaseLabel: "Fase 1: Live Workshop" },
+  { id: "M1", code: "M1", title: "Dasar Komputer & Workspace", duration: "15 mnt", icon: "FolderOpen", color: "#FF8C42", phase: "live", phaseLabel: "Fase 1: Live Workshop" },
+  { id: "M2", code: "M2", title: "Logika & Algoritma Naratif", duration: "10 mnt", icon: "Brain", color: "#FF6B00", phase: "live", phaseLabel: "Fase 1: Live Workshop" },
+  { id: "M3", code: "M3", title: "Toples Variabel & Tipe Data", duration: "10 mnt", icon: "SquaresFour", color: "#06B6D4", phase: "live", phaseLabel: "Fase 1: Live Workshop" },
+  { id: "M4", code: "M4", title: "Percabangan & Diskon", duration: "10 mnt", icon: "GitBranch", color: "#EF4444", phase: "live", phaseLabel: "Fase 1: Live Workshop" },
+  { id: "M5", code: "M5", title: "Perulangan Tanpa Pusing", duration: "10 mnt", icon: "ArrowsClockwise", color: "#22C55E", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
+  { id: "M6", code: "M6", title: "Resep Fungsi & Dapur Kode", duration: "10 mnt", icon: "Function", color: "#D45900", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
+  { id: "M7", code: "M7", title: "Rak Menu & List Data", duration: "10 mnt", icon: "ListNumbers", color: "#FF8C42", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
+  { id: "M8", code: "M8", title: "Mini Project Kasir Warkop", duration: "15 mnt", icon: "Rocket", color: "#FF6B00", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
 ];
