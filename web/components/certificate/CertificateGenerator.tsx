@@ -143,10 +143,18 @@ export function CertificateGenerator({
             gap: "20px",
           }}
         >
-          <div>
-            <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "#F8FAFC" }}>Divisi Pemrograman HIMA TRPL</div>
-            <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Koordinator Kurikulum & Dosen Pembina</div>
-            <div style={{ fontSize: "0.7rem", color: "#64748B", marginTop: "4px" }}>Tanggal: {completionDate}</div>
+          {/* Signatures */}
+          <div style={{ display: "flex", gap: "32px", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "#F8FAFC" }}>Ketua Divisi Pemrograman</div>
+              <div style={{ fontSize: "0.75rem", color: "#F59E0B" }}>Lead Instructor Matrikulasi 2026</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748B", marginTop: "4px" }}>Divisi Pemrograman TRPL</div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "#F8FAFC" }}>Ketua Program Studi TRPL</div>
+              <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Dosen Pembina Kemahasiswaan</div>
+              <div style={{ fontSize: "0.7rem", color: "#64748B", marginTop: "4px" }}>Tanggal: {completionDate}</div>
+            </div>
           </div>
 
           {/* QR Code Digital Seal */}
