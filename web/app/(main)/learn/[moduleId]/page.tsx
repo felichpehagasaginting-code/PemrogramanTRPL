@@ -322,26 +322,65 @@ export default function LearnModulePage() {
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "14px" }}>
-                Sebelum mulai, lihat dulu gambaran besar perjalanan belajarmu. Ada <strong>9 modul</strong> yang akan kamu lalui secara berurutan, dari fondasi paling dasar hingga ke project nyata:
+                Perjalanan matrikulasimu dirancang menjadi <strong>Dua Fase Terarah</strong> agar belajarmu santai, terarah, dan tidak bikin pusing:
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                {[
-                  { kode: "M0", nama: "Kuis Pemetaan & Orientasi", warna: "#FF9D00", aktif: true },
-                  { kode: "M1", nama: "Dasar Komputer & Workspace", warna: "#FF8C42" },
-                  { kode: "M2", nama: "Logika & Algoritma Naratif", warna: "#FF6B00" },
-                  { kode: "M3", nama: "Toples Variabel & Tipe Data", warna: "#06B6D4" },
-                  { kode: "M4", nama: "Percabangan & Keputusan Diskon", warna: "#EF4444" },
-                  { kode: "M5", nama: "Perulangan Loop Tanpa Pusing", warna: "#22C55E" },
-                  { kode: "M6", nama: "Resep Fungsi & Dapur Kode", warna: "#D45900" },
-                  { kode: "M7", nama: "Rak Menu & List Data", warna: "#FF8C42" },
-                  { kode: "M8", nama: "Mini Project Kasir Warkop", warna: "#FF6B00" },
-                ].map((m) => (
-                  <div key={m.kode} style={{ display: "flex", alignItems: "center", gap: "12px", background: m.aktif ? `${m.warna}12` : "var(--bg-page-alt)", border: m.aktif ? `1.5px solid ${m.warna}` : "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "8px 14px" }}>
-                    <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", fontWeight: 800, color: m.warna, width: "28px", flexShrink: 0 }}>{m.kode}</span>
-                    <span style={{ fontSize: "0.875rem", fontWeight: m.aktif ? 700 : 500, color: m.aktif ? "var(--text-primary)" : "var(--text-secondary)" }}>{m.nama}</span>
-                    {m.aktif && <span style={{ marginLeft: "auto", fontSize: "0.7rem", background: m.warna, color: "white", padding: "2px 8px", borderRadius: "var(--radius-full)", fontWeight: 700, flexShrink: 0 }}>KAMU DI SINI</span>}
-                  </div>
-                ))}
+
+              {/* Fase 1 Card Box */}
+              <div style={{ background: "rgba(255, 107, 0, 0.06)", border: "1.5px solid rgba(255, 107, 0, 0.3)", borderRadius: "var(--radius-lg)", padding: "12px 14px", marginBottom: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
+                  <strong style={{ fontSize: "0.85rem", color: "var(--color-primary-500)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    🔴 FASE 1: LIVE WORKSHOP (4–6 JAM)
+                  </strong>
+                  <span style={{ fontSize: "0.72rem", background: "var(--color-primary-500)", color: "white", padding: "2px 8px", borderRadius: "var(--radius-full)", fontWeight: 700 }}>
+                    Sesi Tatap Muka
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: "0 0 8px 0", lineHeight: 1.5 }}>
+                  Dipandu langsung oleh <strong>Ketua Divisi Pemrograman</strong> dan <strong>Staff Divisi Pemrograman</strong> untuk membedah fondasi logika &amp; coding pertama:
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    { kode: "M0", nama: "Kuis Pemetaan & Orientasi", warna: "#FF9D00", aktif: true },
+                    { kode: "M1", nama: "Dasar Komputer & Workspace", warna: "#FF8C42" },
+                    { kode: "M2", nama: "Logika & Algoritma Naratif", warna: "#FF6B00" },
+                    { kode: "M3", nama: "Toples Variabel & Tipe Data", warna: "#06B6D4" },
+                    { kode: "M4", nama: "Percabangan & Keputusan Diskon", warna: "#EF4444" },
+                  ].map((m) => (
+                    <div key={m.kode} style={{ display: "flex", alignItems: "center", gap: "10px", background: m.aktif ? `${m.warna}15` : "var(--bg-card)", border: m.aktif ? `1.5px solid ${m.warna}` : "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "6px 12px" }}>
+                      <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", fontWeight: 800, color: m.warna, width: "26px", flexShrink: 0 }}>{m.kode}</span>
+                      <span style={{ fontSize: "0.82rem", fontWeight: m.aktif ? 700 : 500, color: m.aktif ? "var(--text-primary)" : "var(--text-secondary)" }}>{m.nama}</span>
+                      {m.aktif && <span style={{ marginLeft: "auto", fontSize: "0.68rem", background: m.warna, color: "white", padding: "1px 7px", borderRadius: "var(--radius-full)", fontWeight: 700, flexShrink: 0 }}>KAMU DI SINI</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fase 2 Card Box */}
+              <div style={{ background: "rgba(34, 197, 94, 0.05)", border: "1.5px dashed rgba(34, 197, 94, 0.35)", borderRadius: "var(--radius-lg)", padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
+                  <strong style={{ fontSize: "0.85rem", color: "var(--color-accent-green, #22C55E)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    🟢 FASE 2: GUIDED INDEPENDENT MASTERY
+                  </strong>
+                  <span style={{ fontSize: "0.72rem", background: "#22C55E", color: "white", padding: "2px 8px", borderRadius: "var(--radius-full)", fontWeight: 700 }}>
+                    Belajar Mandiri di Asrama / Rumah
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: "0 0 8px 0", lineHeight: 1.5 }}>
+                  Dilanjutkan santai mandiri didukung Auto-Grader &amp; tombol <strong>&ldquo;Minta Bantuan&rdquo;</strong> (Snapshot link ke senior mentor):
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    { kode: "M5", nama: "Perulangan Loop Tanpa Pusing", warna: "#22C55E" },
+                    { kode: "M6", nama: "Resep Fungsi & Dapur Kode", warna: "#D45900" },
+                    { kode: "M7", nama: "Rak Menu & List Data", warna: "#FF8C42" },
+                    { kode: "M8", nama: "Mini Project Kasir Warkop TRPL", warna: "#FF6B00" },
+                  ].map((m) => (
+                    <div key={m.kode} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "6px 12px" }}>
+                      <span style={{ fontFamily: "var(--font-code)", fontSize: "0.75rem", fontWeight: 800, color: m.warna, width: "26px", flexShrink: 0 }}>{m.kode}</span>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 500, color: "var(--text-secondary)" }}>{m.nama}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           ),
