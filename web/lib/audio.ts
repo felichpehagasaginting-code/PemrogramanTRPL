@@ -3,6 +3,7 @@
 class SoundFXManager {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
+  private idleTimer: any = null;
 
   private initCtx() {
     if (typeof window === "undefined") return;
@@ -13,6 +14,17 @@ class SoundFXManager {
     if (this.ctx && this.ctx.state === "suspended") {
       this.ctx.resume();
     }
+    this.resetIdleTimer();
+  }
+
+  // Release audio hardware resources when idle for 15s (essential for battery/low-end devices)
+  private resetIdleTimer() {
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    this.idleTimer = setTimeout(() => {
+      if (this.ctx && this.ctx.state === "running") {
+        this.ctx.suspend().catch(() => {});
+      }
+    }, 15000);
   }
 
   public toggleMute() {

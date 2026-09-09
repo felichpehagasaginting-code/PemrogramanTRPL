@@ -212,6 +212,11 @@ export function CodeEditor({
           language={language}
           theme={selectedTheme}
           value={code}
+          loading={
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--bg-card)" }}>
+              ⚡ Memuat editor kode...
+            </div>
+          }
           beforeMount={handleEditorWillMount}
           onChange={handleEditorChange}
           options={{
@@ -222,6 +227,12 @@ export function CodeEditor({
             lineNumbers: "on",
             scrollBeyondLastLine: false,
             padding: { top: 12 },
+            cursorBlinking: "solid",
+            cursorSmoothCaretAnimation: "off",
+            smoothScrolling: false,
+            renderValidationDecorations: "editable",
+            renderLineHighlight: "line",
+            contextmenu: false,
           }}
         />
       </div>

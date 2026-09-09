@@ -58,14 +58,18 @@ export function PowerShellTerminal({ code, onExplainedError, virtualFiles }: Pow
     try {
       const res = await runPythonCodeClient(code, inputsToPass, 7000, virtualFiles);
 
-      setHistory((prev) => [
-        ...prev,
-        ...res.output.map((line, i) => ({
-          id: `out-${Date.now()}-${i}`,
-          text: line,
-          type: res.error ? ("error" as const) : ("output" as const),
-        })),
-      ]);
+      setHistory((prev) => {
+        const next = [
+          ...prev,
+          ...res.output.map((line, i) => ({
+            id: `out-${Date.now()}-${i}`,
+            text: line,
+            type: res.error ? ("error" as const) : ("output" as const),
+          })),
+        ];
+        // Memory leak safeguard: Keep only the most recent 250 lines on low-end devices
+        return next.length > 250 ? next.slice(next.length - 250) : next;
+      });
 
       if (res.error && onExplainedError) {
         onExplainedError(explainPythonError(res.error));
