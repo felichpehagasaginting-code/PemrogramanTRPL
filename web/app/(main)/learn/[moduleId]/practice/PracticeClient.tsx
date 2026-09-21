@@ -28,6 +28,7 @@ import { VisualDebugger } from "@/components/editor/VisualDebugger";
 import { MemoryGraph } from "@/components/editor/MemoryGraph";
 import { FlowchartBuilder } from "@/components/editor/FlowchartBuilder";
 import { TddTestBuilder } from "@/components/editor/TddTestBuilder";
+import { SkeletonEditor } from "@/components/ui/Skeleton";
 import { AskHelpModal } from "@/components/learning/AskHelpModal";
 import { ScaffoldedHintDrawer } from "@/components/learning/ScaffoldedHintDrawer";
 import { explainPythonError, generateHint, ExplainedError } from "@/lib/ai/errorExplainer";
@@ -220,7 +221,7 @@ print("Total Bayar:", int(total_bayar))
 export default function PracticeClient() {
   const router = useRouter();
   const { moduleId } = useParams();
-  const { user, completeSubModule, completeModule } = useUserStore();
+  const { user, isUserReady, completeSubModule, completeModule } = useUserStore();
 
   const [quizComplete, setQuizComplete] = useState(false);
   const [code, setCode] = useState("");
@@ -271,42 +272,6 @@ export default function PracticeClient() {
       recorderRef.current = new KeystrokeRecorder(moduleId as string, user?.uid || "maba-user");
     }
   }, [moduleId, user?.uid]);
-
-  // Keyboard Shortcuts Listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
-      if (isCtrlOrCmd && e.key === "Enter") {
-        e.preventDefault();
-        runCode();
-      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "S" || e.key === "s")) {
-        e.preventDefault();
-        handleRunAutoGrader();
-      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "H" || e.key === "h")) {
-        e.preventDefault();
-        handleShowHint();
-      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "B" || e.key === "b")) {
-        e.preventDefault();
-        setAskHelpOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [code, isRunning]);
-
-  if (!user) return <LoadingSpinner text="Memuat latihan..." fullPage />;
-
-  if (!content) {
-    return (
-      <div className="section-container" style={{ textAlign: "center", paddingTop: "var(--space-8)" }}>
-        <p style={{ color: "var(--text-secondary)" }}>Latihan untuk modul ini belum tersedia.</p>
-        <button onClick={() => router.push(`/learn/${moduleId}`)} className="btn btn-primary" style={{ marginTop: "var(--space-4)" }}>
-          Kembali ke Materi
-        </button>
-      </div>
-    );
-  }
 
   function extractPrompts(codeStr: string): string[] {
     const results: string[] = [];
@@ -400,7 +365,7 @@ export default function PracticeClient() {
     setActiveTab("grader");
     setGradingResult(null);
 
-    if (!content.testCases) {
+    if (!content?.testCases) {
       // Fallback simple execution
       await runCode();
       setIsRunning(false);
@@ -425,7 +390,7 @@ export default function PracticeClient() {
   };
 
   const handleShowHint = () => {
-    const hint = generateHint(code, content.description);
+    const hint = generateHint(code, content?.description || "");
     setAiHint(hint);
   };
 
@@ -444,6 +409,44 @@ export default function PracticeClient() {
       router.push(`/learn/${moduleId}`);
     }, 1500);
   };
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && e.key === "Enter") {
+        e.preventDefault();
+        runCode();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "S" || e.key === "s")) {
+        e.preventDefault();
+        handleRunAutoGrader();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "H" || e.key === "h")) {
+        e.preventDefault();
+        handleShowHint();
+      } else if (isCtrlOrCmd && e.shiftKey && (e.key === "B" || e.key === "b")) {
+        e.preventDefault();
+        setAskHelpOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [code, isRunning]);
+
+  if (!user || !isUserReady) {
+    return <SkeletonEditor />;
+  }
+
+  if (!content) {
+    return (
+      <div className="section-container" style={{ textAlign: "center", paddingTop: "var(--space-8)" }}>
+        <p style={{ color: "var(--text-secondary)" }}>Latihan untuk modul ini belum tersedia.</p>
+        <button onClick={() => router.push(`/learn/${moduleId}`)} className="btn btn-primary" style={{ marginTop: "var(--space-4)" }}>
+          Kembali ke Materi
+        </button>
+      </div>
+    );
+  }
 
   if (quizComplete) {
     return (
