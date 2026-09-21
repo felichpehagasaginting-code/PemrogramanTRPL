@@ -576,7 +576,7 @@ const features = [
   },
   {
     icon: <GameController size={24} weight="duotone" />, title: "Gamifikasi & Quest Seru",
-    desc: "Kumpulkan XP, unlock 13 badge prestasi eksklusif, kuis interaktif, dan bersaing sehat di leaderboard satu angkatan.",
+    desc: "Kumpulkan XP, unlock 13 badge prestasi eksklusif, kuis interaktif, dan bersaing sehat di papan peringkat satu angkatan.",
     color: "var(--color-secondary-500)", gradient: "linear-gradient(135deg, rgba(126,87,194,0.06), transparent)",
   },
   {
@@ -953,7 +953,7 @@ export function GamificationSection() {
             Belajar itu kayak <span className="gradient-text">main game. Serius.</span>
           </h2>
           <p style={{ color: "var(--text-secondary)", maxWidth: "520px", margin: "var(--space-3) auto 0", fontSize: "0.95rem", lineHeight: 1.7 }}>
-            Setiap modul selesai = poin XP bertambah, badge unlock, level naik. Tersedia leaderboard kelas untuk pacu semangat bersama.
+            Setiap modul selesai = poin XP bertambah, badge unlock, level naik. Tersedia papan peringkat kelas untuk pacu semangat bersama.
           </p>
         </motion.div>
 
