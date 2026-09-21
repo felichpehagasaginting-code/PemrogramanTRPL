@@ -46,7 +46,7 @@ export function VisualDebugger({ code, onSelectLine }: VisualDebuggerProps) {
         const [, varName, rawVal] = assignMatch;
         const valTrimmed = rawVal.trim();
         let varType = "str";
-        let varVal = valTrimmed;
+        const varVal = valTrimmed;
 
         if (/^\d+$/.test(valTrimmed)) {
           varType = "int";
