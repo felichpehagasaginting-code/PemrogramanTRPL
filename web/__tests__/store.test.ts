@@ -92,4 +92,17 @@ describe("useUserStore", () => {
     const { user } = useUserStore.getState();
     expect(user?.badges).toContain("workspace_master");
   });
+
+  it("should set isUserReady on login and isLeaderboardReady on fetchLeaderboard", async () => {
+    useUserStore.setState({ isUserReady: false, isLeaderboardReady: false });
+    expect(useUserStore.getState().isUserReady).toBe(false);
+
+    const { login, fetchLeaderboard } = useUserStore.getState();
+    await login("Maba Test", "maba@test.com");
+    expect(useUserStore.getState().isUserReady).toBe(true);
+
+    await fetchLeaderboard();
+    expect(useUserStore.getState().isLeaderboardReady).toBe(true);
+  });
 });
+
