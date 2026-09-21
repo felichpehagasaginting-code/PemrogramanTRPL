@@ -1,20 +1,18 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   SealCheck,
-  DownloadSimple,
   Printer,
-  ShareNetwork,
   LinkedinLogo,
-  CheckCircle,
-  Sparkle,
+  ShareNetwork,
 } from "@phosphor-icons/react";
+import { QRCodeSVG } from "./QRCodeSVG";
 
 interface CertificateGeneratorProps {
   studentName: string;
   completionDate?: string;
-  totalXP: number;
+  totalXP?: number;
   certNumber?: string;
 }
 
@@ -25,6 +23,13 @@ export function CertificateGenerator({
   certNumber = "TRPL-2026-MATRIK-0828",
 }: CertificateGeneratorProps) {
   const certRef = useRef<HTMLDivElement | null>(null);
+  const [verifyUrl, setVerifyUrl] = useState(`https://pemrograman-trpl-2026.web.app/verify/${certNumber}`);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setVerifyUrl(`${window.location.origin}/verify/${certNumber}`);
+    }
+  }, [certNumber]);
 
   const handlePrint = () => {
     window.print();
@@ -32,7 +37,7 @@ export function CertificateGenerator({
 
   const handleShareLinkedIn = () => {
     const shareText = encodeURIComponent(
-      `Saya baru saja menyelesaikan Matrikulasi Pemrograman TRPL 2026 dengan perolehan ${totalXP} XP! Siap melangkah menjadi software engineer tangguh! 🚀`
+      `Saya resmi menyelesaikan Matrikulasi Pemrograman TRPL 2026 dengan perolehan ${totalXP} XP! Verifikasi: ${verifyUrl} 🚀`
     );
     window.open(
       `https://www.linkedin.com/feed/?shareActive=true&text=${shareText}`,
@@ -42,13 +47,46 @@ export function CertificateGenerator({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px", alignItems: "center" }}>
+      {/* Print styles */}
+      <style>{`
+        @page {
+          size: landscape;
+          margin: 0;
+        }
+        @media print {
+          html, body {
+            background: #030712 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          body * {
+            visibility: hidden !important;
+          }
+          #certificate-print-area, #certificate-print-area * {
+            visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          #certificate-print-area {
+            position: fixed !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 95vw !important;
+            max-width: 1000px !important;
+            border: 4px solid #F59E0B !important;
+            box-shadow: none !important;
+          }
+        }
+      `}</style>
+
       {/* Printable Certificate Frame */}
       <div
         ref={certRef}
         id="certificate-print-area"
         style={{
           width: "100%",
-          maxWidth: "840px",
+          maxWidth: "860px",
           background: "linear-gradient(135deg, #0B0F19 0%, #030712 100%)",
           border: "4px solid #F59E0B",
           borderRadius: "16px",
@@ -64,8 +102,8 @@ export function CertificateGenerator({
         <div
           style={{
             position: "absolute",
-            inset: "10px",
-            border: "1px dashed rgba(245, 158, 11, 0.4)",
+            inset: "12px",
+            border: "1px dashed rgba(245, 158, 11, 0.35)",
             borderRadius: "12px",
             pointerEvents: "none",
           }}
@@ -89,7 +127,7 @@ export function CertificateGenerator({
         {/* Title */}
         <div style={{ textAlign: "center", margin: "20px 0" }}>
           <span style={{ textTransform: "uppercase", fontSize: "0.85rem", letterSpacing: "3px", color: "#94A3B8", fontWeight: 600 }}>
-            Sertifikat Kelulusan & Kompetensi
+            Sertifikat Kelulusan &amp; Kompetensi
           </span>
           <h1
             style={{
@@ -130,7 +168,7 @@ export function CertificateGenerator({
           </span>
         </div>
 
-        {/* Signatures & QR Code */}
+        {/* Signatures & Dynamic QR Code */}
         <div
           style={{
             display: "flex",
@@ -157,13 +195,13 @@ export function CertificateGenerator({
             </div>
           </div>
 
-          {/* QR Code Digital Seal */}
+          {/* Dynamic Vector QR Code Digital Seal */}
           <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div
               style={{
-                width: "72px",
-                height: "72px",
-                background: "#FFF",
+                width: "82px",
+                height: "82px",
+                background: "#FFFFFF",
                 padding: "6px",
                 borderRadius: "8px",
                 boxShadow: "0 0 15px rgba(245, 158, 11, 0.4)",
@@ -172,15 +210,24 @@ export function CertificateGenerator({
                 justifyContent: "center",
               }}
             >
-              {/* SVG QR Code Simulation */}
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" fill="white" />
-                <path fill="#000" d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v4h-4v-4zm-4 4h4v4h-4v-4zm4-4h4v4h-4v-4z" />
-              </svg>
+              <QRCodeSVG value={verifyUrl} size={70} />
             </div>
-            <span style={{ fontSize: "0.68rem", color: "#F59E0B", fontWeight: 700, marginTop: "6px", fontFamily: "monospace" }}>
+            <a
+              href={verifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: "0.68rem",
+                color: "#F59E0B",
+                fontWeight: 700,
+                marginTop: "6px",
+                fontFamily: "monospace",
+                textDecoration: "none",
+              }}
+              title="Klik untuk verifikasi sertifikat"
+            >
               {certNumber}
-            </span>
+            </a>
           </div>
         </div>
       </div>
@@ -188,7 +235,7 @@ export function CertificateGenerator({
       {/* Action Controls */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <button onClick={handlePrint} className="btn btn-primary" style={{ gap: "8px" }}>
-          <Printer size={18} /> Cetak / Simpan PDF
+          <Printer size={18} weight="bold" /> Cetak / Simpan PDF
         </button>
         <button onClick={handleShareLinkedIn} className="btn btn-secondary" style={{ gap: "8px", color: "#38BDF8" }}>
           <LinkedinLogo size={18} weight="fill" /> Bagikan ke LinkedIn
