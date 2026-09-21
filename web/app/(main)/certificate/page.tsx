@@ -23,7 +23,7 @@ export default function CertificatePage() {
       {/* Header Bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <Link href="/dashboard" className="btn btn-secondary" style={{ gap: "6px" }}>
-          <ArrowLeft size={16} /> Kembali ke Dashboard
+          <ArrowLeft size={16} /> Kembali ke Dasbor
         </Link>
         <span className="badge badge-primary" style={{ gap: "6px" }}>
           <Trophy size={14} weight="fill" />
