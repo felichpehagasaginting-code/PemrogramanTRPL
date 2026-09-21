@@ -121,7 +121,7 @@ export default function PracticePage() {
           </div>
 
           <button onClick={() => router.push("/dashboard")} className="btn btn-primary w-full">
-            Kembali ke Dashboard
+            Kembali ke Dasbor
           </button>
         </div>
       </div>
