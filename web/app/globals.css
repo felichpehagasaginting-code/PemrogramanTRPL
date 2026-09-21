@@ -47,6 +47,7 @@
   --color-accent-red:    #EF4444;
 
   /* === Backwards-compat aliases (deprecated → migrate to tokens) === */
+  --primary:              var(--color-primary-500);
   --primary-color:        var(--color-primary-500);
   --primary-color-600:    var(--color-primary-600);
   --primary-color-700:    var(--color-primary-700);
@@ -56,6 +57,10 @@
   --bg-page-strong:       var(--bg-page-alt);
   --gradient-primary:     var(--gradient-hero);
   --color-neutral-500:    var(--color-neutral-400);
+
+  /* === Skeleton Tokens === */
+  --skeleton-base:        rgba(0, 0, 0, 0.07);
+  --skeleton-shimmer:     rgba(0, 0, 0, 0.14);
 }
 
 /* Dark-mode aliases auto-follow because the themed values are set on
@@ -65,6 +70,7 @@
 [data-theme="blue"].dark, html.dark[data-theme="blue"],
 [data-theme="emerald"].dark, html.dark[data-theme="emerald"],
 .dark {
+  --primary:              var(--color-primary-500);
   --primary-color:        var(--color-primary-500);
   --primary-color-600:    var(--color-primary-400);
   --primary-color-700:    var(--color-primary-300);
@@ -73,6 +79,8 @@
   --bg-secondary:         var(--bg-card);
   --bg-page-strong:       var(--bg-page-alt);
   --gradient-primary:     var(--gradient-hero);
+  --skeleton-base:        rgba(255, 255, 255, 0.06);
+  --skeleton-shimmer:     rgba(255, 255, 255, 0.15);
 }
 
 /* ══════════════════════════════════════════
