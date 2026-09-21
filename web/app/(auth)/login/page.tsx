@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { isMockFirebase } from "@/lib/firebase";
 import { Code, GoogleLogo, User, ShieldCheck } from "@phosphor-icons/react";
@@ -9,6 +10,7 @@ import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { LOGIN_FEATURES } from "@/lib/features";
 import { SESSION_EXPIRED_KEY } from "@/lib/auth/useSessionTimeout";
 import { DosenPinDialpadModal } from "@/components/auth/DosenPinDialpadModal";
+import gsap from "gsap";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +24,86 @@ export default function LoginPage() {
   const [sessionExpiredNotice, setSessionExpiredNotice] = useState(false);
   const [dosenModalOpen, setDosenModalOpen] = useState(false);
 
+  // GSAP animation refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const glow1Ref = useRef<HTMLDivElement>(null);
+  const glow2Ref = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  // Initial Entrance Animation with GSAP
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Floating glowing dots
+      if (glow1Ref.current) {
+        gsap.to(glow1Ref.current, {
+          x: 24,
+          y: 18,
+          scale: 1.1,
+          duration: 5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
+      if (glow2Ref.current) {
+        gsap.to(glow2Ref.current, {
+          x: -20,
+          y: -20,
+          scale: 1.15,
+          duration: 6,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
+
+      // Card pop-in & content stagger
+      if (cardRef.current) {
+        const tl = gsap.timeline();
+        tl.fromTo(
+          cardRef.current,
+          { opacity: 0, y: 30, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" }
+        );
+
+        if (logoRef.current) {
+          tl.fromTo(
+            logoRef.current,
+            { scale: 0, rotate: -15 },
+            { scale: 1, rotate: 0, duration: 0.45, ease: "back.out(1.8)" },
+            "-=0.3"
+          );
+        }
+
+        const items = cardRef.current.querySelectorAll(".login-anim-item");
+        if (items.length > 0) {
+          tl.fromTo(
+            items,
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.35, stagger: 0.06, ease: "power2.out" },
+            "-=0.2"
+          );
+        }
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Animate error shake with GSAP
+  useEffect(() => {
+    if (error && errorRef.current) {
+      gsap.fromTo(
+        errorRef.current,
+        { x: 0 },
+        { x: 8, duration: 0.08, repeat: 5, yoyo: true, ease: "power1.inOut" }
+      );
+    }
+  }, [error]);
+
+  // Handle session expired notice
   useEffect(() => {
     try {
       const expiredFromStorage = sessionStorage.getItem(SESSION_EXPIRED_KEY);
@@ -32,18 +114,37 @@ export default function LoginPage() {
     } catch {}
   }, []);
 
+  const handleSuccessNavigation = (targetPath: string) => {
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        opacity: 0,
+        y: -16,
+        scale: 0.98,
+        duration: 0.35,
+        ease: "power2.in",
+        onComplete: () => router.push(targetPath),
+      });
+    } else {
+      router.push(targetPath);
+    }
+  };
+
+  // Handle redirect result
   useEffect(() => {
     handleRedirectResult().then((signedIn) => {
-      if (signedIn) router.push("/dashboard");
+      if (signedIn) {
+        handleSuccessNavigation("/dashboard");
+      }
       setCheckingRedirect(false);
     }).catch(() => setCheckingRedirect(false));
-  }, [handleRedirectResult, router]);
+  }, [handleRedirectResult]);
 
+  // Handle existing user redirect
   useEffect(() => {
     if (user && !checkingRedirect) {
-      router.push("/dashboard");
+      handleSuccessNavigation("/dashboard");
     }
-  }, [user, checkingRedirect, router]);
+  }, [user, checkingRedirect]);
 
   const handleSSOLogin = async () => {
     setLoading(true);
@@ -67,6 +168,7 @@ export default function LoginPage() {
 
   return (
     <main
+      ref={containerRef}
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -79,30 +181,32 @@ export default function LoginPage() {
       }}
     >
       <div
+        ref={glow1Ref}
         className="glow-dot"
         style={{
           width: "400px",
           height: "400px",
           top: "-100px",
           left: "-100px",
-          background: "rgba(255, 107, 0, 0.08)",
+          background: "rgba(255, 107, 0, 0.09)",
           filter: "blur(60px)",
         }}
       />
       <div
+        ref={glow2Ref}
         className="glow-dot"
         style={{
-          width: "300px",
-          height: "300px",
+          width: "320px",
+          height: "320px",
           bottom: "-50px",
           right: "-50px",
-          background: "rgba(255, 157, 0, 0.06)",
+          background: "rgba(255, 157, 0, 0.07)",
           filter: "blur(50px)",
         }}
       />
 
       <div
-        className="fade-in"
+        ref={cardRef}
         style={{
           width: "100%",
           maxWidth: "420px",
@@ -115,11 +219,15 @@ export default function LoginPage() {
           zIndex: 1,
         }}
       >
-        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "var(--text-muted)", fontSize: "0.8rem", textDecoration: "none", marginBottom: "var(--space-3)", fontFamily: "inherit" }}>
-          &#8592; Beranda
-        </a>
+        <div className="login-anim-item">
+          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "var(--text-muted)", fontSize: "0.8rem", textDecoration: "none", marginBottom: "var(--space-3)", fontFamily: "inherit" }}>
+            &#8592; Beranda
+          </Link>
+        </div>
+
         <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
           <div
+            ref={logoRef}
             style={{
               width: "48px",
               height: "48px",
@@ -134,10 +242,10 @@ export default function LoginPage() {
           >
             <Code size={24} color="white" weight="bold" />
           </div>
-          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)" }}>
+          <h2 className="login-anim-item" style={{ fontFamily: "var(--font-heading)", fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)" }}>
             Masuk Platform
           </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginTop: "4px" }}>
+          <p className="login-anim-item" style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginTop: "4px" }}>
             Belajar Coding Interaktif Mahasiswa TRPL 2026
           </p>
         </div>
@@ -172,6 +280,7 @@ export default function LoginPage() {
 
         {error && (
           <div
+            ref={errorRef}
             role="alert"
             aria-live="assertive"
             style={{
@@ -194,7 +303,7 @@ export default function LoginPage() {
           <button
             onClick={handleSSOLogin}
             disabled={loading || checkingRedirect}
-            className="login-btn focus-ring"
+            className="login-btn focus-ring login-anim-item"
             aria-label={loading ? "Memproses login..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Google"}
             style={{
               width: "100%",
@@ -210,14 +319,15 @@ export default function LoginPage() {
               justifyContent: "center",
               gap: "10px",
               cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.6 : 1,
+              opacity: loading ? 0.7 : 1,
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
             }}
           >
             <GoogleLogo size={20} weight="bold" color="var(--color-primary-500)" />
-            {loading ? "Memproses..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Akun Google"}
+            {loading ? "Memproses Otentikasi..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Akun Google"}
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "4px 0", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+          <div className="login-anim-item" style={{ display: "flex", alignItems: "center", gap: "8px", margin: "4px 0", color: "var(--text-muted)", fontSize: "0.75rem" }}>
             <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
             <span>ATAU</span>
             <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
@@ -226,7 +336,7 @@ export default function LoginPage() {
           <button
             onClick={handleGuestLogin}
             disabled={loading || checkingRedirect}
-            className="focus-ring"
+            className="focus-ring login-anim-item"
             aria-label="Masuk langsung mode tamu / demo"
             style={{
               width: "100%",
@@ -242,6 +352,7 @@ export default function LoginPage() {
               justifyContent: "center",
               gap: "8px",
               cursor: "pointer",
+              transition: "transform 0.15s ease",
             }}
           >
             <User size={18} aria-hidden="true" color="var(--color-primary-500)" /> Masuk Cepat (Mode Tamu / Maba)
@@ -249,7 +360,7 @@ export default function LoginPage() {
 
           <button
             onClick={() => setDosenModalOpen(true)}
-            className="focus-ring"
+            className="focus-ring login-anim-item"
             aria-label="Masuk sebagai dosen penguji"
             style={{
               width: "100%",
@@ -266,6 +377,7 @@ export default function LoginPage() {
               gap: "8px",
               cursor: "pointer",
               marginTop: "4px",
+              transition: "transform 0.15s ease",
             }}
           >
             <ShieldCheck size={18} color="#A855F7" weight="fill" />
@@ -281,3 +393,4 @@ export default function LoginPage() {
     </main>
   );
 }
+
