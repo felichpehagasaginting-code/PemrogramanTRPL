@@ -27,7 +27,7 @@ interface QuestionData {
 export default function QuizPage() {
   const router = useRouter();
   const { moduleId } = useParams();
-  const { user, completeModule, addXP, unlockBadge } = useUserStore();
+  const { user, completeModule, completeSubModule, addXP, unlockBadge } = useUserStore();
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const gameApi = useGameStore.getState();
@@ -806,12 +806,18 @@ export default function QuizPage() {
       const meme = getRandomMemes(moduleId as string, 1)[0];
       if (meme) gameApi.triggerMeme(meme.emoji, meme.caption);
 
+      const xpGained = score * 10;
+      if (xpGained > 0) {
+        addXP(xpGained);
+      }
+
       const passRate = (score / questions.length) * 100;
       if (passRate >= 60) {
         // Confetti splash
         fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
-        // Save module completion
+        // Save submodule and module completion
+        completeSubModule(moduleId as string, `quiz-${moduleId}`);
         completeModule(moduleId as string);
 
         // If they got 100%, unlock perfectionist badge
@@ -1023,6 +1029,10 @@ export default function QuizPage() {
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "8px", marginBottom: "var(--space-6)" }}>
                 Kamu menyelesaikan kuis dengan skor <strong>{Math.round((score / questions.length) * 100)}%</strong> ({score} dari {questions.length} benar).
               </p>
+
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "var(--radius-full)", padding: "6px 16px", color: "#15803D", fontWeight: 700, fontSize: "0.85rem", marginBottom: "var(--space-6)" }}>
+                ⚡ +{score * 10} XP Kuis & +15 XP Modul berhasil ditambahkan!
+              </div>
 
               {quizMemes.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "var(--space-6)" }}>
