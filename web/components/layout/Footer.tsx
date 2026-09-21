@@ -77,7 +77,7 @@ export const Footer = memo(function Footer() {
             <h4 style={{ fontFamily: "var(--font-heading)", fontSize: "0.875rem", color: "rgba(255,250,246,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "var(--space-4)" }}>
               Platform
             </h4>
-            {["Kurikulum", "Live Coding", "Gamifikasi", "Leaderboard"].map((item) => (
+            {["Kurikulum", "Live Coding", "Gamifikasi", "Papan Peringkat"].map((item) => (
               <a
                 key={item}
                 href="#"
