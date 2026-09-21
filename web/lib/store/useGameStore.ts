@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useUserStore } from "./useUserStore";
 import { isMockFirebase, db } from "../firebase";
-import { doc, updateDoc, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 export const LEVELS = [
   { name: "Script Kiddie", minXP: 0, maxXP: 99, icon: "🐣" },
@@ -121,6 +122,8 @@ export const useGameStore = create<GameState>()(
         const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
         const newStreak = lastActiveDate === yesterday ? dailyStreak + 1 : 1;
         set({ dailyStreak: newStreak, lastActiveDate: today });
+        const streakBonus = newStreak % 7 === 0 ? 50 : 25;
+        useUserStore.getState().addXP(streakBonus);
       },
     }),
     { name: "matrikulasi-game-storage" }
