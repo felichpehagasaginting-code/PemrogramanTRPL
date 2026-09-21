@@ -23,7 +23,7 @@ type PracticeMode = "coding" | "quiz";
 export default function PracticePage() {
   const router = useRouter();
   const { moduleId } = useParams();
-  const { user, completeSubModule, completeModule } = useUserStore();
+  const { user, completeSubModule, completeModule, addXP } = useUserStore();
   const gameApi = useGameStore.getState();
   const [quizComplete, setQuizComplete] = useState(false);
   const [codingComplete, setCodingComplete] = useState(false);
@@ -44,6 +44,7 @@ export default function PracticePage() {
 
   const handleQuizComplete = (score: number, total: number) => {
     completeSubModule(moduleId as string, `quiz-${moduleId}`);
+    if (score > 0) addXP(score * 10);
     setQuizComplete(true);
     const meme = getRandomMemes(moduleId as string, 1)[0];
     if (meme) gameApi.triggerMeme(meme.emoji, meme.caption);
@@ -56,6 +57,7 @@ export default function PracticePage() {
   const handleCodingSubmit = () => {
     completeSubModule(moduleId as string, `practice-${moduleId}`);
     completeModule(moduleId as string);
+    addXP(50);
     fireConfetti();
     const meme = getRandomMemes(moduleId as string, 1)[0];
     if (meme) gameApi.triggerMeme(meme.emoji, meme.caption);
