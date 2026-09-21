@@ -19,6 +19,7 @@ import {
   Cpu,
   GitCommit,
   Flask,
+  ClockCounterClockwise,
 } from "@phosphor-icons/react";
 import { QuizEngine, QuizQuestion } from "@/components/quiz/QuizEngine";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -38,6 +39,8 @@ import { KeystrokeRecorder } from "@/lib/recorder/keystrokeRecorder";
 import { MONACO_CUSTOM_THEMES, defineMonacoThemes } from "@/lib/editorThemes";
 import { lintPythonCode, LintWarning } from "@/lib/linter/simplePythonLinter";
 import { PaintBrush } from "@phosphor-icons/react";
+import { useCodeHistory } from "@/lib/recorder/useCodeHistory";
+import { CodeHistoryDrawer } from "@/components/editor/CodeHistoryDrawer";
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -249,6 +252,15 @@ export default function PracticeClient() {
   const [collectedInputs, setCollectedInputs] = useState<string[]>([]);
   const [currentInputValue, setCurrentInputValue] = useState("");
 
+  // Code History state and hook
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const {
+    history,
+    saveRevision,
+    deleteRevision,
+    clearHistory,
+  } = useCodeHistory(`practice_${moduleId}`);
+
   const content = PRACTICE_CONTENT[moduleId as string];
 
   const handleEditorWillMount = (monaco: any) => {
@@ -284,6 +296,7 @@ export default function PracticeClient() {
   }
 
   const runCode = async () => {
+    saveRevision(code, "Snapshot Sebelum Eksekusi");
     setExplainedError(null);
     setActiveTab("terminal");
 
@@ -361,6 +374,7 @@ export default function PracticeClient() {
   };
 
   const handleRunAutoGrader = async () => {
+    saveRevision(code, "Snapshot Sebelum Evaluasi");
     setIsRunning(true);
     setActiveTab("grader");
     setGradingResult(null);
@@ -589,6 +603,25 @@ export default function PracticeClient() {
                   <option value="github-dark">🐙 GitHub Dark</option>
                 </select>
               </div>
+
+              <button
+                onClick={() => setIsHistoryOpen(true)}
+                className="btn btn-sm btn-ghost focus-ring"
+                style={{
+                  color: "var(--text-primary)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border-color)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 600,
+                }}
+                aria-label="Buka Riwayat Versi Kode"
+                title="Buka Riwayat Versi Kode"
+              >
+                <ClockCounterClockwise size={16} weight="bold" />
+                <span>Riwayat</span>
+              </button>
 
               <button
                 onClick={() => setShowHintDrawer(true)}
@@ -978,6 +1011,18 @@ export default function PracticeClient() {
         isOpen={showHintDrawer}
         onClose={() => setShowHintDrawer(false)}
         moduleTitle={`Latihan Modul ${moduleId}`}
+      />
+
+      {/* Code History Drawer */}
+      <CodeHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={history}
+        currentCode={code}
+        onRestore={(restoredCode) => setCode(restoredCode)}
+        onSaveSnapshot={(codeToSave, label) => saveRevision(codeToSave, label)}
+        onDeleteRevision={deleteRevision}
+        onClearHistory={clearHistory}
       />
     </div>
   );

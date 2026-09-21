@@ -28,9 +28,12 @@ import {
   CaretDown,
   CaretUp,
   Users,
+  ClockCounterClockwise,
 } from "@phosphor-icons/react";
 import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
 import { PairProgrammingRoom } from "@/components/editor/PairProgrammingRoom";
+import { useCodeHistory } from "@/lib/recorder/useCodeHistory";
+import { CodeHistoryDrawer } from "@/components/editor/CodeHistoryDrawer";
 
 interface VirtualFile {
   name: string;
@@ -87,6 +90,15 @@ export default function VSCodeSandboxPage() {
   const [mission3, setMission3] = useState(false);
   const [mission4, setMission4] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(false);
+
+  // Code history hook
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const {
+    history,
+    saveRevision,
+    deleteRevision,
+    clearHistory,
+  } = useCodeHistory(`sandbox_${activeFileName}`);
 
   const activeFile = files.find((f) => f.name === activeFileName) || files[0];
 
@@ -861,6 +873,32 @@ export default function VSCodeSandboxPage() {
                     );
                   })}
                 </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveRevision(activeFile.content, `Snapshot ${activeFile.name}`);
+                      setIsHistoryOpen(true);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "1px solid #3d3d3d",
+                      borderRadius: "4px",
+                      color: "#e5e7eb",
+                      fontSize: "0.72rem",
+                      padding: "2px 8px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                    title="Riwayat Versi Kode"
+                  >
+                    <ClockCounterClockwise size={13} weight="bold" />
+                    <span>Riwayat</span>
+                  </button>
+                </div>
               </div>
 
               {/* Text Editor Area */}
@@ -1027,6 +1065,22 @@ export default function VSCodeSandboxPage() {
         }
       `}</style>
       <FeaturePopupQueue features={SANDBOX_FEATURES} delay={7000} />
+
+      {/* Code History Drawer */}
+      <CodeHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={history}
+        currentCode={activeFile.content}
+        onRestore={(restoredCode) => {
+          setFiles((prev) =>
+            prev.map((f) => (f.name === activeFileName ? { ...f, content: restoredCode } : f))
+          );
+        }}
+        onSaveSnapshot={(codeToSave, label) => saveRevision(codeToSave, label)}
+        onDeleteRevision={deleteRevision}
+        onClearHistory={clearHistory}
+      />
     </div>
   );
 }
