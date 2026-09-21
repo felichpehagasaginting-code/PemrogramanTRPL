@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
+import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut, signInAnonymously } from "../firebase";
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from "firebase/firestore";
 
 const setAuthCookie = () => { document.cookie = "matrikulasi-auth=true; path=/; max-age=86400; SameSite=Lax"; };
@@ -120,15 +120,6 @@ const INITIAL_PROGRESS: UserProgress = {
 
 export const MODULE_KEYS = Object.keys(INITIAL_PROGRESS);
 
-const DEFAULT_MOCK_LEADERBOARD: LeaderboardUser[] = [
-  { uid: "creator-felich", name: "Felich Pehagasa Ginting", email: "felich@mhs.cwe.ac.id", avatar: "avatar_default", xp: 1550, level: "TRPL Legend", isCreator: true },
-  { uid: "leader-1", name: "Reza TRPL", avatar: "avatar_1", xp: 1150, level: "TRPL Legend" },
-  { uid: "leader-2", name: "Aditya Cipta", avatar: "avatar_2", xp: 950, level: "Algorithm Master" },
-  { uid: "leader-3", name: "Siti Rahma", avatar: "avatar_3", xp: 820, level: "Algorithm Master" },
-  { uid: "leader-4", name: "Robby Hermawan", avatar: "avatar_4", xp: 480, level: "Developer Muda" },
-  { uid: "leader-5", name: "Amelia Putri", avatar: "avatar_5", xp: 310, level: "Developer Muda" },
-];
-
 const getLevelName = (xp: number): string => {
   const lv = LEVELS.find((l) => xp >= l.minXP && xp <= l.maxXP);
   return lv ? lv.name : "Script Kiddie";
@@ -138,6 +129,9 @@ interface UserState {
   user: UserProfile | null;
   leaderboard: LeaderboardUser[];
   allUsers: UserProfile[];
+  isUserReady: boolean;
+  isLeaderboardReady: boolean;
+  isAllUsersReady: boolean;
   badgePopup: { isOpen: boolean; badge: BadgeInfo | null };
   levelUpPopup: { isOpen: boolean; oldLevel: string; newLevel: string };
   memePopup: { isOpen: boolean; memeUrl: string; caption: string };
@@ -148,6 +142,7 @@ interface UserState {
   handleRedirectResult: () => Promise<boolean>;
   fetchLeaderboard: () => Promise<void>;
   subscribeLeaderboardRealtime: () => () => void;
+  subscribeCurrentUserRealtime: (uid: string) => () => void;
   fetchAllUsers: () => Promise<void>;
   logout: () => void;
   addXP: (amount: number) => Promise<void>;
@@ -212,36 +207,50 @@ export const useUserStore = create<UserState>()(
             };
 
             await setDoc(userRef, finalProfile, { merge: true });
-            set({ user: finalProfile });
+            set({ user: finalProfile, isUserReady: true });
             setAuthCookie();
           } else {
             await setDoc(userRef, tempProfile, { merge: true });
-            set({ user: tempProfile });
+            set({ user: tempProfile, isUserReady: true });
             setAuthCookie();
           }
           await get().fetchLeaderboard();
         } catch (e) {
           console.warn("Firestore sync failed on login:", e);
-          set({ user: tempProfile });
+          set({ user: tempProfile, isUserReady: true });
           setAuthCookie();
         }
       };
 
       return {
       user: null,
-      leaderboard: DEFAULT_MOCK_LEADERBOARD,
+      leaderboard: [],
       allUsers: [],
+      isUserReady: false,
+      isLeaderboardReady: false,
+      isAllUsersReady: false,
       badgePopup: { isOpen: false, badge: null },
       levelUpPopup: { isOpen: false, oldLevel: "", newLevel: "" },
       memePopup: { isOpen: false, memeUrl: "", caption: "" },
 
       login: async (name, email) => {
         const isFelich = isCreator({ email, name });
+        if (!isMockFirebase) {
+          try {
+            const anonRes = await signInAnonymously(auth);
+            if (anonRes.user) {
+              await processFirebaseUser(anonRes.user);
+              return;
+            }
+          } catch (e) {
+            console.warn("signInAnonymously failed, falling back to direct document:", e);
+          }
+        }
         const uid = isFelich ? "creator-felich" : `user-${Date.now()}`;
-        const mockProfile: UserProfile = {
+        const initialProfile: UserProfile = {
           uid,
-          name: isFelich ? "Felich Pehagasa Ginting" : name,
-          email: isFelich ? "felich@mhs.cwe.ac.id" : email,
+          name: isFelich ? "Felich Pehagasa Ginting" : name || "Maba TRPL 2026",
+          email: isFelich ? "felich@mhs.cwe.ac.id" : email || "maba2026@student.polsri.ac.id",
           avatar: "avatar_default",
           xp: isFelich ? 1550 : 0,
           level: isFelich ? "TRPL Legend" : "Script Kiddie",
@@ -258,23 +267,23 @@ export const useUserStore = create<UserState>()(
               const data = userDoc.data() as UserProfile;
               if (isFelich) {
                 const updatedXP = Math.max(data.xp || 0, 1550);
-                const restored = { ...data, ...mockProfile, xp: updatedXP, level: "TRPL Legend" };
+                const restored = { ...data, ...initialProfile, xp: updatedXP, level: "TRPL Legend" };
                 await setDoc(userRef, restored, { merge: true });
-                set({ user: restored });
+                set({ user: restored, isUserReady: true });
               } else {
-                set({ user: data });
+                set({ user: data, isUserReady: true });
               }
               setAuthCookie();
             } else {
-              await setDoc(userRef, mockProfile);
-              set({ user: mockProfile });
+              await setDoc(userRef, initialProfile);
+              set({ user: initialProfile, isUserReady: true });
               setAuthCookie();
             }
             await get().fetchLeaderboard();
             return;
           } catch {}
         }
-        set({ user: mockProfile });
+        set({ user: initialProfile, isUserReady: true });
         setAuthCookie();
         await get().fetchLeaderboard();
       },
@@ -294,7 +303,7 @@ export const useUserStore = create<UserState>()(
             isCreator: true,
             isDosenPenguji: true,
           };
-          set({ user: dosenProfile });
+          set({ user: dosenProfile, isUserReady: true });
           setAuthCookie();
           return true;
         }
@@ -351,7 +360,10 @@ export const useUserStore = create<UserState>()(
       },
 
       fetchLeaderboard: async () => {
-        if (isMockFirebase) return;
+        if (isMockFirebase) {
+          set({ leaderboard: [], isLeaderboardReady: true });
+          return;
+        }
         try {
           const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
           const snapshot = await getDocs(q);
@@ -373,14 +385,18 @@ export const useUserStore = create<UserState>()(
               isCreator: isCreatorUser,
             });
           });
-          set({ leaderboard: list });
+          set({ leaderboard: list, isLeaderboardReady: true });
         } catch (e) {
           console.warn("fetchLeaderboard error:", e);
+          set({ isLeaderboardReady: true });
         }
       },
 
       subscribeLeaderboardRealtime: () => {
-        if (isMockFirebase) return () => {};
+        if (isMockFirebase) {
+          set({ isLeaderboardReady: true });
+          return () => {};
+        }
         try {
           const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
           const unsubscribe = onSnapshot(
@@ -404,38 +420,54 @@ export const useUserStore = create<UserState>()(
                   isCreator: isCreatorUser,
                 });
               });
-              set({ leaderboard: list });
+              set({ leaderboard: list, isLeaderboardReady: true });
             },
             (err) => {
               console.warn("subscribeLeaderboardRealtime error:", err);
+              set({ isLeaderboardReady: true });
             }
           );
           return unsubscribe;
         } catch (e) {
           console.warn("Failed to subscribe to realtime leaderboard:", e);
+          set({ isLeaderboardReady: true });
+          return () => {};
+        }
+      },
+
+      subscribeCurrentUserRealtime: (uid: string) => {
+        if (!uid || isMockFirebase) {
+          set({ isUserReady: true });
+          return () => {};
+        }
+        try {
+          const userRef = doc(db, "users", uid);
+          const unsubscribe = onSnapshot(
+            userRef,
+            (docSnap) => {
+              if (docSnap.exists()) {
+                const data = docSnap.data() as UserProfile;
+                set({ user: data, isUserReady: true });
+              } else {
+                set({ isUserReady: true });
+              }
+            },
+            (err) => {
+              console.warn("subscribeCurrentUserRealtime error:", err);
+              set({ isUserReady: true });
+            }
+          );
+          return unsubscribe;
+        } catch (e) {
+          console.warn("Failed to subscribe to current user realtime:", e);
+          set({ isUserReady: true });
           return () => {};
         }
       },
 
       fetchAllUsers: async () => {
         if (isMockFirebase) {
-          const mockUsers: UserProfile[] = DEFAULT_MOCK_LEADERBOARD
-            .filter((lb) => lb.uid !== "dosen-penguji-trpl" && !lb.email?.includes("dosen.penguji"))
-            .map((lb) => ({
-              uid: lb.uid, name: lb.name,
-              email: `${lb.name.toLowerCase().replace(/\s/g, ".")}@student.polsri.ac.id`,
-              avatar: lb.avatar, xp: lb.xp, level: lb.level,
-              badges: (lb.xp > 800 ? BADGES.slice(0, 5) : BADGES.slice(0, 3)).map((b) => b.id),
-              streak: Math.floor(Math.random() * 10) + 1,
-              progress: Object.keys(INITIAL_PROGRESS).reduce((acc, key, idx) => {
-                acc[key] = {
-                  completedSubModules: [],
-                  status: idx === 0 ? "completed" : lb.xp > idx * 100 ? "completed" : lb.xp > (idx - 1) * 100 ? "active" : "locked",
-                } as any;
-                return acc;
-              }, {} as UserProgress),
-            }));
-          set({ allUsers: mockUsers });
+          set({ allUsers: [], isAllUsersReady: true });
           return;
         }
         try {
@@ -448,14 +480,16 @@ export const useUserStore = create<UserState>()(
             }
             list.push(d);
           });
-          set({ allUsers: list });
-        } catch {}
+          set({ allUsers: list, isAllUsersReady: true });
+        } catch {
+          set({ allUsers: [], isAllUsersReady: true });
+        }
       },
 
       logout: () => {
         if (!isMockFirebase) fbSignOut(auth).catch(() => {});
         clearAuthCookie();
-        set({ user: null });
+        set({ user: null, isUserReady: false, isLeaderboardReady: false, isAllUsersReady: false });
       },
 
       addXP: async (amount) => {
@@ -612,7 +646,13 @@ export const useUserStore = create<UserState>()(
         if (!user || isMockFirebase) return;
         try { await setDoc(doc(db, "users", user.uid), user, { merge: true }); } catch {}
       },
-    }},
-    { name: "matrikulasi-user-storage" }
+    };
+  },
+    {
+      name: "matrikulasi-user-storage",
+      partialize: (state) => ({
+        user: state.user,
+      }),
+    }
   )
 );
