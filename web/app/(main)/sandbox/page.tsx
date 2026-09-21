@@ -161,7 +161,7 @@ export default function VSCodeSandboxPage() {
     e.preventDefault();
     if (!newFileName.trim()) return;
 
-    let cleanName = newFileName.trim().replace(/\s+/g, "_");
+    const cleanName = newFileName.trim().replace(/\s+/g, "_");
     if (files.some((f) => f.name === cleanName)) {
       alert("Berkas dengan nama tersebut sudah ada!");
       return;
@@ -231,16 +231,16 @@ export default function VSCodeSandboxPage() {
             <h1
               style={{
                 fontFamily: "var(--font-heading)",
-                fontSize: isMobile ? "1.5rem" : "1.875rem",
+                fontSize: isMobile ? "1.25rem" : "1.75rem",
                 fontWeight: 800,
                 color: "var(--text-primary)",
-                margin: "0 0 4px",
+                margin: "0 0 2px",
               }}
             >
-              VS Code Sandbox <span className="gradient-text">Simulator</span>
+              Simulator Sandbox <span className="gradient-text">VS Code</span>
             </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", margin: 0 }}>
-              Workspace simulasi mandiri untuk melatih pembuatan file, edit kode Python, dan eksekusi Terminal CLI!
+            <p style={{ color: "var(--text-secondary)", fontSize: isMobile ? "0.78rem" : "0.85rem", margin: 0 }}>
+              Ruang simulasi koding mandiri dan eksekusi Terminal CLI!
             </p>
           </div>
 
@@ -249,22 +249,25 @@ export default function VSCodeSandboxPage() {
             style={{
               display: "flex",
               background: "var(--bg-card)",
-              border: "1px solid var(--border-color)",
+              border: "1.5px solid var(--border-color)",
               borderRadius: "var(--radius-full)",
               padding: "3px",
+              gap: "3px",
+              boxShadow: "var(--shadow-sm)",
             }}
           >
             <button
               onClick={() => setSandboxMode("vscode")}
               style={{
-                padding: "6px 14px",
+                padding: "5px 12px",
                 borderRadius: "var(--radius-full)",
                 border: "none",
-                fontSize: "0.78rem",
+                fontSize: "0.75rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                background: sandboxMode === "vscode" ? "var(--primary)" : "transparent",
-                color: sandboxMode === "vscode" ? "white" : "var(--text-secondary)",
+                transition: "all 0.2s ease",
+                background: sandboxMode === "vscode" ? "var(--color-primary-500)" : "transparent",
+                color: sandboxMode === "vscode" ? "#ffffff" : "var(--text-secondary)",
               }}
             >
               Mode Mandiri
@@ -272,20 +275,21 @@ export default function VSCodeSandboxPage() {
             <button
               onClick={() => setSandboxMode("pair")}
               style={{
-                padding: "6px 14px",
+                padding: "5px 12px",
                 borderRadius: "var(--radius-full)",
                 border: "none",
-                fontSize: "0.78rem",
+                fontSize: "0.75rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                background: sandboxMode === "pair" ? "var(--primary)" : "transparent",
-                color: sandboxMode === "pair" ? "white" : "var(--text-secondary)",
+                transition: "all 0.2s ease",
+                background: sandboxMode === "pair" ? "var(--color-primary-500)" : "transparent",
+                color: sandboxMode === "pair" ? "#ffffff" : "var(--text-secondary)",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: "5px",
               }}
             >
-              <Users size={14} /> Pair Programming
+              <Users size={14} weight="bold" /> Mode Berpasangan
             </button>
           </div>
         </div>
@@ -301,7 +305,7 @@ export default function VSCodeSandboxPage() {
         <div
           style={{
             display: "flex",
-            background: "#1E1E1E",
+            background: "var(--bg-card)",
             border: "1px solid var(--border-color)",
             borderRadius: "var(--radius-md)",
             marginBottom: "12px",
@@ -309,9 +313,9 @@ export default function VSCodeSandboxPage() {
           }}
         >
           {[
-            { id: "editor", label: "📝 Code Editor" },
+            { id: "editor", label: "📝 Editor Kode" },
             { id: "terminal", label: "💻 Terminal" },
-            { id: "misi", label: "🎯 Misi Sandbox" },
+            { id: "misi", label: "🎯 Misi" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -320,11 +324,11 @@ export default function VSCodeSandboxPage() {
               className="focus-ring"
               style={{
                 flex: 1,
-                padding: "10px",
+                padding: "8px",
                 background: mobileActiveTab === tab.id ? "var(--color-primary-500)" : "transparent",
-                color: mobileActiveTab === tab.id ? "white" : "var(--text-secondary)",
+                color: mobileActiveTab === tab.id ? "#ffffff" : "var(--text-secondary)",
                 border: "none",
-                fontSize: "0.8rem",
+                fontSize: "0.78rem",
                 fontWeight: 700,
                 cursor: "pointer",
               }}
