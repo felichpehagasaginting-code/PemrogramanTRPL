@@ -67,7 +67,7 @@ export function AvatarCustomizer({ isOpen, onClose }: AvatarCustomizerProps) {
         </div>
 
         <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: "var(--space-6)" }}>
-          Pilih karakter avatar digital yang akan ditampilkan pada Leaderboard dan Profil kamu!
+          Pilih karakter avatar digital yang akan ditampilkan pada Papan Peringkat dan Profil kamu!
         </p>
 
         {/* Options Grid */}
