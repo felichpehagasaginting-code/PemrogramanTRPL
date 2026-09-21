@@ -9,6 +9,7 @@ import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PROFILE_FEATURES } from "@/lib/features";
 import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
 import { SkillRadarChart } from "@/components/profile/SkillRadarChart";
+import { SkeletonProfile } from "@/components/ui/Skeleton";
 
 const AVATARS = [
   { id: "avatar_default", emoji: "🤖", label: "Robot" },
@@ -20,11 +21,11 @@ const AVATARS = [
 ];
 
 export default function ProfilePage() {
-  const { user, updateAvatar, restoreCreatorProgress } = useUserStore();
+  const { user, isUserReady, updateAvatar, restoreCreatorProgress } = useUserStore();
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || "avatar_default");
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
 
-  if (!user) return null;
+  if (!user || !isUserReady) return <SkeletonProfile />;
 
   const handleAvatarChange = (avatarId: string) => {
     setSelectedAvatar(avatarId);
