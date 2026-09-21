@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lifebuoy, ArrowLeft, Play, Copy, Check, Terminal, Warning, Sparkle } from "@phosphor-icons/react";
 import Editor from "@monaco-editor/react";
+import { SkeletonSnapshot } from "@/components/ui/Skeleton";
 
 export default function HelpSnapshotPage() {
   const params = useParams();
@@ -43,11 +44,7 @@ export default function HelpSnapshotPage() {
   };
 
   if (loading) {
-    return (
-      <div className="section-container" style={{ textAlign: "center", padding: "80px 20px" }}>
-        <p style={{ color: "var(--text-secondary)" }}>Memuat cuplikan kode diskusi...</p>
-      </div>
-    );
+    return <SkeletonSnapshot />;
   }
 
   if (error || !snapshot) {
@@ -59,7 +56,7 @@ export default function HelpSnapshotPage() {
           {error || "Tautan bantuan ini mungkin sudah kadaluarsa atau tidak valid."}
         </p>
         <Link href="/dashboard" className="btn btn-primary">
-          Kembali ke Dashboard
+          Kembali ke Dasbor
         </Link>
       </div>
     );
@@ -71,7 +68,7 @@ export default function HelpSnapshotPage() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <Link href="/dashboard" className="btn btn-secondary" style={{ gap: "6px" }}>
           <ArrowLeft size={16} />
-          Kembali ke Dashboard
+          Kembali ke Dasbor
         </Link>
         <div className="badge badge-primary" style={{ gap: "6px" }}>
           <Lifebuoy size={14} weight="fill" />
