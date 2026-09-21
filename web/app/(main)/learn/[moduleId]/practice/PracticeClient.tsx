@@ -221,7 +221,7 @@ print("Total Bayar:", int(total_bayar))
 export default function PracticeClient() {
   const router = useRouter();
   const { moduleId } = useParams();
-  const { user, isUserReady, completeSubModule, completeModule } = useUserStore();
+  const { user, isUserReady, completeSubModule, completeModule, addXP } = useUserStore();
 
   const [quizComplete, setQuizComplete] = useState(false);
   const [code, setCode] = useState("");
@@ -381,6 +381,7 @@ export default function PracticeClient() {
 
       if (res.passed) {
         completeSubModule(moduleId as string, `practice-${moduleId}`);
+        addXP(50);
       }
     } catch (err: any) {
       setOutput([`Error Auto-Grader: ${err.message}`]);
@@ -396,6 +397,7 @@ export default function PracticeClient() {
 
   const handleQuizComplete = (score: number, total: number) => {
     completeSubModule(moduleId as string, `quiz-${moduleId}`);
+    if (score > 0) addXP(score * 10);
     setQuizComplete(true);
     if (moduleId === "M0") {
       completeModule("M0");
@@ -405,6 +407,7 @@ export default function PracticeClient() {
 
   const handleParsonsSuccess = () => {
     completeSubModule(moduleId as string, `practice-${moduleId}`);
+    addXP(50);
     setTimeout(() => {
       router.push(`/learn/${moduleId}`);
     }, 1500);
