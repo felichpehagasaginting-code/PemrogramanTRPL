@@ -17,9 +17,9 @@ service cloud.firestore {
          request.auth.token.email == "felichpehagasa@gmail.com");
     }
 
-    // Users Collection with Anti-Tampering Protection
+    // Users Collection with Anti-Tampering Protection (Public Read for Class Leaderboard)
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow create: if isOwner(userId) || isAdmin();
       // Owner can update profile info with bounded XP increments (max +350 XP per valid module step)
       allow update: if isAdmin() || (
@@ -37,6 +37,14 @@ service cloud.firestore {
       allow create: if isAuthenticated();
       allow update: if isAdmin() || (isAuthenticated() && (resource.data.authorId == request.auth.uid || request.resource.data.status != null));
       allow delete: if isAdmin() || (isAuthenticated() && resource.data.authorId == request.auth.uid);
+    }
+
+    // Real-time Pair Programming Rooms & Collaboration Chat
+    match /pair_rooms/{roomId} {
+      allow read, write: if isAuthenticated();
+      match /messages/{messageId} {
+        allow read, write: if isAuthenticated();
+      }
     }
   }
 }
