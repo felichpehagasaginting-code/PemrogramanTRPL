@@ -13,12 +13,12 @@ export interface BroadcastData {
 // In-memory global store for active broadcast (simulating database document)
 let currentBroadcast: BroadcastData = {
   id: "announcement-default",
-  title: "📢 Sambutan Dosen Pengampu TRPL 2026",
+  title: "📢 Pengumuman Matrikulasi TRPL 2026",
   message: "Selamat datang di Platform Matrikulasi Pemrograman! Selesaikan Modul M0 s/d M8 sebelum pekan UTS.",
   type: "info",
   isActive: true,
   createdAt: new Date().toISOString(),
-  author: "Dosen Pengampu TRPL",
+  author: "Tim Matrikulasi TRPL",
 };
 
 export async function GET() {
