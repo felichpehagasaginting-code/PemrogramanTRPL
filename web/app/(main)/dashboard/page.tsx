@@ -13,6 +13,8 @@ import { SkillTree } from "@/components/learning/SkillTree";
 import { DailyStreakWidget } from "@/components/dashboard/DailyStreakWidget";
 import { DailyLogicBiteModal } from "@/components/learning/DailyLogicBiteModal";
 
+import { SkeletonDashboard } from "@/components/ui/Skeleton";
+
 const moduleIconMap: Record<string, React.ReactNode> = {
   M0: <Lightning size={22} weight="fill" />, M1: <Lightning size={22} weight="fill" />,
   M2: <Lightning size={22} weight="fill" />, M3: <Lightning size={22} weight="fill" />,
@@ -23,6 +25,8 @@ const moduleIconMap: Record<string, React.ReactNode> = {
 
 export default function DashboardPage() {
   const user = useUserStore((s) => s.user);
+  const isUserReady = useUserStore((s) => s.isUserReady);
+  const isLeaderboardReady = useUserStore((s) => s.isLeaderboardReady);
   const leaderboard = useUserStore((s) => s.leaderboard);
   const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
   const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
@@ -35,7 +39,9 @@ export default function DashboardPage() {
     };
   }, [fetchLeaderboard, subscribeLeaderboardRealtime]);
 
-  if (!user) return null;
+  if (!user || !isUserReady || !isLeaderboardReady) {
+    return <SkeletonDashboard />;
+  }
 
   // Calculate completed modules percentage
   const moduleKeys = Object.keys(user.progress);
@@ -485,7 +491,7 @@ export default function DashboardPage() {
             }}
           >
             <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--text-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", marginBottom: "var(--space-4)", display: "flex", alignItems: "center", gap: "6px" }}>
-              <Trophy size={18} weight="fill" color="var(--color-primary-500)" /> TOP LEADERBOARD
+              <Trophy size={18} weight="fill" color="var(--color-primary-500)" /> PAPAN PERINGKAT
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {sortedLeaderboard.map((item, idx) => (
@@ -519,7 +525,7 @@ export default function DashboardPage() {
               ))}
             </div>
             <Link href="/leaderboard" style={{ display: "block", textAlign: "center", fontSize: "0.8rem", fontWeight: 700, color: "var(--color-primary-500)", textDecoration: "none", marginTop: "12px" }}>
-              Lihat Leaderboard Lengkap →
+              Lihat Semua →
             </Link>
           </div>
 
