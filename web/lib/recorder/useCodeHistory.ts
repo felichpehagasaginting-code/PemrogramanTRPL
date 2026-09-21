@@ -13,10 +13,23 @@ export interface CodeRevision {
 const MAX_REVISIONS = 15;
 
 export function useCodeHistory(contextKey: string) {
-  const [history, setHistory] = useState<CodeRevision[]>([]);
   const storageKey = `trpl_history_${contextKey}`;
 
-  // Load revisions from localStorage on mount or when contextKey changes
+  const [history, setHistory] = useState<CodeRevision[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // Fallback empty
+    }
+    return [];
+  });
+
+  // Re-sync if contextKey changes
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -25,12 +38,12 @@ export function useCodeHistory(contextKey: string) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           setHistory(parsed);
+          return;
         }
-      } else {
-        setHistory([]);
       }
-    } catch (e) {
-      console.warn("Failed to load code history:", e);
+      setHistory([]);
+    } catch {
+      setHistory([]);
     }
   }, [storageKey]);
 
@@ -56,8 +69,8 @@ export function useCodeHistory(contextKey: string) {
         const updated = [newRevision, ...prev].slice(0, MAX_REVISIONS);
         try {
           localStorage.setItem(storageKey, JSON.stringify(updated));
-        } catch (e) {
-          console.warn("Failed to save code history:", e);
+        } catch {
+          // ignore storage error
         }
         return updated;
       });
@@ -72,7 +85,9 @@ export function useCodeHistory(contextKey: string) {
         const updated = prev.filter((rev) => rev.id !== id);
         try {
           localStorage.setItem(storageKey, JSON.stringify(updated));
-        } catch (e) {}
+        } catch {
+          // ignore
+        }
         return updated;
       });
     },
@@ -84,7 +99,9 @@ export function useCodeHistory(contextKey: string) {
     try {
       localStorage.removeItem(storageKey);
       setHistory([]);
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
   }, [storageKey]);
 
   return {
