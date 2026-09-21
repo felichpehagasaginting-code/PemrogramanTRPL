@@ -12,7 +12,7 @@ export default function NotFoundPage() {
           Halaman yang kamu cari tidak ada atau telah dipindahkan.
         </p>
         <Link href="/dashboard" className="btn btn-primary">
-          Kembali ke Dashboard
+          Kembali ke Dasbor
         </Link>
       </div>
     </div>
