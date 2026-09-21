@@ -16,7 +16,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
+  const isUserReady = useUserStore((s) => s.isUserReady);
   const logout = useUserStore((s) => s.logout);
+  const subscribeCurrentUserRealtime = useUserStore((s) => s.subscribeCurrentUserRealtime);
+  const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
   const { checkDailyStreak } = useGameStore();
   const [mounted, setMounted] = useState(false);
 
@@ -26,20 +29,30 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     setMounted(true);
     checkDailyStreak();
-    if (!user) router.push("/login");
-  }, [user, router, checkDailyStreak]);
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    const unsubUser = subscribeCurrentUserRealtime(user.uid);
+    const unsubLb = subscribeLeaderboardRealtime();
+    return () => {
+      unsubUser();
+      unsubLb();
+    };
+  }, [user?.uid, router, checkDailyStreak, subscribeCurrentUserRealtime, subscribeLeaderboardRealtime]);
 
   const handleLogout = () => {
     logout();
     router.push("/");
   };
 
-  if (!mounted || !user) return <LoadingScreen text="Memuat platform..." fullPage />;
+  if (!mounted || !user || !isUserReady) return <LoadingScreen text="Menghubungkan data TRPL..." fullPage />;
 
   const menuLinks = [
-    { label: "Dashboard", href: "/dashboard", icon: <BookOpen size={20} weight="bold" /> },
+    { label: "Dasbor", href: "/dashboard", icon: <BookOpen size={20} weight="bold" /> },
     { label: "Sandbox", href: "/sandbox", icon: <Code size={20} weight="bold" /> },
-    { label: "Leaderboard", href: "/leaderboard", icon: <Trophy size={20} weight="bold" /> },
+    { label: "Papan Peringkat", href: "/leaderboard", icon: <Trophy size={20} weight="bold" /> },
     { label: "Profil", href: "/profile", icon: <User size={20} weight="bold" /> },
     { label: "Admin", href: "/admin", icon: <ShieldCheck size={20} weight="bold" /> },
   ];
