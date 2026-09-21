@@ -38,7 +38,7 @@ export function HelpDeskQueue() {
       const res = await fetch("/api/help/list");
       if (res.ok) {
         const data = await res.json();
-        if (data.tickets && data.tickets.length > 0) {
+        if (data.tickets) {
           setTickets(data.tickets);
           return;
         }
@@ -48,29 +48,7 @@ export function HelpDeskQueue() {
     } finally {
       setLoading(false);
     }
-    
-    // default demo tickets
-    setTickets([
-      {
-        id: "help-demo-1",
-        authorName: "Budi Santoso",
-        moduleId: "M4 (Percabangan)",
-        error: "SyntaxError: expected ':' at line 3",
-        code: "usia = int(input())\nif usia >= 17\n    print('Boleh nonton')",
-        createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-        status: "waiting",
-      },
-      {
-        id: "help-demo-2",
-        authorName: "Siti Rahma",
-        moduleId: "M5 (Perulangan)",
-        error: "IndexError: list index out of range",
-        code: "angka = [10, 20, 30]\nfor i in range(5):\n    print(angka[i])",
-        createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-        status: "in_progress",
-        mentorNote: "Perhatikan panjang array `len(angka)` ya Siti, jangan hardcode range(5).",
-      },
-    ]);
+    setTickets([]);
   };
 
   useEffect(() => {
