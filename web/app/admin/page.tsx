@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore, BADGES, LEVELS, isAdmin } from "@/lib/store/useUserStore";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SkeletonAdmin } from "@/components/ui/Skeleton";
 import {
   ShieldCheck, Users, Trophy, MagnifyingGlass,
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
@@ -40,6 +40,8 @@ export default function AdminPage() {
   const allUsers = useUserStore((s) => s.allUsers);
   const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
+  const isAllUsersReady = useUserStore((s) => s.isAllUsersReady);
+  const isLeaderboardReady = useUserStore((s) => s.isLeaderboardReady);
   const resetUserProgress = useUserStore((s) => s.resetUserProgress);
   const awardXP = useUserStore((s) => s.awardXP);
   const addUser = useUserStore((s) => s.addUser);
@@ -56,6 +58,7 @@ export default function AdminPage() {
   const [addModal, setAddModal] = useState(false);
   const [editUser, setEditUser] = useState<string | null>(null);
   const [playbackUser, setPlaybackUser] = useState<any | null>(null);
+  const [playbackStartTime, setPlaybackStartTime] = useState<number>(0);
   const [formData, setFormData] = useState(INITIAL_FORM);
 
   useEffect(() => {
@@ -161,7 +164,7 @@ export default function AdminPage() {
             </button>
 
             <Link href="/dashboard" className="btn btn-secondary" style={{ width: "100%", display: "block" }}>
-              Kembali ke Dashboard
+              Kembali ke Dasbor
             </Link>
           </div>
         </div>
@@ -174,7 +177,7 @@ export default function AdminPage() {
     );
   }
 
-  if (loading) return <LoadingSpinner text="Memuat data admin..." fullPage />;
+  if (loading || !isAllUsersReady || !isLeaderboardReady) return <SkeletonAdmin />;
 
   const allModuleKeys = Object.keys(MODULE_LABELS);
   const totalStudents = allUsers.length;
@@ -244,7 +247,7 @@ export default function AdminPage() {
               onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,107,0,0.08)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
-              <ArrowLeft size={14} weight="bold" /> Dashboard
+              <ArrowLeft size={14} weight="bold" /> Dasbor
             </Link>
           </div>
         </div>
@@ -510,6 +513,7 @@ export default function AdminPage() {
                       <div style={{ display: "flex", gap: "4px", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => {
+                            setPlaybackStartTime(Date.now() - 60000);
                             setPlaybackUser(u);
                           }}
                           className="btn btn-sm"
@@ -752,7 +756,7 @@ export default function AdminPage() {
                 sessionId: `sess-${playbackUser.uid}`,
                 studentId: playbackUser.uid,
                 moduleId: "M4",
-                startTime: Date.now() - 60000,
+                startTime: playbackStartTime,
                 totalEvents: 6,
                 hasPasteBurst: false,
                 events: [
