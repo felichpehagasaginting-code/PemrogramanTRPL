@@ -47,14 +47,6 @@ export interface LeaderboardUser {
   level: string;
 }
 
-const DEFAULT_MOCK_LEADERBOARD: LeaderboardUser[] = [
-  { uid: "leader-1", name: "Reza TRPL", avatar: "avatar_1", xp: 1150, level: "TRPL Legend" },
-  { uid: "leader-2", name: "Aditya Cipta", avatar: "avatar_2", xp: 950, level: "Algorithm Master" },
-  { uid: "leader-3", name: "Siti Rahma", avatar: "avatar_3", xp: 820, level: "Algorithm Master" },
-  { uid: "leader-4", name: "Robby Hermawan", avatar: "avatar_4", xp: 480, level: "Developer Muda" },
-  { uid: "leader-5", name: "Amelia Putri", avatar: "avatar_5", xp: 310, level: "Developer Muda" },
-];
-
 interface PopupState {
   isOpen: boolean;
   badge: BadgeInfo | null;
@@ -93,7 +85,7 @@ interface GameState {
 export const useGameStore = create<GameState>()(
   persist(
     (set, get) => ({
-      leaderboard: DEFAULT_MOCK_LEADERBOARD,
+      leaderboard: [],
       badgePopup: { isOpen: false, badge: null },
       levelUpPopup: { isOpen: false, oldLevel: "", newLevel: "" },
       memePopup: { isOpen: false, memeUrl: "", caption: "" },
