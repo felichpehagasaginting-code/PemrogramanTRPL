@@ -25,7 +25,7 @@ export function useSessionTimeout() {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const logout = useUserStore((s) => s.logout);
-  const lastRecordedRef = useRef<number>(Date.now());
+  const lastRecordedRef = useRef<number>(0);
 
   // Record activity with a throttle to prevent excessive storage writes
   const recordActivity = useCallback(() => {
