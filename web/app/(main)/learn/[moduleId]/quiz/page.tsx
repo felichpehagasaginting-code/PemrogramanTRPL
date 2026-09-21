@@ -1037,7 +1037,7 @@ export default function QuizPage() {
 
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
                 <button onClick={() => router.push("/dashboard")} className="btn btn-primary">
-                  Kembali ke Dashboard
+                  Kembali ke Dasbor
                 </button>
               </div>
             </>
