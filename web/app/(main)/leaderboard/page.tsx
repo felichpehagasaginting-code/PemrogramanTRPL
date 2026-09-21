@@ -8,9 +8,10 @@ import { AvatarIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { LEADERBOARD_FEATURES } from "@/lib/features";
 import { soundFX } from "@/lib/audio";
+import { SkeletonLeaderboard } from "@/components/ui/Skeleton";
 
 export default function LeaderboardPage() {
-  const { user, leaderboard, fetchLeaderboard, subscribeLeaderboardRealtime } = useUserStore();
+  const { user, leaderboard, isLeaderboardReady, fetchLeaderboard, subscribeLeaderboardRealtime } = useUserStore();
 
   useEffect(() => {
     fetchLeaderboard();
@@ -20,7 +21,7 @@ export default function LeaderboardPage() {
     };
   }, [fetchLeaderboard, subscribeLeaderboardRealtime]);
 
-  if (!user) return null;
+  if (!user || !isLeaderboardReady) return <SkeletonLeaderboard />;
 
   // Filter out Dosen Penguji from public student leaderboard
   const baseList = leaderboard.filter(
@@ -69,7 +70,7 @@ export default function LeaderboardPage() {
       {/* Page Header */}
       <div style={{ textAlign: "center", marginBottom: "var(--space-8)" }}>
         <span className="badge badge-amber" style={{ marginBottom: "var(--space-3)" }}>
-          <Trophy size={12} weight="fill" /> LEADERBOARD PLATFORM
+          <Trophy size={12} weight="fill" /> PAPAN PERINGKAT KELAS
         </span>
         <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>
           Peringkat Kelas TRPL 2026
