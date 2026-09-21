@@ -20,6 +20,7 @@ import {
 import { InlineAnnotationThread } from "@/components/learning/InlineAnnotationThread";
 import { SeniorTipCard, SeniorTipData } from "@/components/learning/SeniorTipCard";
 import { PrintableSummaryModal } from "@/components/learning/PrintableSummaryModal";
+import { SkeletonDashboard } from "@/components/ui/Skeleton";
 
 interface Slide {
   title: string;
@@ -219,7 +220,7 @@ function FolderCreationSimulator() {
 export default function LearnModulePage() {
   const router = useRouter();
   const { moduleId } = useParams();
-  const { user, completeSubModule, completeModule } = useUserStore();
+  const { user, isUserReady, completeSubModule, completeModule } = useUserStore();
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [printModalOpen, setPrintModalOpen] = useState(false);
@@ -240,7 +241,7 @@ export default function LearnModulePage() {
     extensionAdded: false,
   });
 
-  if (!user) return null;
+  if (!user || !isUserReady) return <SkeletonDashboard />;
 
   // Modul details metadata
   const moduleMap: Record<string, { title: string; slides: Slide[] }> = {
@@ -725,7 +726,7 @@ export default function LearnModulePage() {
                   e.preventDefault();
                   if (!cliInput) return;
 
-                  let outputLines = [...cliOutput];
+                  const outputLines = [...cliOutput];
                   // Remove cursor line
                   outputLines.pop();
 
@@ -1134,7 +1135,7 @@ export default function LearnModulePage() {
                   Pembagian: <code style={{ color: "#CE9178" }}>/</code> (contoh: 5 / 2 = 2.5)
                 </div>
                 <div style={{ background: "var(--bg-page-alt)", padding: "10px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  Bagi Bulat: <code style={{ color: "#CE9178" }}>//</code> (contoh: 5 // 2 = 2)<br />
+                  Bagi Bulat: <code style={{ color: "#CE9178" }}>{"//"}</code> (contoh: 5 // 2 = 2)<br />
                   Sisa Bagi: <code style={{ color: "#CE9178" }}>%</code> (contoh: 5 % 2 = 1)<br />
                   Perpangkatan: <code style={{ color: "#CE9178" }}>**</code> (contoh: 2 ** 3 = 8)
                 </div>
@@ -1845,7 +1846,7 @@ export default function LearnModulePage() {
         <button
           onClick={() => router.push("/dashboard")}
           className="focus-ring"
-          aria-label="Kembali ke dashboard"
+          aria-label="Kembali ke dasbor"
           style={{
             background: "none",
             cursor: "pointer",
