@@ -82,15 +82,18 @@ describe("useUserStore", () => {
     expect(user?.progress.M1.status).toBe("active");
   });
 
-  it("should unlock badge on module completion", async () => {
+  it("should unlock badge and award bonus XP on module completion", async () => {
     const { login } = useUserStore.getState();
     await login("Test User", "test@example.com");
 
+    const xpBefore = useUserStore.getState().user?.xp || 0;
     const { completeModule } = useUserStore.getState();
     await completeModule("M1");
 
     const { user } = useUserStore.getState();
     expect(user?.badges).toContain("workspace_master");
+    // completeModule gives +50 XP, and unlockBadge("workspace_master") gives another +50 XP = +100 XP total
+    expect(user?.xp).toBe(xpBefore + 100);
   });
 
   it("should set isUserReady on login and isLeaderboardReady on fetchLeaderboard", async () => {
