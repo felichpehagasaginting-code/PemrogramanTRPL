@@ -11,6 +11,10 @@ import {
   Check,
   Circle,
   Sparkle,
+  DoorOpen,
+  ArrowsClockwise,
+  X,
+  Plus,
 } from "@phosphor-icons/react";
 import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
 import { db, isMockFirebase } from "@/lib/firebase";
@@ -20,12 +24,12 @@ import {
   onSnapshot,
   setDoc,
   addDoc,
+  deleteDoc,
   query,
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
 import { useUserStore } from "@/lib/store/useUserStore";
-
 import { SkeletonEditor } from "@/components/ui/Skeleton";
 
 interface PeerMessage {
@@ -34,6 +38,12 @@ interface PeerMessage {
   text: string;
   time: string;
   isMe?: boolean;
+}
+
+interface PeerInfo {
+  id: string;
+  name: string;
+  lastSeen?: any;
 }
 
 const DEFAULT_CODE = `# Ruang Kolaborasi Live TRPL 2026
@@ -49,7 +59,10 @@ sapa_kelompok(tim)
 
 export function PairProgrammingRoom() {
   const user = useUserStore((s) => s.user);
-  const [roomCode] = useState("TRPL-LAB-404");
+  const [roomCode, setRoomCode] = useState("TRPL-LAB-404");
+  const [isChangeRoomOpen, setIsChangeRoomOpen] = useState(false);
+  const [roomInput, setRoomInput] = useState("");
+  const [activePeers, setActivePeers] = useState<PeerInfo[]>([]);
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState<string[]>([]);
@@ -58,7 +71,28 @@ export function PairProgrammingRoom() {
   const [chatInput, setChatInput] = useState("");
   const [isDark, setIsDark] = useState(true);
   const [isRoomReady, setIsRoomReady] = useState(isMockFirebase);
+
   const isLocalEditRef = useRef(false);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const myPeerIdRef = useRef<string>("");
+
+  // Initialize unique client peer ID
+  useEffect(() => {
+    if (!myPeerIdRef.current) {
+      myPeerIdRef.current = user?.uid || `peer-${Math.random().toString(36).substring(2, 9)}`;
+    }
+  }, [user?.uid]);
+
+  // Read initial room code from URL query param if present
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoom = params.get("room");
+      if (urlRoom && urlRoom.trim()) {
+        setRoomCode(urlRoom.trim().toUpperCase());
+      }
+    }
+  }, []);
 
   // Detect and observe dark/light theme mode
   useEffect(() => {
@@ -75,12 +109,32 @@ export function PairProgrammingRoom() {
     return () => observer.disconnect();
   }, []);
 
-  // Real-time Firestore sync for code and messages
+  // Real-time Firestore sync for code, messages, and live peer presence
   useEffect(() => {
     if (isMockFirebase) {
       setIsRoomReady(true);
+      setActivePeers([{ id: "mock-1", name: user?.name || "Kamu" }]);
       return;
     }
+
+    const currentPeerId = myPeerIdRef.current || `peer-${Date.now()}`;
+    const peerRef = doc(db, "pair_rooms", roomCode, "peers", currentPeerId);
+
+    // Heartbeat function to announce peer presence
+    const sendHeartbeat = () => {
+      setDoc(
+        peerRef,
+        {
+          name: user?.name || "Mahasiswa",
+          uid: currentPeerId,
+          lastSeen: serverTimestamp(),
+        },
+        { merge: true }
+      ).catch(() => {});
+    };
+
+    sendHeartbeat();
+    const heartbeatTimer = setInterval(sendHeartbeat, 15000);
 
     // 1. Listen to shared code
     const roomRef = doc(db, "pair_rooms", roomCode);
@@ -109,9 +163,9 @@ export function PairProgrammingRoom() {
 
     // 2. Listen to real-time chat messages
     const messagesCol = collection(db, "pair_rooms", roomCode, "messages");
-    const q = query(messagesCol, orderBy("createdAt", "asc"));
+    const qMessages = query(messagesCol, orderBy("createdAt", "asc"));
     const unsubMessages = onSnapshot(
-      q,
+      qMessages,
       (snapshot) => {
         const loaded: PeerMessage[] = [];
         snapshot.forEach((docSnap) => {
@@ -136,9 +190,37 @@ export function PairProgrammingRoom() {
       }
     );
 
+    // 3. Listen to live active peers in room
+    const peersCol = collection(db, "pair_rooms", roomCode, "peers");
+    const unsubPeers = onSnapshot(
+      peersCol,
+      (snapshot) => {
+        const peers: PeerInfo[] = [];
+        snapshot.forEach((docSnap) => {
+          const d = docSnap.data();
+          peers.push({
+            id: docSnap.id,
+            name: d.name || "Mahasiswa",
+            lastSeen: d.lastSeen,
+          });
+        });
+        setActivePeers(peers.length > 0 ? peers : [{ id: currentPeerId, name: user?.name || "Kamu" }]);
+      },
+      (err) => {
+        console.warn("Firestore peers snapshot error:", err);
+      }
+    );
+
     return () => {
+      clearInterval(heartbeatTimer);
       unsubRoom();
       unsubMessages();
+      unsubPeers();
+      // Clean up peer presence on leave
+      deleteDoc(peerRef).catch(() => {});
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
     };
   }, [roomCode, user?.uid, user?.name]);
 
@@ -148,22 +230,47 @@ export function PairProgrammingRoom() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleSwitchRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleaned = roomInput.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+    if (!cleaned) return;
+    setRoomCode(cleaned);
+    setIsChangeRoomOpen(false);
+    setRoomInput("");
+
+    // Update URL without full page reload
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("room", cleaned);
+      window.history.replaceState({}, "", url.toString());
+    }
+  };
+
   const handleCodeChange = (val: string | undefined) => {
     const newCode = val || "";
     setCode(newCode);
 
     if (!isMockFirebase) {
       isLocalEditRef.current = true;
-      const roomRef = doc(db, "pair_rooms", roomCode);
-      setDoc(
-        roomRef,
-        { code: newCode, updatedAt: serverTimestamp() },
-        { merge: true }
-      ).finally(() => {
-        setTimeout(() => {
-          isLocalEditRef.current = false;
-        }, 300);
-      });
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+
+      // Debounce Firestore write by 350ms to eliminate rate limit exhaustion
+      syncTimeoutRef.current = setTimeout(() => {
+        const roomRef = doc(db, "pair_rooms", roomCode);
+        setDoc(
+          roomRef,
+          { code: newCode, updatedAt: serverTimestamp() },
+          { merge: true }
+        )
+          .catch((err) => console.warn("Sync code error:", err))
+          .finally(() => {
+            setTimeout(() => {
+              isLocalEditRef.current = false;
+            }, 200);
+          });
+      }, 350);
     }
   };
 
@@ -179,7 +286,7 @@ export function PairProgrammingRoom() {
         const messagesCol = collection(db, "pair_rooms", roomCode, "messages");
         await addDoc(messagesCol, {
           sender: user?.name || "Mahasiswa",
-          uid: user?.uid || "anon",
+          uid: user?.uid || myPeerIdRef.current || "anon",
           text: textToSend,
           createdAt: serverTimestamp(),
         });
@@ -226,10 +333,109 @@ export function PairProgrammingRoom() {
         boxShadow: "var(--shadow-md)",
         display: "flex",
         flexDirection: "column",
-        height: "620px",
+        height: "640px",
+        position: "relative",
       }}
     >
-      {/* Minimalist Room Header */}
+      {/* Change Room Modal / Overlay */}
+      {isChangeRoomOpen && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.65)",
+            backdropFilter: "blur(4px)",
+            zIndex: 40,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+          }}
+        >
+          <div
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "var(--radius-lg)",
+              padding: "20px",
+              width: "100%",
+              maxWidth: "400px",
+              boxShadow: "var(--shadow-xl)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "14px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <DoorOpen size={20} color="var(--color-primary-500)" weight="bold" />
+                <h4 style={{ margin: 0, fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                  Ganti atau Buat Ruangan
+                </h4>
+              </div>
+              <button
+                onClick={() => setIsChangeRoomOpen(false)}
+                className="btn btn-ghost btn-xs"
+                style={{ padding: "4px" }}
+                aria-label="Tutup"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginBottom: "14px", lineHeight: 1.5 }}>
+              Masukkan kode ruangan baru untuk terhubung dengan rekan kelompok Anda. Contoh: <code>TIM-ALGO-A</code>
+            </p>
+
+            <form onSubmit={handleSwitchRoom}>
+              <input
+                type="text"
+                placeholder="Misal: TRPL-PROJEK-01"
+                value={roomInput}
+                onChange={(e) => setRoomInput(e.target.value.toUpperCase())}
+                autoFocus
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--border-color)",
+                  background: "var(--bg-page)",
+                  color: "var(--text-primary)",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  marginBottom: "14px",
+                  outline: "none",
+                  letterSpacing: "0.5px",
+                }}
+              />
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => setIsChangeRoomOpen(false)}
+                  className="btn btn-sm btn-secondary"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={!roomInput.trim()}
+                  className="btn btn-sm btn-primary"
+                  style={{ gap: "6px" }}
+                >
+                  <ArrowsClockwise size={15} weight="bold" />
+                  <span>Gabung Ruangan</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Room Header */}
       <div
         style={{
           background: "var(--bg-card)",
@@ -274,19 +480,46 @@ export function PairProgrammingRoom() {
                   fontSize: "0.72rem",
                   color: "#10B981",
                   fontWeight: 600,
+                  background: "rgba(16, 185, 129, 0.1)",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
                 }}
+                title={activePeers.map((p) => p.name).join(", ")}
               >
-                <Circle size={7} weight="fill" color="#10B981" /> 2 Terhubung
+                <Circle size={7} weight="fill" color="#10B981" /> {activePeers.length} Terhubung
               </span>
             </div>
-            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-              ID: <strong style={{ color: "var(--color-primary-500)" }}>{roomCode}</strong>
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.72rem", color: "var(--text-muted)" }}>
+              <span>ID:</span>
+              <strong style={{ color: "var(--color-primary-500)" }}>{roomCode}</strong>
+              <button
+                onClick={() => setIsChangeRoomOpen(true)}
+                className="btn btn-ghost btn-xs"
+                style={{
+                  padding: "1px 6px",
+                  fontSize: "0.7rem",
+                  color: "var(--text-secondary)",
+                  height: "auto",
+                }}
+                title="Ganti Ruangan"
+              >
+                [Ganti]
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Minimalist Action Buttons */}
         <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+          <button
+            onClick={() => setIsChangeRoomOpen(true)}
+            className="btn btn-xs btn-secondary"
+            title="Masuk atau Buat Ruangan Lain"
+            style={{ gap: "4px", fontSize: "0.75rem", padding: "4px 10px" }}
+          >
+            <DoorOpen size={13} weight="bold" />
+            <span>Ruangan</span>
+          </button>
           <button
             onClick={handleCopyCode}
             className="btn btn-xs btn-secondary"
@@ -346,62 +579,94 @@ export function PairProgrammingRoom() {
             />
           </div>
 
-          {/* Terminal Output */}
+          {/* Terminal / Output View */}
           <div
             style={{
               height: "140px",
-              background: isDark ? "#0A101D" : "var(--bg-page-alt)",
-              padding: "10px 14px",
               borderTop: "1px solid var(--border-color)",
-              fontFamily: "var(--font-code)",
-              fontSize: "0.78rem",
-              color: "var(--text-primary)",
-              overflowY: "auto",
+              background: isDark ? "#0d1117" : "#f6f8fa",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <div
               style={{
+                padding: "4px 10px",
                 fontSize: "0.7rem",
-                fontWeight: 700,
-                color: "var(--color-primary-500)",
-                marginBottom: "4px",
+                fontWeight: 600,
+                color: "var(--text-muted)",
+                borderBottom: "1px solid var(--border-color)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Konsol Terminal:
+              <span>Terminal Output (Python 3)</span>
+              {output.length > 0 && (
+                <button
+                  onClick={() => setOutput([])}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--text-muted)",
+                    cursor: "pointer",
+                    fontSize: "0.68rem",
+                  }}
+                >
+                  Bersihkan
+                </button>
+              )}
             </div>
-            {output.length === 0 ? (
-              <div style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
-                Klik "Jalankan" untuk mengeksekusi kode Python ini bersama...
-              </div>
-            ) : (
-              output.map((line, i) => <div key={i}>{line}</div>)
-            )}
+            <div
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: "0.75rem",
+                color: isDark ? "#58a6ff" : "#0969da",
+                overflowY: "auto",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {output.length === 0 ? (
+                <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+                  Klik &apos;Jalankan&apos; untuk mengeksekusi kode Python...
+                </span>
+              ) : (
+                output.map((line, idx) => <div key={idx}>{line}</div>)
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Peer Chat Area */}
+        {/* Live Peer Chat Area */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            background: "var(--bg-page-alt)",
+            background: "var(--bg-card)",
           }}
         >
+          {/* Chat Header */}
           <div
             style={{
               padding: "8px 12px",
-              background: "var(--bg-card)",
               borderBottom: "1px solid var(--border-color)",
-              fontSize: "0.75rem",
+              fontSize: "0.8rem",
               fontWeight: 700,
               color: "var(--text-primary)",
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              justifyContent: "space-between",
             }}
           >
-            <ChatCircleDots size={16} color="var(--color-primary-500)" />
-            <span>Diskusi Langsung</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <ChatCircleDots size={16} color="var(--color-primary-500)" />
+              <span>Diskusi Langsung</span>
+            </div>
+            <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>
+              {activePeers.length} rekan di ruang ini
+            </span>
           </div>
 
           {/* Messages Feed */}

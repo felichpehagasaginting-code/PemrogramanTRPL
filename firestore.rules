@@ -39,11 +39,14 @@ service cloud.firestore {
       allow delete: if isAdmin() || (isAuthenticated() && resource.data.authorId == request.auth.uid);
     }
 
-    // Real-time Pair Programming Rooms & Collaboration Chat
+    // Real-time Pair Programming Rooms, Collaborative Chat, & Peer Presence
     match /pair_rooms/{roomId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if true;
       match /messages/{messageId} {
-        allow read, write: if isAuthenticated();
+        allow read, write: if true;
+      }
+      match /peers/{peerId} {
+        allow read, write: if true;
       }
     }
   }
