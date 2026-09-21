@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const today = new Date().toISOString().split("T")[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
-    let data = streaks.get(uid) || {
+    const data = streaks.get(uid) || {
       uid,
       currentStreak: 0,
       longestStreak: 0,
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       streaks.set(uid, data);
 
       let bonusXP = DAILY_BONUS_XP;
-      let messages = [`+${DAILY_BONUS_XP} XP for daily login`];
+      const messages = [`+${DAILY_BONUS_XP} XP for daily login`];
 
       if (data.currentStreak % STREAK_BONUS_THRESHOLD === 0) {
         bonusXP += STREAK_BONUS_XP;
