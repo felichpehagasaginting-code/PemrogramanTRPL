@@ -83,8 +83,50 @@ export function explainPythonError(rawError: string): ExplainedError {
       title: "🔢 Urutan Nomor Melewati Batas (IndexError)",
       explanation: "Kamu mencoba mengambil elemen List di nomor indeks yang melebihi jumlah data yang ada.",
       suggestion: "Ingat prinsip programmer: nomor urut (indeks) di Python selalu dimulai dari angka 0, bukan 1. Kalau isi list ada 3 barang, nomornya: 0, 1, 2.",
-      mentorNote: "💡 Analogi: Ada 3 laci (0, 1, 2), tapi kamu minta buka laci nomor 5.",
+      mentorNote: "💡 Analogi: Ada 3 laci (0, 1, 2), tapi kodinganmu minta membuka laci nomor 3 atau lebih!",
       icon: "🔢",
+    };
+  }
+
+  if (/KeyError/i.test(errStr)) {
+    const keyMatch = errStr.match(/KeyError:\s*(['"]?)(.*?)\1/);
+    const keyName = keyMatch ? keyMatch[2] : "kunci";
+    return {
+      title: `🔑 Kunci Dictionary Tidak Ditemukan (KeyError: '${keyName}')`,
+      explanation: `Kamu memanggil kunci '${keyName}' dari Dictionary, padahal kunci tersebut belum pernah didaftarkan.`,
+      suggestion: `Gunakan metode '.get("${keyName}")' yang lebih aman, atau periksa ejaan huruf besar/kecil kunci data kamu.`,
+      mentorNote: "💡 Analogi: Seperti mencari kontak teman di buku telepon, tapi nomor dan namanya memang belum pernah dicatat.",
+      icon: "🔑",
+    };
+  }
+
+  if (/ValueError/i.test(errStr)) {
+    return {
+      title: "⚠️ Nilai Data Tidak Sesuai Format (ValueError)",
+      explanation: "Fungsi menerima nilai yang tipe datanya benar, tapi isi nilainya tidak masuk akal untuk diproses (misal: int('halo') atau konversi teks bukan angka).",
+      suggestion: "Pastikan input teks hanya berisi karakter angka jika ingin diubah ke integer dengan int().",
+      mentorNote: "💡 Analogi: Toples toplesnya muat, tapi kamu maksa masukin batu ke toples garam!",
+      icon: "⚠️",
+    };
+  }
+
+  if (/AttributeError/i.test(errStr)) {
+    return {
+      title: "🧩 Perintah Tidak Dikenal pada Objek (AttributeError)",
+      explanation: "Kamu memanggil metode atau fungsi bawaan yang tidak dimiliki oleh tipe data tersebut (contoh: string dipanggil .append() atau integer dipanggil .lower()).",
+      suggestion: "Cek kembali tipe data variabelmu: .append() hanya untuk List, sedangkan .lower() hanya untuk String.",
+      mentorNote: "💡 Analogi: Menekan tombol 'klakson' di sepeda ontel — fiturnya memang tidak tersedia!",
+      icon: "🧩",
+    };
+  }
+
+  if (/RecursionError|maximum recursion depth exceeded/i.test(errStr)) {
+    return {
+      title: "🌀 Fungsi Memanggil Dirinya Tanpa Henti (RecursionError)",
+      explanation: "Fungsi memanggil dirinya sendiri terus-menerus tanpa ada kondisi henti (*base case*), sehingga memori tumpukan Python penuh.",
+      suggestion: "Tambahkan kondisi `if kondisi_berhenti: return hasil` di baris paling awal fungsi.",
+      mentorNote: "💡 Analogi: Dua cermin ditaruh berhadapan, pantulannya jadi tak terhingga!",
+      icon: "🌀",
     };
   }
 

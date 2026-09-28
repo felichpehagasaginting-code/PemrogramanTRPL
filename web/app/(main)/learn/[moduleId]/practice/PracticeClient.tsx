@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
 import { useRouter, useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useUserStore } from "@/lib/store/useUserStore";
-import Editor from "@monaco-editor/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -20,18 +20,16 @@ import {
   GitCommit,
   Flask,
   ClockCounterClockwise,
+  ArrowsOut,
+  ArrowsIn,
+  FloppyDisk,
+  ArrowsClockwise,
 } from "@phosphor-icons/react";
 import { QuizEngine, QuizQuestion } from "@/components/quiz/QuizEngine";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { runPythonCodeClient } from "@/lib/pyodide/pyodideRunner";
 import { gradeSubmission, GradingResult } from "@/lib/grader/autoGrader";
-import { VisualDebugger } from "@/components/editor/VisualDebugger";
-import { MemoryGraph } from "@/components/editor/MemoryGraph";
-import { FlowchartBuilder } from "@/components/editor/FlowchartBuilder";
-import { TddTestBuilder } from "@/components/editor/TddTestBuilder";
 import { SkeletonEditor } from "@/components/ui/Skeleton";
-import { AskHelpModal } from "@/components/learning/AskHelpModal";
-import { ScaffoldedHintDrawer } from "@/components/learning/ScaffoldedHintDrawer";
 import { explainPythonError, generateHint, ExplainedError } from "@/lib/ai/errorExplainer";
 import { ParsonsProblem, ParsonsBlock } from "@/components/learning/ParsonsProblem";
 import { PowerShellTerminal } from "@/components/editor/PowerShellTerminal";
@@ -40,8 +38,22 @@ import { MONACO_CUSTOM_THEMES, defineMonacoThemes } from "@/lib/editorThemes";
 import { lintPythonCode, LintWarning } from "@/lib/linter/simplePythonLinter";
 import { PaintBrush } from "@phosphor-icons/react";
 import { useCodeHistory } from "@/lib/recorder/useCodeHistory";
-import { CodeHistoryDrawer } from "@/components/editor/CodeHistoryDrawer";
 import { EVALUATION_QUESTIONS } from "@/lib/content/modules-data";
+
+// Performance Optimization: Dynamic import for Monaco Editor without SSR
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+  loading: () => <SkeletonEditor />,
+});
+
+// Route & Tab Level Code-Splitting: Lazy load heavy visual tooling components
+const VisualDebugger = lazy(() => import("@/components/editor/VisualDebugger").then((m) => ({ default: m.VisualDebugger })));
+const MemoryGraph = lazy(() => import("@/components/editor/MemoryGraph").then((m) => ({ default: m.MemoryGraph })));
+const FlowchartBuilder = lazy(() => import("@/components/editor/FlowchartBuilder").then((m) => ({ default: m.FlowchartBuilder })));
+const TddTestBuilder = lazy(() => import("@/components/editor/TddTestBuilder").then((m) => ({ default: m.TddTestBuilder })));
+const AskHelpModal = lazy(() => import("@/components/learning/AskHelpModal").then((m) => ({ default: m.AskHelpModal })));
+const ScaffoldedHintDrawer = lazy(() => import("@/components/learning/ScaffoldedHintDrawer").then((m) => ({ default: m.ScaffoldedHintDrawer })));
+const CodeHistoryDrawer = lazy(() => import("@/components/editor/CodeHistoryDrawer").then((m) => ({ default: m.CodeHistoryDrawer })));
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -68,7 +80,7 @@ interface PracticeData {
 const PRACTICE_CONTENT: Record<string, PracticeData> = {
   M0: {
     mode: "quiz",
-    description: "Pre-Test Diagnostik TRPL 2026: Ukur pemahaman awal logika & dasar pemrograman kamu.",
+    description: "Pre-Test Diagnostik TRPL 2026: Ukur pemahaman awal logika komputasi & dasar pemrograman kamu.",
     questions: EVALUATION_QUESTIONS.map((q) => ({
       id: q.id,
       question: q.question,
@@ -79,7 +91,7 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M1: {
     mode: "parsons",
-    description: "Susun alur pembuatan folder & file Python pertama kamu dengan benar!",
+    description: "Workspace TRPL CWE: Susun alur pembuatan folder & file Python pertama kamu di partisi D:\\TRPL!",
     parsonsSolution: [
       { id: "b1", code: "# Langkah 1: Buat folder project", indent: 0 },
       { id: "b2", code: "workspace_folder = 'Matrikulasi'", indent: 0 },
@@ -90,8 +102,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M2: {
     mode: "coding",
-    description: "Buat program Python pertama kamu! Buat variabel nama = 'Maba' dan cetak 'Halo, Maba!'",
-    initialCode: "# Buat variabel nama\nnama = 'Maba'\n# Cetak 'Halo, Maba!'\nprint('Halo, ' + nama + '!')\n",
+    description: "Studi Kasus Agro-Informatika: Presensi Mandor Lapangan CWE. Buat variabel nama = 'Maba' dan cetak 'Halo, Maba!'",
+    initialCode: "# Buat variabel nama mandor / asisten lapangan CWE\nnama = 'Maba'\n# Cetak 'Halo, Maba!'\nprint('Halo, ' + nama + '!')\n",
     testCases: [
       {
         id: "tc1",
@@ -102,8 +114,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M3: {
     mode: "coding",
-    description: "Buat variabel dengan tipe data string, integer, dan float, lalu cetak nilainya.",
-    initialCode: "nama = 'Budi'\numur = 18\ntinggi = 170.5\nprint(nama)\nprint(umur)\nprint(tinggi)\n",
+    description: "Studi Kasus Agro-Informatika: Data Operasional Mandor & Sensor PKS CWE. Buat variabel tipe data string (nama = 'Budi'), integer (umur = 18), dan float (tinggi/target tonase = 170.5), lalu cetak nilainya.",
+    initialCode: "# Pendataan Mandor Lapangan & Parameter Timbangan PKS CWE\nnama = 'Budi'\numur = 18\ntinggi = 170.5\nprint(nama)\nprint(umur)\nprint(tinggi)\n",
     testCases: [
       {
         id: "tc1",
@@ -114,8 +126,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M4: {
     mode: "coding",
-    description: "Buat program yang mengecek angka = 10. Jika genap cetak 'Genap', jika ganjil cetak 'Ganjil'.",
-    initialCode: "angka = 10\nif angka % 2 == 0:\n    print('Genap')\nelse:\n    print('Ganjil')\n",
+    description: "Studi Kasus Agro-Informatika: Sistem Timbangan Jalur Truk TBS PKS CWE. Buat program yang mengecek nomor antrean angka = 10. Jika genap cetak 'Genap' (jalur timbangan A), jika ganjil cetak 'Ganjil' (jalur timbangan B).",
+    initialCode: "# Pemeriksaan Jalur Truk TBS Timbangan PKS CWE\nangka = 10\nif angka % 2 == 0:\n    print('Genap')\nelse:\n    print('Ganjil')\n",
     structuralRules: [
       {
         type: "contains_regex",
@@ -133,8 +145,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M5: {
     mode: "coding",
-    description: "Buat program yang mencetak angka 1 sampai 5 menggunakan perulangan for.",
-    initialCode: "for i in range(1, 6):\n    print(i)\n",
+    description: "Studi Kasus Agro-Informatika: Monitoring Sensor Sterilizer Rebusan Sawit CWE. Buat program yang mencetak urutan pengecekan sensor suhu ruang rebusan 1 sampai 5 menggunakan perulangan for.",
+    initialCode: "# Monitoring Sensor Ruang Rebusan Sawit (Sterilizer) 1 sampai 5\nfor i in range(1, 6):\n    print(i)\n",
     structuralRules: [
       {
         type: "contains_regex",
@@ -152,8 +164,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M6: {
     mode: "coding",
-    description: "Buat fungsi bernama 'sapa' yang menerima parameter nama dan mengembalikan string 'Halo, [nama]!'",
-    initialCode: "def sapa(nama):\n    return 'Halo, ' + nama + '!'\n\nprint(sapa('TRPL'))\n",
+    description: "Studi Kasus Agro-Informatika: Generator Format Sapaan Radio Lapangan Kebun CWE. Buat fungsi bernama 'sapa' yang menerima parameter nama dan mengembalikan string 'Halo, [nama]!'",
+    initialCode: "# Format pesan otomatis radio komunikasi kebun CWE\ndef sapa(nama):\n    return 'Halo, ' + nama + '!'\n\nprint(sapa('TRPL'))\n",
     structuralRules: [
       {
         type: "contains_regex",
@@ -171,8 +183,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M7: {
     mode: "coding",
-    description: "Buat list berisi 5 buah favorit, lalu cetak buah ketiga (index 2).",
-    initialCode: "buah = ['apel', 'mangga', 'pisang', 'anggur', 'jeruk']\nprint(buah[2])\n",
+    description: "Studi Kasus Agro-Informatika: Manajemen Rak Sampel Mutu Laboratorium Panen CWE. Buat list 5 item komoditas 'buah', lalu cetak sampel ketiga (index 2: 'pisang').",
+    initialCode: "# Rak Sampel Mutu Panen Laboratorium CWE\nbuah = ['apel', 'mangga', 'pisang', 'anggur', 'jeruk']\nprint(buah[2])\n",
     testCases: [
       {
         id: "tc1",
@@ -183,8 +195,8 @@ const PRACTICE_CONTENT: Record<string, PracticeData> = {
   },
   M8: {
     mode: "coding",
-    description: "Mini Project: Sistem Kasir Warkop TRPL 2026. Hitung total pesanan kopi dan mie, berikan diskon 10% jika total >= Rp 30.000, lalu cetak Total Bayar.",
-    initialCode: `# Mini Project: Kasir Warkop TRPL 2026
+    description: "Mini Project Agro-Informatika: Sistem Kasir Koperasi Karyawan Perkebunan Sawit & Kantin TRPL CWE 2026. Hitung total belanja kopi dan mie instan, berikan diskon 10% jika total >= Rp 30.000, lalu cetak Total Belanja dan Total Bayar.",
+    initialCode: `# Mini Project: Kasir Koperasi Sawit & Kantin TRPL CWE 2026
 harga_kopi = 5000
 harga_mie = 10000
 
@@ -233,6 +245,15 @@ export default function PracticeClient() {
   const [showPasteToast, setShowPasteToast] = useState(false);
   const editorRef = useRef(null);
 
+  // Split-Pane Resizer & Zen Mode (Recommendation 1)
+  const [editorHeight, setEditorHeight] = useState<number>(360);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+
+  // Auto-Save with Local Conflict Recovery (Recommendation 4)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("saved");
+  const [hasDraft, setHasDraft] = useState<boolean>(false);
+
   // Real-time Python linting
   const lintWarnings = useMemo(() => {
     return lintPythonCode(code);
@@ -254,6 +275,57 @@ export default function PracticeClient() {
   } = useCodeHistory(`practice_${moduleId}`);
 
   const content = PRACTICE_CONTENT[moduleId as string];
+
+  const draftStorageKey = `draft_code_${moduleId}_${user?.uid || "guest"}`;
+
+  // Initialize code: Check for auto-saved draft or fallback to content.initialCode
+  useEffect(() => {
+    if (typeof window === "undefined" || !content) return;
+    const defaultCode = content.initialCode || "";
+    try {
+      const savedDraft = localStorage.getItem(draftStorageKey);
+      if (savedDraft && savedDraft.trim() && savedDraft !== defaultCode) {
+        setCode(savedDraft);
+        setHasDraft(true);
+      } else {
+        setCode(defaultCode);
+        setHasDraft(false);
+      }
+    } catch {
+      setCode(defaultCode);
+    }
+  }, [moduleId, content, draftStorageKey]);
+
+  // Debounced auto-save effect
+  useEffect(() => {
+    if (typeof window === "undefined" || !code || !content?.initialCode) return;
+    setAutoSaveStatus("saving");
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(draftStorageKey, code);
+        setAutoSaveStatus("saved");
+        if (code !== content.initialCode) {
+          setHasDraft(true);
+        }
+      } catch (err) {
+        setAutoSaveStatus("idle");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [code, draftStorageKey, content?.initialCode]);
+
+  const handleResetToInitial = () => {
+    if (!content?.initialCode) return;
+    if (confirm("Kembalikan kode ke template awal modul? Perubahan draf saat ini akan dibatalkan.")) {
+      setCode(content.initialCode);
+      try {
+        localStorage.removeItem(draftStorageKey);
+      } catch {}
+      setHasDraft(false);
+      setAutoSaveStatus("saved");
+    }
+  };
 
   const handleEditorWillMount = (monaco: any) => {
     defineMonacoThemes(monaco);
@@ -602,6 +674,43 @@ export default function PracticeClient() {
                 </select>
               </div>
 
+              {/* Auto-Save Status Badge & Reset Draft Button */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.75rem",
+                  padding: "4px 8px",
+                  borderRadius: "var(--radius-md)",
+                  background: "var(--bg-page-alt)",
+                  border: "1px solid var(--border-color)",
+                }}
+              >
+                <FloppyDisk size={14} color={autoSaveStatus === "saving" ? "#F59E0B" : "#22C55E"} weight="fill" />
+                <span style={{ color: "var(--text-secondary)" }}>
+                  {autoSaveStatus === "saving" ? "Menyimpan..." : "Draf Lokal Tersimpan"}
+                </span>
+                {hasDraft && (
+                  <button
+                    onClick={handleResetToInitial}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#EF4444",
+                      fontSize: "0.72rem",
+                      cursor: "pointer",
+                      padding: "0 4px",
+                      textDecoration: "underline",
+                      fontWeight: 600,
+                    }}
+                    title="Hapus draf lokal dan kembalikan ke kode awal modul"
+                  >
+                    Reset Awal
+                  </button>
+                )}
+              </div>
+
               <button
                 onClick={() => setIsHistoryOpen(true)}
                 className="btn btn-sm btn-ghost focus-ring"
@@ -636,6 +745,26 @@ export default function PracticeClient() {
                 aria-label="Buka Petunjuk Bertingkat (3-Tier Hint)"
               >
                 <Lightbulb size={16} weight="fill" color="#F59E0B" /> 💡 3-Tier Hint
+              </button>
+
+              {/* Zen Fullscreen Mode Toggle */}
+              <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="btn btn-sm btn-ghost focus-ring"
+                style={{
+                  color: isFullscreen ? "#F59E0B" : "var(--text-primary)",
+                  background: isFullscreen ? "rgba(245, 158, 11, 0.15)" : "var(--bg-card)",
+                  border: isFullscreen ? "1px solid #F59E0B" : "1px solid var(--border-color)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 700,
+                }}
+                aria-label={isFullscreen ? "Keluar dari Zen Focus Mode" : "Aktifkan Zen Focus Mode"}
+                title={isFullscreen ? "Keluar dari Zen Mode (Esc)" : "Masuk ke Zen Focus Mode (Editor Penuh)"}
+              >
+                {isFullscreen ? <ArrowsIn size={16} weight="bold" /> : <ArrowsOut size={16} weight="bold" />}
+                <span>{isFullscreen ? "Keluar Zen" : "Zen Mode"}</span>
               </button>
             </div>
           </div>
@@ -689,32 +818,112 @@ export default function PracticeClient() {
             </div>
           )}
 
-          {/* Code Editor Container */}
+          {/* Code Editor Container with Zen Mode & Split Resizer */}
           <div
-            style={{
-              height: "320px",
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
-              border: "1px solid var(--border-color)",
-            }}
+            style={
+              isFullscreen
+                ? {
+                    position: "fixed",
+                    inset: 0,
+                    zIndex: 99999,
+                    background: "#030712",
+                    padding: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }
+                : {
+                    position: "relative",
+                  }
+            }
           >
-            <Editor
-              height="100%"
-              language="python"
-              theme={selectedTheme}
-              value={code}
-              beforeMount={handleEditorWillMount}
-              onChange={handleEditorCodeChange}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                fontFamily: "Fira Code, JetBrains Mono, monospace",
-                fontLigatures: true,
-                lineNumbers: "on",
-                scrollBeyondLastLine: false,
-                padding: { top: 12 },
+            {isFullscreen && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", background: "rgba(255,255,255,0.05)", padding: "10px 16px", borderRadius: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#F8FAFC", fontWeight: 700, fontSize: "0.9rem" }}>
+                  <span>🧘 Zen Focus Mode: {content.description}</span>
+                </div>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <button onClick={runCode} disabled={isRunning} className="btn btn-primary btn-sm" style={{ gap: "6px" }}>
+                    <Play size={14} weight="fill" /> {isRunning ? "Menjalankan..." : "Jalankan Kode"}
+                  </button>
+                  <button onClick={() => setIsFullscreen(false)} className="btn btn-secondary btn-sm" style={{ gap: "6px" }}>
+                    <ArrowsIn size={14} weight="bold" /> Keluar Zen (Esc)
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div
+              style={{
+                height: isFullscreen ? "calc(100vh - 100px)" : `${editorHeight}px`,
+                borderRadius: "var(--radius-lg)",
+                overflow: "hidden",
+                border: "1.5px solid var(--border-color)",
+                boxShadow: "var(--shadow-md)",
+                transition: isResizing ? "none" : "height 0.2s ease",
               }}
-            />
+            >
+              <MonacoEditor
+                height="100%"
+                language="python"
+                theme={selectedTheme}
+                value={code}
+                beforeMount={handleEditorWillMount}
+                onChange={handleEditorCodeChange}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: "Fira Code, JetBrains Mono, monospace",
+                  fontLigatures: true,
+                  lineNumbers: "on",
+                  scrollBeyondLastLine: false,
+                  padding: { top: 12 },
+                }}
+              />
+            </div>
+
+            {/* Split Resizer Handle */}
+            {!isFullscreen && (
+              <div
+                role="separator"
+                aria-orientation="horizontal"
+                aria-label="Tarik untuk mengubah tinggi editor koding"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setIsResizing(true);
+                  const startY = e.clientY;
+                  const startHeight = editorHeight;
+
+                  const handleMouseMove = (moveEvent: MouseEvent) => {
+                    const newHeight = Math.max(220, Math.min(750, startHeight + (moveEvent.clientY - startY)));
+                    setEditorHeight(newHeight);
+                  };
+
+                  const handleMouseUp = () => {
+                    setIsResizing(false);
+                    window.removeEventListener("mousemove", handleMouseMove);
+                    window.removeEventListener("mouseup", handleMouseUp);
+                  };
+
+                  window.addEventListener("mousemove", handleMouseMove);
+                  window.addEventListener("mouseup", handleMouseUp);
+                }}
+                style={{
+                  height: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "row-resize",
+                  margin: "4px 0",
+                  opacity: 0.6,
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.6")}
+                title="Tarik ke atas/bawah untuk mengatur tinggi editor"
+              >
+                <div style={{ width: "48px", height: "4px", borderRadius: "2px", background: "var(--border-color-strong)" }} />
+              </div>
+            )}
           </div>
 
           {/* Action buttons */}
@@ -898,18 +1107,28 @@ export default function PracticeClient() {
             </div>
           )}
 
-          {activeTab === "debugger" && <VisualDebugger code={code} />}
+          {activeTab === "debugger" && (
+            <Suspense fallback={<div style={{ padding: "32px", display: "flex", justifyContent: "center" }}><LoadingSpinner /></div>}>
+              <VisualDebugger code={code} />
+            </Suspense>
+          )}
 
           {activeTab === "ram" && (
-            <MemoryGraph variables={{ x: 10, total: 25.5, items: ["Python", "TRPL"], aktif: true }} />
+            <Suspense fallback={<div style={{ padding: "32px", display: "flex", justifyContent: "center" }}><LoadingSpinner /></div>}>
+              <MemoryGraph variables={{ x: 10, total: 25.5, items: ["Python", "TRPL"], aktif: true }} />
+            </Suspense>
           )}
 
           {activeTab === "flowchart" && (
-            <FlowchartBuilder onCodeGenerated={(py) => setCode(py)} />
+            <Suspense fallback={<div style={{ padding: "32px", display: "flex", justifyContent: "center" }}><LoadingSpinner /></div>}>
+              <FlowchartBuilder onCodeGenerated={(py) => setCode(py)} />
+            </Suspense>
           )}
 
           {activeTab === "tdd" && (
-            <TddTestBuilder studentCode={code} />
+            <Suspense fallback={<div style={{ padding: "32px", display: "flex", justifyContent: "center" }}><LoadingSpinner /></div>}>
+              <TddTestBuilder studentCode={code} />
+            </Suspense>
           )}
 
           {activeTab === "grader" && (
@@ -995,33 +1214,45 @@ export default function PracticeClient() {
       )}
 
       {/* Ask Help Modal */}
-      <AskHelpModal
-        isOpen={askHelpOpen}
-        onClose={() => setAskHelpOpen(false)}
-        code={code}
-        moduleId={moduleId as string}
-        lastError={explainedError?.title}
-        userName={user.name}
-      />
+      {askHelpOpen && (
+        <Suspense fallback={null}>
+          <AskHelpModal
+            isOpen={askHelpOpen}
+            onClose={() => setAskHelpOpen(false)}
+            code={code}
+            moduleId={moduleId as string}
+            lastError={explainedError?.title}
+            userName={user.name}
+          />
+        </Suspense>
+      )}
 
       {/* 3-Tier Scaffolding Hint Drawer */}
-      <ScaffoldedHintDrawer
-        isOpen={showHintDrawer}
-        onClose={() => setShowHintDrawer(false)}
-        moduleTitle={`Latihan Modul ${moduleId}`}
-      />
+      {showHintDrawer && (
+        <Suspense fallback={null}>
+          <ScaffoldedHintDrawer
+            isOpen={showHintDrawer}
+            onClose={() => setShowHintDrawer(false)}
+            moduleTitle={`Latihan Modul ${moduleId}`}
+          />
+        </Suspense>
+      )}
 
       {/* Code History Drawer */}
-      <CodeHistoryDrawer
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        history={history}
-        currentCode={code}
-        onRestore={(restoredCode) => setCode(restoredCode)}
-        onSaveSnapshot={(codeToSave, label) => saveRevision(codeToSave, label)}
-        onDeleteRevision={deleteRevision}
-        onClearHistory={clearHistory}
-      />
+      {isHistoryOpen && (
+        <Suspense fallback={null}>
+          <CodeHistoryDrawer
+            isOpen={isHistoryOpen}
+            onClose={() => setIsHistoryOpen(false)}
+            history={history}
+            currentCode={code}
+            onRestore={(restoredCode) => setCode(restoredCode)}
+            onSaveSnapshot={(codeToSave, label) => saveRevision(codeToSave, label)}
+            onDeleteRevision={deleteRevision}
+            onClearHistory={clearHistory}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
