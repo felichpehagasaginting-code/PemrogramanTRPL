@@ -23,9 +23,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
   const { checkDailyStreak } = useGameStore();
   const [mounted, setMounted] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // Activate 1-hour inactivity auto-logout protection
   useSessionTimeout();
+
+  // Close user menu on route change
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
@@ -49,13 +55,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   };
 
   if (!mounted || !user || !isUserReady) return <LoadingScreen text="Menghubungkan data TRPL..." fullPage />;
-
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  // Close user menu on route change
-  useEffect(() => {
-    setUserMenuOpen(false);
-  }, [pathname]);
 
   const menuLinks = [
     { label: "Dasbor", href: "/dashboard", icon: <BookOpen size={18} weight="bold" /> },
