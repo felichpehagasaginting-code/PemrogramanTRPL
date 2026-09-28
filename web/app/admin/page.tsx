@@ -11,7 +11,7 @@ import {
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
   Student, ChartBar, CheckCircle, LockKey, SignOut, Code,
   PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft, PlayCircle,
-  FileText,
+  FileText, Table,
 } from "@phosphor-icons/react";
 
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
@@ -53,6 +53,8 @@ export default function AdminPage() {
   const subscribeAllUsersRealtime = useUserStore((s) => s.subscribeAllUsersRealtime);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "struggling" | "postTestReady" | "certified">("all");
+  const [csvPreviewModalOpen, setCsvPreviewModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"users" | "analytics" | "helpdesk" | "plagiarism" | "broadcast" | "testcases">("users");
   const [academicModalOpen, setAcademicModalOpen] = useState(false);
   const [dosenGateModalOpen, setDosenGateModalOpen] = useState(false);
@@ -204,9 +206,38 @@ export default function AdminPage() {
   const completedAll = allUsers.filter((u) => u.level === "TRPL Legend").length;
   const avgStreak = totalStudents > 0 ? Math.round(allUsers.reduce((s, u) => s + (u.streak || 0), 0) / totalStudents) : 0;
 
-  const filteredUsers = allUsers.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = allUsers.filter((u) => {
+    const matchesSearch =
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase());
+    if (!matchesSearch) return false;
+
+    if (statusFilter === "all") return true;
+
+    const pre = u.tests?.preTest;
+    const post = u.tests?.postTest;
+    const isCertified = Boolean(
+      pre?.completed &&
+      allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") &&
+      post?.completed
+    );
+
+    if (statusFilter === "certified") {
+      return isCertified;
+    }
+
+    if (statusFilter === "postTestReady") {
+      return pre?.completed && !post?.completed;
+    }
+
+    if (statusFilter === "struggling") {
+      // Selesai pretest tapi stuck di modul 1 atau 2 (kurang dari 3 modul selesai)
+      const completedCount = allModuleKeys.filter((k) => u.progress?.[k]?.status === "completed").length;
+      return Boolean(pre?.completed && completedCount <= 3 && !post?.completed);
+    }
+
+    return true;
+  });
 
   const moduleStats = allModuleKeys.map((key) => {
     const completed = allUsers.filter((u) => u.progress[key]?.status === "completed").length;
@@ -452,6 +483,9 @@ export default function AdminPage() {
             <button onClick={() => { resetForm(); setAddModal(true); }} className="btn btn-primary btn-sm" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <UserPlus size={16} /> Tambah Mahasiswa
             </button>
+            <button onClick={() => setCsvPreviewModalOpen(true)} className="btn btn-secondary btn-sm" style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--color-primary-500)" }} title="Lihat pratinjau tabel sebelum mengunduh CSV">
+              <Table size={16} /> Pratinjau CSV
+            </button>
             <button onClick={exportCSV} className="btn btn-secondary btn-sm" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <DownloadSimple size={16} /> Export CSV
             </button>
@@ -499,16 +533,75 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Search & Table */}
+        {/* Search & Quick Filter Chips & Table */}
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl)", overflow: "hidden", marginBottom: "var(--space-12)" }}>
           <div style={{ padding: "var(--space-5) var(--space-6)", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-            <h3 style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--text-primary)" }}>
-              Data Seluruh Mahasiswa
-            </h3>
-            <div style={{ position: "relative", width: "260px", maxWidth: "100%" }}>
+            <div>
+              <h3 style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                Data Seluruh Mahasiswa
+              </h3>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                Menampilkan {filteredUsers.length} dari {totalStudents} mahasiswa
+              </span>
+            </div>
+
+            {/* Quick Filter Chips (Recommendation 9) */}
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+              {[
+                { id: "all", label: "Semua", count: totalStudents, color: "var(--text-secondary)" },
+                {
+                  id: "struggling",
+                  label: "🔴 Perlu Bantuan (M1-M3)",
+                  count: allUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.filter((k) => u.progress?.[k]?.status === "completed").length <= 3 && !u.tests?.postTest?.completed).length,
+                  color: "#EF4444",
+                },
+                {
+                  id: "postTestReady",
+                  label: "🟡 Mengerjakan Post-Test",
+                  count: allUsers.filter((u) => u.tests?.preTest?.completed && !u.tests?.postTest?.completed).length,
+                  color: "#F59E0B",
+                },
+                {
+                  id: "certified",
+                  label: "🟢 Lulus Lengkap",
+                  count: allUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") && u.tests?.postTest?.completed).length,
+                  color: "#22C55E",
+                },
+              ].map((chip) => {
+                const isActive = statusFilter === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    onClick={() => setStatusFilter(chip.id as any)}
+                    className="focus-ring"
+                    style={{
+                      background: isActive ? "rgba(255, 107, 0, 0.15)" : "var(--bg-page-alt)",
+                      border: `1.5px solid ${isActive ? "var(--color-primary-500)" : "var(--border-color)"}`,
+                      color: isActive ? "var(--color-primary-500)" : "var(--text-secondary)",
+                      borderRadius: "var(--radius-full)",
+                      padding: "4px 10px",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      transition: "all var(--transition-fast)",
+                    }}
+                  >
+                    <span>{chip.label}</span>
+                    <span style={{ background: "rgba(0,0,0,0.15)", padding: "1px 5px", borderRadius: "10px", fontSize: "0.7rem" }}>
+                      {chip.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ position: "relative", width: "240px", maxWidth: "100%" }}>
               <MagnifyingGlass size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
-                type="text" placeholder="Cari mahasiswa..." value={search}
+                type="text" placeholder="Cari nama / email..." value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{ width: "100%", padding: "8px 12px 8px 36px", borderRadius: "var(--radius-full)", border: "1.5px solid var(--border-color)", background: "var(--bg-page)", fontSize: "0.85rem", color: "var(--text-primary)", outline: "none" }}
               />
@@ -549,8 +642,40 @@ export default function AdminPage() {
                     onClick={() => setSelectedUid(selectedUid === u.uid ? null : u.uid)}
                   >
                     <td style={{ padding: "8px 12px", fontWeight: 800, color: i < 3 ? "#FFD93D" : "var(--text-muted)" }}>#{i + 1}</td>
-                    <td style={{ padding: "8px 12px", fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>{u.name}</td>
-                    <td style={{ padding: "8px 12px", color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>{u.email}</td>
+                    <td style={{ padding: "8px 12px", fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>
+                      {search.trim() ? (
+                        <span>
+                          {u.name.split(new RegExp(`(${search})`, "gi")).map((part: string, idx: number) =>
+                            part.toLowerCase() === search.toLowerCase() ? (
+                              <mark key={idx} style={{ background: "rgba(255, 107, 0, 0.35)", color: "inherit", borderRadius: "2px", padding: "0 2px" }}>
+                                {part}
+                              </mark>
+                            ) : (
+                              part
+                            )
+                          )}
+                        </span>
+                      ) : (
+                        u.name
+                      )}
+                    </td>
+                    <td style={{ padding: "8px 12px", color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
+                      {search.trim() ? (
+                        <span>
+                          {u.email.split(new RegExp(`(${search})`, "gi")).map((part: string, idx: number) =>
+                            part.toLowerCase() === search.toLowerCase() ? (
+                              <mark key={idx} style={{ background: "rgba(255, 107, 0, 0.35)", color: "inherit", borderRadius: "2px", padding: "0 2px" }}>
+                                {part}
+                              </mark>
+                            ) : (
+                              part
+                            )
+                          )}
+                        </span>
+                      ) : (
+                        u.email
+                      )}
+                    </td>
                     <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "var(--color-primary-600)" }}>{u.xp}</td>
                     <td style={{ padding: "8px 12px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.75rem" }}>{u.level}</td>
                     
@@ -968,6 +1093,124 @@ export default function AdminPage() {
           user={testDetailUser}
           initialTab={testDetailInitialTab}
         />
+
+        {/* CSV Mini Data Preview Modal (Recommendation 9) */}
+        {csvPreviewModalOpen && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(6px)",
+              padding: "20px",
+            }}
+          >
+            <div
+              style={{
+                background: "var(--bg-card)",
+                borderRadius: "var(--radius-xl)",
+                padding: "var(--space-6)",
+                width: "100%",
+                maxWidth: "960px",
+                maxHeight: "85vh",
+                display: "flex",
+                flexDirection: "column",
+                border: "1.5px solid var(--border-color)",
+                boxShadow: "var(--shadow-2xl)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <div>
+                  <h4 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <Table size={22} color="var(--color-primary-500)" />
+                    Pratinjau Data Rekapitulasi CSV ({sorted.length} Baris Mahasiswa)
+                  </h4>
+                  <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "4px 0 0 0" }}>
+                    Pratinjau struktur tabel data nilai, status kelulusan, dan modul sebelum diunduh ke format Excel/CSV.
+                  </p>
+                </div>
+                <button onClick={() => setCsvPreviewModalOpen(false)} className="btn btn-sm btn-ghost">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div style={{ flex: 1, overflow: "auto", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", marginBottom: "16px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.75rem" }}>
+                  <thead style={{ position: "sticky", top: 0, background: "var(--bg-page-alt)", zIndex: 1 }}>
+                    <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
+                      <th style={{ padding: "8px", textAlign: "left" }}>#</th>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Nama</th>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>XP</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>Pre-Test</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>Post-Test</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>Sertifikat</th>
+                      {allModuleKeys.map((k) => (
+                        <th key={k} style={{ padding: "8px 4px", textAlign: "center" }}>{k}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sorted.slice(0, 50).map((u, idx) => {
+                      const pre = u.tests?.preTest;
+                      const post = u.tests?.postTest;
+                      const isCert = Boolean(
+                        pre?.completed &&
+                        allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") &&
+                        post?.completed
+                      );
+                      return (
+                        <tr key={u.uid} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                          <td style={{ padding: "6px 8px", color: "var(--text-muted)" }}>{idx + 1}</td>
+                          <td style={{ padding: "6px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>{u.name}</td>
+                          <td style={{ padding: "6px 8px", color: "var(--text-secondary)" }}>{u.email}</td>
+                          <td style={{ padding: "6px 8px", textAlign: "center", fontWeight: 700, color: "var(--color-primary-600)" }}>{u.xp}</td>
+                          <td style={{ padding: "6px 8px", textAlign: "center" }}>{pre ? `${pre.percentage}%` : "-"}</td>
+                          <td style={{ padding: "6px 8px", textAlign: "center" }}>{post ? `${post.percentage}%` : "-"}</td>
+                          <td style={{ padding: "6px 8px", textAlign: "center" }}>
+                            <span style={{ padding: "2px 6px", borderRadius: "4px", fontSize: "0.7rem", fontWeight: 700, background: isCert ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: isCert ? "#22C55E" : "#EF4444" }}>
+                              {isCert ? "LULUS" : "BELUM"}
+                            </span>
+                          </td>
+                          {allModuleKeys.map((k) => (
+                            <td key={k} style={{ padding: "6px 4px", textAlign: "center", fontSize: "0.68rem" }}>
+                              {u.progress?.[k]?.status === "completed" ? "✅" : "⏳"}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                  * Menampilkan 50 entri teratas. Unduh file untuk melihat seluruh dataset.
+                </span>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => setCsvPreviewModalOpen(false)} className="btn btn-secondary btn-sm">
+                    Tutup
+                  </button>
+                  <button
+                    onClick={() => {
+                      exportCSV();
+                      setCsvPreviewModalOpen(false);
+                    }}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: "6px" }}
+                  >
+                    <DownloadSimple size={16} /> Unduh File CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
