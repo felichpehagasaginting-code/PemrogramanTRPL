@@ -1214,14 +1214,15 @@ code, pre {
   /* Hero */
   .hero-grid {
     grid-template-columns: 1fr !important;
-    gap: var(--space-6) !important;
+    gap: var(--space-5) !important;
   }
   .hero-visual {
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
     width: 100%;
-    max-width: 520px;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+    overflow: hidden;
   }
   .hero-buttons {
     flex-direction: column !important;
@@ -1235,6 +1236,23 @@ code, pre {
   section > .section-container {
     padding-left: 16px !important;
     padding-right: 16px !important;
+  }
+
+  /* Hero text overflow prevention */
+  #hero h1 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  #hero p {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+  }
+
+  /* Color switcher compact on mobile */
+  .color-switcher-wrapper {
+    transform: scale(0.92);
+    transform-origin: left center;
   }
 
   /* Prevent iOS Safari input auto-zoom */
@@ -1301,6 +1319,26 @@ code, pre {
 @media (max-width: 480px) {
   .badge-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .curriculum-stats { grid-template-columns: 1fr 1fr !important; }
+
+  /* Even tighter mobile hero */
+  .hero-grid {
+    gap: var(--space-4) !important;
+  }
+  #hero {
+    padding-top: 80px !important;
+    padding-bottom: 32px !important;
+  }
+
+  /* Sandbox tabs scroll on very small screens */
+  .hero-visual > div {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Hide macOS traffic lights on tiny screens to save space */
+  .sandbox-traffic-lights {
+    display: none !important;
+  }
 }
 
 /* Glass Shimmer Animation */

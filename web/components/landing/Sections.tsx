@@ -124,6 +124,8 @@ function HeroSandbox() {
         display: "flex",
         flexDirection: "column",
         width: "100%",
+        maxWidth: "100%",
+        boxSizing: "border-box" as const,
       }}
     >
       {/* Chrome Top Bar */}
@@ -134,16 +136,20 @@ function HeroSandbox() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 14px",
+          padding: "0 10px",
           height: "44px",
           userSelect: "none",
+          gap: "6px",
+          overflow: "hidden",
         }}
       >
-        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FF5F57", display: "inline-block" }} aria-hidden="true" />
-          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FFBD2E", display: "inline-block" }} aria-hidden="true" />
-          <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#28C840", display: "inline-block" }} aria-hidden="true" />
-          <div style={{ display: "flex", gap: "3px", marginLeft: "12px" }}>
+        <div style={{ display: "flex", gap: "6px", alignItems: "center", minWidth: 0, overflow: "hidden" }}>
+          <div className="sandbox-traffic-lights" style={{ display: "flex", gap: "6px", alignItems: "center", flexShrink: 0 }}>
+            <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FF5F57", display: "inline-block" }} aria-hidden="true" />
+            <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#FFBD2E", display: "inline-block" }} aria-hidden="true" />
+            <span style={{ width: "11px", height: "11px", borderRadius: "50%", background: "#28C840", display: "inline-block" }} aria-hidden="true" />
+          </div>
+          <div style={{ display: "flex", gap: "3px", marginLeft: "8px", overflow: "auto", WebkitOverflowScrolling: "touch" }}>
             <button onClick={() => setTab("code")} aria-label="Tab kode sumber" aria-selected={tab === "code"} style={tabStyle(tab === "code")}><Code size={13} /> Code</button>
             <button onClick={() => setTab("preview")} aria-label="Tab preview" aria-selected={tab === "preview"} style={tabStyle(tab === "preview")}><Play size={13} /> Output</button>
             <button onClick={() => setTab("folder")} aria-label="Tab folder workspace" aria-selected={tab === "folder"} style={tabStyle(tab === "folder")}><Books size={13} /> Workspace</button>
@@ -187,7 +193,7 @@ function HeroSandbox() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          style={{ flex: 1, display: "flex", flexDirection: "column", background: "#0B101D", padding: "14px" }}
+          style={{ flex: 1, display: "flex", flexDirection: "column", background: "#0B101D", padding: "14px", minWidth: 0, overflow: "hidden" }}
         >
           {tab === "code" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -430,7 +436,7 @@ export function HeroSection() {
       <div style={{ position: "absolute", bottom: "-150px", left: "-100px", width: "500px", height: "500px", background: "radial-gradient(circle, var(--color-primary-400) 0%, transparent 70%)", opacity: 0.06, pointerEvents: "none" }} />
 
       <div className="section-container" style={{ width: "100%", position: "relative", zIndex: 1, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem, 4vw, 3.5rem)", alignItems: "center" }} className="hero-grid">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem, 4vw, 3.5rem)", alignItems: "center", minWidth: 0, overflow: "hidden" }} className="hero-grid">
           <motion.div style={{ opacity: heroOpacity, display: "flex", flexDirection: "column" }}>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: "16px" }}>
               <span className="badge badge-primary" style={{ padding: "6px 14px", fontSize: "0.8rem", gap: "6px" }}>
@@ -469,7 +475,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.25 }}
-              style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "28px", maxWidth: "520px" }}
+              style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)", color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "28px", maxWidth: "520px", overflowWrap: "break-word", wordBreak: "break-word" }}
             >
               Belajar koding dari nol bareng senior TRPL yang{" "}
               <strong className="rgb-text" style={{ fontWeight: 700, display: "inline-block" }}>suportif & anti-ribet</strong>.
@@ -491,7 +497,7 @@ export function HeroSection() {
               </Button>
             </motion.div>
 
-            <div>
+            <div className="color-switcher-wrapper">
               <ColorSwitcher />
             </div>
           </motion.div>
