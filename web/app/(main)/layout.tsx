@@ -50,13 +50,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   if (!mounted || !user || !isUserReady) return <LoadingScreen text="Menghubungkan data TRPL..." fullPage />;
 
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Close user menu on route change
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [pathname]);
+
   const menuLinks = [
-    { label: "Dasbor", href: "/dashboard", icon: <BookOpen size={20} weight="bold" /> },
-    { label: "Post-Test", href: "/post-test", icon: <CheckSquareOffset size={20} weight="bold" /> },
-    { label: "Sandbox", href: "/sandbox", icon: <Code size={20} weight="bold" /> },
-    { label: "Papan Peringkat", href: "/leaderboard", icon: <Trophy size={20} weight="bold" /> },
-    { label: "Profil", href: "/profile", icon: <User size={20} weight="bold" /> },
-    { label: "Admin", href: "/admin", icon: <ShieldCheck size={20} weight="bold" /> },
+    { label: "Dasbor", href: "/dashboard", icon: <BookOpen size={18} weight="bold" /> },
+    { label: "Sandbox", href: "/sandbox", icon: <Code size={18} weight="bold" /> },
+    { label: "Peringkat", href: "/leaderboard", icon: <Trophy size={18} weight="bold" /> },
+    { label: "Profil", href: "/profile", icon: <User size={18} weight="bold" /> },
   ];
 
   return (
@@ -70,7 +75,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           display: "flex", alignItems: "center",
         }}
       >
-        <div className="section-container" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+        <div className="section-container" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
           {/* Brand Logo with Institution Logos */}
           <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -105,7 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </nav>
 
           {/* User Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, position: "relative" }}>
             <div
               style={{
                 background: "var(--bg-page-alt)",
@@ -125,36 +130,129 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             >
               <span style={{ color: "var(--color-primary-500)" }}>⚡</span> {user.xp} XP
             </div>
+
             <ThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="focus-ring"
-              aria-label="Keluar dari akun"
-              title="Keluar dari akun"
-              style={{
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1.5px solid rgba(239, 68, 68, 0.3)",
-                borderRadius: "var(--radius-full)",
-                color: "#EF4444",
-                padding: "4px 10px",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
-              }}
-            >
-              <SignOut size={16} weight="bold" />
-              <span>Keluar</span>
-            </button>
+
+            {/* Avatar Dropdown Trigger */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="focus-ring"
+                aria-label="Buka menu pengguna"
+                aria-expanded={userMenuOpen}
+                style={{
+                  background: userMenuOpen ? "var(--color-primary-500)" : "var(--bg-page-alt)",
+                  color: userMenuOpen ? "#FFFFFF" : "var(--text-primary)",
+                  border: "1.5px solid var(--border-color-strong)",
+                  borderRadius: "var(--radius-full)",
+                  padding: "4px 10px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <span>{user.name.split(" ")[0]}</span>
+                <span style={{ fontSize: "0.65rem", opacity: 0.8 }}>▼</span>
+              </button>
+
+              {/* User Dropdown Popover */}
+              {userMenuOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 8px)",
+                    right: 0,
+                    width: "220px",
+                    background: "var(--bg-card)",
+                    border: "1.5px solid var(--border-color-strong)",
+                    borderRadius: "var(--radius-lg)",
+                    boxShadow: "var(--shadow-xl)",
+                    padding: "8px",
+                    zIndex: 1000,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                  }}
+                >
+                  <div style={{ padding: "8px 10px", borderBottom: "1px solid var(--border-color)", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {user.name}
+                    </div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {user.email}
+                    </div>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--color-primary-500)", marginTop: "2px" }}>
+                      Level: {user.level}
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/profile"
+                    onClick={() => setUserMenuOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "var(--radius-md)",
+                      textDecoration: "none",
+                      color: "var(--text-primary)",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                    }}
+                    className="dropdown-item-hover"
+                  >
+                    <User size={16} /> Profil Saya
+                  </Link>
+
+                  <Link
+                    href="/admin"
+                    onClick={() => setUserMenuOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "var(--radius-md)",
+                      textDecoration: "none",
+                      color: "var(--text-primary)",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                    }}
+                    className="dropdown-item-hover"
+                  >
+                    <ShieldCheck size={16} color="#F59E0B" /> Panel Dosen TRPL
+                  </Link>
+
+                  <div style={{ height: "1px", background: "var(--border-color)", margin: "4px 0" }} />
+
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "var(--radius-md)",
+                      border: "none",
+                      background: "rgba(239, 68, 68, 0.08)",
+                      color: "#EF4444",
+                      fontSize: "0.8rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      width: "100%",
+                      textAlign: "left",
+                    }}
+                  >
+                    <SignOut size={16} weight="bold" /> Keluar
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -232,6 +330,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </nav>
 
       <style jsx>{`
+        .dropdown-item-hover:hover {
+          background: var(--bg-page-alt);
+        }
         .mobile-bottom-nav {
           display: none !important;
         }
