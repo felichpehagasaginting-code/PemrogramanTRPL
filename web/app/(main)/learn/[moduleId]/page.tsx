@@ -1908,21 +1908,21 @@ export default function LearnModulePage() {
         </button>
       </div>
 
-      {/* Interactive Guided Slide Stepper & Reading Time Indicator (Recommendation 5) */}
-      <div style={{ marginBottom: "var(--space-6)" }}>
+      {/* Interactive Guided Slide Stepper & Reading Time Indicator */}
+      <div style={{ marginBottom: "var(--space-5)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--color-primary-500)", background: "rgba(255, 107, 0, 0.1)", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
-              Langkah {currentSlideIndex + 1} dari {slides.length}
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-primary-600)", background: "rgba(255, 107, 0, 0.1)", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+              {currentSlideIndex + 1} / {slides.length}
             </span>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 600 }}>
-              • {currentSlide?.title || "Materi Belajar"}
+            <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+              {currentSlide?.title || "Materi Belajar"}
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "var(--text-muted)", background: "var(--bg-card)", padding: "3px 10px", borderRadius: "var(--radius-full)", border: "1px solid var(--border-color)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.73rem", color: "var(--text-muted)" }}>
             <Clock size={13} weight="bold" />
-            <span>Estimasi baca: ~{Math.max(1, Math.round(((slides.length - currentSlideIndex) * 1.5)))} menit tersisa</span>
+            <span>~{Math.max(1, Math.round(((slides.length - currentSlideIndex) * 1.5)))} mnt tersisa</span>
           </div>
         </div>
 

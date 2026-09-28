@@ -332,122 +332,159 @@ export default function AdminPage() {
       </header>
 
       <div className="section-container" style={{ paddingTop: "var(--space-4)" }}>
-        {/* Navigation Mode Tabs */}
-        <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border-color)", marginBottom: "var(--space-6)", overflowX: "auto", paddingBottom: "2px" }}>
-          <button
-            onClick={() => setViewMode("users")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "users" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "users" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <Users size={16} /> Mahasiswa
-          </button>
-          <button
-            onClick={() => setViewMode("analytics")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "analytics" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "analytics" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <ChartBar size={16} /> Analytics & Laporan
-          </button>
-          <button
-            onClick={() => setViewMode("helpdesk")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "helpdesk" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "helpdesk" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <ShieldCheck size={16} /> 🆘 Help Desk
-          </button>
-          <button
-            onClick={() => setViewMode("plagiarism")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "plagiarism" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "plagiarism" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <ShieldCheck size={16} /> 🔍 Plagiarisme (AST)
-          </button>
-          <button
-            onClick={() => setViewMode("broadcast")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "broadcast" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "broadcast" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <ShieldCheck size={16} /> 📢 Broadcast Siaran
-          </button>
-          <button
-            onClick={() => setViewMode("testcases")}
-            style={{
-              padding: "8px 16px",
-              background: "transparent",
-              border: "none",
-              borderBottom: viewMode === "testcases" ? "3px solid var(--color-primary-500)" : "none",
-              color: viewMode === "testcases" ? "var(--color-primary-500)" : "var(--text-secondary)",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <Code size={16} /> 🧪 Test Cases Grader
-          </button>
+        {/* Navigation Mode: 3 Major Tabs with Sub-Tool Switches */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-color)", marginBottom: "var(--space-6)", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            <button
+              onClick={() => setViewMode("users")}
+              style={{
+                padding: "8px 16px",
+                background: "transparent",
+                border: "none",
+                borderBottom: viewMode === "users" ? "3px solid var(--color-primary-500)" : "3px solid transparent",
+                color: viewMode === "users" ? "var(--color-primary-500)" : "var(--text-secondary)",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Users size={16} /> Data Mahasiswa & Rekap
+            </button>
+            <button
+              onClick={() => {
+                if (viewMode !== "broadcast" && viewMode !== "helpdesk") {
+                  setViewMode("broadcast");
+                }
+              }}
+              style={{
+                padding: "8px 16px",
+                background: "transparent",
+                border: "none",
+                borderBottom: (viewMode === "broadcast" || viewMode === "helpdesk") ? "3px solid var(--color-primary-500)" : "3px solid transparent",
+                color: (viewMode === "broadcast" || viewMode === "helpdesk") ? "var(--color-primary-500)" : "var(--text-secondary)",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <ShieldCheck size={16} /> Pusat Siaran & Bantuan
+            </button>
+            <button
+              onClick={() => {
+                if (viewMode !== "analytics" && viewMode !== "plagiarism" && viewMode !== "testcases") {
+                  setViewMode("analytics");
+                }
+              }}
+              style={{
+                padding: "8px 16px",
+                background: "transparent",
+                border: "none",
+                borderBottom: (viewMode === "analytics" || viewMode === "plagiarism" || viewMode === "testcases") ? "3px solid var(--color-primary-500)" : "3px solid transparent",
+                color: (viewMode === "analytics" || viewMode === "plagiarism" || viewMode === "testcases") ? "var(--color-primary-500)" : "var(--text-secondary)",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <ChartBar size={16} /> Statistik & Evaluasi Ujian
+            </button>
+          </div>
+
+          {/* Sub-tool Pills for Broadcast Group */}
+          {(viewMode === "broadcast" || viewMode === "helpdesk") && (
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <button
+                onClick={() => setViewMode("broadcast")}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--border-color)",
+                  background: viewMode === "broadcast" ? "var(--color-primary-500)" : "var(--bg-card)",
+                  color: viewMode === "broadcast" ? "white" : "var(--text-secondary)",
+                }}
+              >
+                📢 Siaran Pengumuman
+              </button>
+              <button
+                onClick={() => setViewMode("helpdesk")}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--border-color)",
+                  background: viewMode === "helpdesk" ? "var(--color-primary-500)" : "var(--bg-card)",
+                  color: viewMode === "helpdesk" ? "white" : "var(--text-secondary)",
+                }}
+              >
+                🆘 Antrean Help Desk
+              </button>
+            </div>
+          )}
+
+          {/* Sub-tool Pills for Evaluation Group */}
+          {(viewMode === "analytics" || viewMode === "plagiarism" || viewMode === "testcases") && (
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <button
+                onClick={() => setViewMode("analytics")}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--border-color)",
+                  background: viewMode === "analytics" ? "var(--color-primary-500)" : "var(--bg-card)",
+                  color: viewMode === "analytics" ? "white" : "var(--text-secondary)",
+                }}
+              >
+                📈 Analytics & Heatmap
+              </button>
+              <button
+                onClick={() => setViewMode("plagiarism")}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--border-color)",
+                  background: viewMode === "plagiarism" ? "var(--color-primary-500)" : "var(--bg-card)",
+                  color: viewMode === "plagiarism" ? "white" : "var(--text-secondary)",
+                }}
+              >
+                🔍 Plagiarisme AST
+              </button>
+              <button
+                onClick={() => setViewMode("testcases")}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--border-color)",
+                  background: viewMode === "testcases" ? "var(--color-primary-500)" : "var(--bg-card)",
+                  color: viewMode === "testcases" ? "white" : "var(--text-secondary)",
+                }}
+              >
+                🧪 Test Cases Grader
+              </button>
+            </div>
+          )}
         </div>
 
         {viewMode === "plagiarism" ? (
