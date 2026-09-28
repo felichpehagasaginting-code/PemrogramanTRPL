@@ -46,28 +46,51 @@ export function DosenPinDialpadModal({
 
   // Validate when 4 digits are reached
   useEffect(() => {
+    let isMounted = true;
     if (pin.length === 4) {
-      if (pin === DOSEN_SECRET_PIN) {
-        setIsSuccess(true);
-        setError(null);
-        setTimeout(() => {
-          loginAsDosenPenguji(pin);
-          if (onSuccess) {
-            onSuccess();
+      const verifyPin = async () => {
+        try {
+          const success = await loginAsDosenPenguji(pin);
+          if (!isMounted) return;
+          if (success) {
+            setIsSuccess(true);
+            setError(null);
+            setTimeout(() => {
+              if (onSuccess) {
+                onSuccess();
+              } else {
+                router.push("/admin");
+              }
+              onClose();
+            }, 600);
           } else {
-            router.push("/admin");
+            setShake(true);
+            setError("PIN salah! Akses khusus Dosen Penguji.");
+            setTimeout(() => {
+              if (isMounted) {
+                setShake(false);
+                setPin("");
+              }
+            }, 500);
           }
-          onClose();
-        }, 600);
-      } else {
-        setShake(true);
-        setError("PIN salah! Akses khusus Dosen Penguji.");
-        setTimeout(() => {
-          setShake(false);
-          setPin("");
-        }, 500);
-      }
+        } catch {
+          if (isMounted) {
+            setShake(true);
+            setError("Gagal menghubungi server verifikasi.");
+            setTimeout(() => {
+              if (isMounted) {
+                setShake(false);
+                setPin("");
+              }
+            }, 500);
+          }
+        }
+      };
+      verifyPin();
     }
+    return () => {
+      isMounted = false;
+    };
   }, [pin, loginAsDosenPenguji, onSuccess, onClose, router]);
 
   // Physical keyboard listener

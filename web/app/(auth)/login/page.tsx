@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/lib/store/useUserStore";
@@ -226,21 +227,13 @@ export default function LoginPage() {
         </div>
 
         <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
-          <div
-            ref={logoRef}
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "12px",
-              background: "var(--gradient-hero)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto var(--space-4)",
-              boxShadow: "var(--shadow-glow-soft)",
-            }}
-          >
-            <Code size={24} color="white" weight="bold" />
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
+            <div style={{ width: "48px", height: "36px", position: "relative" }}>
+              <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+            </div>
+            <div style={{ width: "36px", height: "36px", position: "relative" }}>
+              <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+            </div>
           </div>
           <h2 className="login-anim-item" style={{ fontFamily: "var(--font-heading)", fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)" }}>
             Masuk Platform
