@@ -4,7 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![Python](https://img.shields.io/badge/Python-WASM%20Pyodide-yellow?style=for-the-badge&logo=python)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-orange?style=for-the-badge&logo=firebase)
-![Vitest](https://img.shields.io/badge/Vitest-31%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
+![Vitest](https://img.shields.io/badge/Vitest-58%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
 Platform pembelajaran pemrograman interaktif, adaptif, ramah pemula, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026**.

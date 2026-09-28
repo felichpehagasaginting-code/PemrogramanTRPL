@@ -1,243 +1,188 @@
 # KERANGKA ACUAN KERJA (TERMS OF REFERENCE)
 ## PROGRAM MATRIKULASI PEMROGRAMAN DASAR MAHASISWA BARU
 ### PROGRAM STUDI SARJANA TERAPAN TEKNOLOGI REKAYASA PERANGKAT LUNAK (TRPL)
+### POLITEKNIK KELAPA SAWIT CITRA WIDYA EDUKASI
 **ANGKATAN 2026**
 
 ---
 
 | Dokumen | Kerangka Acuan Kerja (Terms of Reference / TOR) |
 | :--- | :--- |
-| **Nama Program** | Matrikulasi Pemrograman Dasar TRPL 2026: *Bridging the Logic Gap* |
-| **Unit Penyelenggara** | Divisi Pemrograman — Panitia Matrikulasi Mahasiswa Baru TRPL 2026 |
-| **Sasaran Peserta** | Seluruh Mahasiswa Baru TRPL Angkatan 2026 (Estimasi: 100–120 Mahasiswa) |
-| **Model Pelaksanaan** | *Two-Phase Blended Bootcamp* (Tatap Muka Intensif 4–6 Jam + Mandiri Asrama) |
-| **Periode Pelaksanaan** | Masa Pra-Perkuliahan Semester Ganjil TA 2026/2027 |
-| **Platform Pendukung** | Platform Web Matrikulasi TRPL (*Client-Side Pyodide WASM Engine*) |
+| **Nama Program** | Matrikulasi Pemrograman Dasar TRPL 2026 |
+| **Institusi** | Politeknik Kelapa Sawit Citra Widya Edukasi (CWE) |
+| **Program Studi** | Sarjana Terapan Teknologi Rekayasa Perangkat Lunak (TRPL) |
+| **Unit Penyelenggara** | Divisi Pemrograman — Panitia Matrikulasi Angkatan 2026 |
+| **Sasaran Peserta** | Mahasiswa Baru TRPL Angkatan 2026 (100–120 Mahasiswa) |
+| **Bentuk Kegiatan** | Pembelajaran Terpadu 3 Fase (Teori Kelas, Praktik Langsung, dan Proyek Daring) |
+| **Waktu Pelaksanaan** | Masa Pra-Perkuliahan Semester Ganjil TA 2026/2027 |
+| **Media Belajar** | Ruang Kelas / Lab Komputer dan Platform Web Matrikulasi TRPL (Pyodide Python WASM) |
 
 ---
 
-### 1. LATAR BELAKANG (*WHY*)
+### 1. LATAR BELAKANG
 
-Setiap awal tahun akademik, Program Studi Sarjana Terapan Teknologi Rekayasa Perangkat Lunak (TRPL) menyambut mahasiswa baru dengan latar belakang pendidikan menengah yang sangat heterogen. Fakta lapangan menunjukkan disparitas kesiapan awal (*baseline gap*) yang signifikan:
+Program Studi Sarjana Terapan Teknologi Rekayasa Perangkat Lunak (TRPL) Politeknik Kelapa Sawit Citra Widya Edukasi menyiapkan lulusan yang mampu membangun perangkat lunak dan otomasi sistem, termasuk digitalisasi operasional perkebunan kelapa sawit. Kemampuan dasar yang menopang seluruh mata kuliah lanjutan adalah pemrograman, yaitu kecakapan menerjemahkan logika pemecahan masalah ke dalam instruksi komputer.
 
-1. **Lulusan SMK Rekayasa Perangkat Lunak (RPL):** Telah memiliki jam terbang koding, memahami sintaks pemrograman prosedural, dan terbiasa menyusun alur logika.
-2. **Lulusan SMA Rumpun IPA / SMK Teknik Non-IT:** Memiliki daya nalar analitis yang kuat, namun belum pernah mentransformasikan logika matematis ke dalam sintaks bahasa pemrograman nyata.
-3. **Lulusan SMA Rumpun IPS, Bahasa, atau Kejuruan Non-Teknis:** Belum pernah berinteraksi sama sekali dengan konsep komputasi, terminal konsol, maupun sintaks kode program.
+Pada masa matrikulasi, sesi Pemrograman dijadwalkan langsung setelah sesi Algoritma agar mahasiswa dapat mempraktikkan alur diagram alir menjadi kode program nyata. Namun, mahasiswa baru TRPL 2026 memiliki latar belakang pendidikan yang beragam:
+1. **Lulusan SMK RPL:** Sudah mengenal sintaks kode dan alur pemrograman dasar.
+2. **Lulusan SMA IPA / SMK Teknik Non-IT:** Memiliki dasar logika analitis, tetapi belum pernah menulis kode program.
+3. **Lulusan SMA IPS / Bahasa / Non-Teknis:** Belum pernah berinteraksi dengan terminal perintah maupun sintaks pemrograman.
 
-Kesenjangan awal ini memicu rentetan kendala berulang pada minggu-minggu pertama perkuliahan reguler:
+Perbedaan latar belakang ini berpotensi menimbulkan kendala pada minggu-minggu pertama kuliah:
+* **Waktu perkuliahan tersita untuk teknis instalasi:** Menyiapkan Python, VS Code, dan konfigurasi sistem operasi yang berbeda-beda sering memakan waktu lama.
+* **Keraguan bagi pemula:** Mahasiswa non-IT kerap merasa tertinggal saat berhadapan langsung dengan sintaks kode dan pesan eror.
+* **Keterbatasan pendampingan kelas:** Dosen dan asisten memiliki keterbatasan waktu untuk memeriksa kode setiap mahasiswa satu per satu di kelas besar.
 
-* **Kendala Konfigurasi Lingkungan (*Setup Fatigue*):**  
-  Pada metode konvensional, pekan-pekan awal kerap terbuang hanya untuk instalasi interpreter Python, konfigurasi variabel lingkungan sistem (`PATH`), serta instalasi ekstensi editor (VS Code). Perbedaan sistem operasi (Windows 10/11, macOS, Linux) dan laptop mahasiswa sering memicu error teknis yang melunturkan antusiasme belajar sebelum materi logika sempat dipahami.
-* **Hambatan Psikologis (*Imposter Syndrome*):**  
-  Mahasiswa baru tanpa latar belakang IT kerap merasa terintimidasi melihat layar terminal hitam dan pesan *syntax error* berbahasa Inggris, yang berujung pada rasa minder dan keengganan berpartisipasi aktif di kelas.
-* **Keterbatasan Rasio Asistensi di Kelas Besar:**  
-  Dalam kelas beranggotakan 100+ mahasiswa, tim pengajar dan asisten laboratorium memiliki keterbatasan fisik untuk memeriksa baris kode mahasiswa satu per satu secara manual, memperlambat proses perbaikan logika (*feedback loop*).
-
-Menjawab tantangan tersebut, **Divisi Pemrograman Panitia Matrikulasi TRPL 2026** menyelenggarakan program matrikulasi terstruktur. Program ini mengintegrasikan pengajaran intensif langsung oleh Ketua Divisi Pemrograman bersama jajaran staf divisi dengan eksplorasi mandiri terpandu melalui platform pembelajaran web modern berbasis WebAssembly (*zero-setup environment*).
+Untuk mengatasi hal tersebut, Divisi Pemrograman menyelenggarakan program matrikulasi terstruktur dengan platform web interaktif tanpa instalasi lokal (*zero-setup*). Program ini membekali mahasiswa secara bertahap: pemahaman konsep di kelas, praktik koding langsung dengan bimbingan asisten, serta latihan mandiri terarah hingga penyelesaian proyek akhir.
 
 ---
 
-### 2. URAIAN DAN BATASAN KEGIATAN (*WHAT*)
+### 2. TUJUAN KEGIATAN
 
-#### 2.1 Uraian Kegiatan
-Kegiatan ini merupakan pembekalan intensif logika komputasional dan pemrograman prosedural dasar menggunakan bahasa **Python 3.11** melalui platform web interaktif yang dapat diakses dari browser mana pun tanpa proses instalasi software di laptop peserta.
-
-#### 2.2 Batasan Kegiatan (*In-Scope vs Out-of-Scope*)
-Untuk menjaga fokus materi dan ketercapaian kompetensi dalam waktu yang terbatas, ditetapkan batasan berikut:
-
-* **Ruang Lingkup Termasuk (*In-Scope*):**
-  1. Pengenalan antarmuka konsol/terminal dasar (*PowerShell*) dan hierarki folder proyek.
-  2. Logika dekomposisi masalah dan pembacaan diagram alir (*flowchart*).
-  3. Variabel, tipe data primitif (*integer, float, string, boolean*), serta operasi input/output dinamis.
-  4. Struktur percabangan keputusan (*if, elif, else*) dan ekspresi logika Boolean.
-  5. Perulangan (*for-loop, while-loop*) dan mitigasi *infinite loop*.
-  6. Modularisasi kode melalui fungsi, parameter, dan nilai balik (*return value*).
-  7. Koleksi data terstruktur dasar (*list indexing, slicing, append, iteration*).
-  8. Pengerjaan proyek akhir terintegrasi 3 fase (*Sistem Kasir Warkop TRPL 2026*).
-
-* **Ruang Lingkup Dikecualikan (*Out-of-Scope*):**
-  1. Pemrograman Berorientasi Objek lanjut (*OOP: Class, Inheritance, Polymorphism*).
-  2. Pengembangan antarmuka grafis pengguna (*GUI Desktop/Web Frameworks*).
-  3. Manajemen basis data relasional (*SQL/RDBMS*) dan konektivitas jaringan eksternal.
-  4. Topik-topik lanjutan ini secara khusus dialokasikan untuk mata kuliah reguler di semester berikutnya.
+1. **Menyamakan Pemahaman Dasar:** Memastikan seluruh mahasiswa baru memahami logika pemrograman sebelum perkuliahan semester ganjil dimulai.
+2. **Kesiapan Lingkungan Praktik:** Mengeliminasi kendala instalasi lokal melalui platform koding berbasis web yang langsung dapat dijalankan dari peramban.
+3. **Penyampaian Materi Komunikatif:** Menjelaskan konsep pemrograman melalui analogi kontekstual sehari-hari dan demonstrasi kode langsung (*live coding*).
+4. **Evaluasi Pemahaman Terukur:** Mengukur lonjakan kemampuan peserta secara objektif melalui *pre-test* di awal sesi dan *post-test* di akhir sesi tatap muka.
+5. **Kemandirian dan Portofolio:** Melatih mahasiswa memanfaatkan penguji otomatis (*auto-grader*), sistem peninjauan kode (*snapshot* bantuan), serta menghasilkan portofolio proyek mini pertama.
 
 ---
 
-### 3. MAKSUD DAN TUJUAN (*WHY & BENEFIT*)
+### 3. RUANG LINGKUP MATERI
 
-#### 3.1 Maksud Kegiatan
-Menyediakan wadah pembekalan pra-kuliah yang adaptif, ramah pemula, dan terstandar guna menyamakan nalar komputasi seluruh mahasiswa baru TRPL Angkatan 2026.
+#### 3.1 Materi yang Dicakup (*In-Scope*)
+1. Korelasi alur algoritma dengan sintaks pemrograman Python 3.11.
+2. Pengenalan antarmuka terminal konsol (*PowerShell*) dan hierarki penyimpanan berkas.
+3. Variabel, tipe data dasar (*integer, float, string, boolean*), serta operasi input/output interaktif.
+4. Struktur percabangan logika (*if, elif, else*) dan operator perbandingan.
+5. Struktur perulangan (*for-loop, while-loop*) dan pencegahan eror *infinite loop*.
+6. Modularisasi kode melalui fungsi dasar, parameter, dan nilai balik (*return value*).
+7. Penggunaan struktur data *list* (*indexing, slicing, append*).
+8. Pembacaan dan analisis pesan eror umum pemula (*syntax error, runtime error*).
+9. Pengerjaan proyek akhir bertahap (*Sistem Kasir Warkop TRPL 2026*).
 
-#### 3.2 Tujuan Khusus
-1. **Penyetaraan Baseline Teknis:** Memastikan seluruh mahasiswa baru memahami logika dasar pemrograman secara merata sebelum perkuliahan perdana dimulai.
-2. **Efisiensi Waktu Perkuliahan:** Mengeliminasi waktu terbuang untuk instalasi lokal pada pekan pertama kuliah melalui platform berbasis WebAssembly.
-3. **Penyampaian Materi Humanis & Terarah:** Memandu mahasiswa baru melalui analogi kehidupan sehari-hari, live-coding langsung, dan dekonstruksi pesan error tanpa jargon yang membingungkan.
-4. **Membina Kemandirian & Budaya Konsultasi:** Melatih mahasiswa memanfaatkan alat bantu pengujian otomatis (*Auto-Grader*) dan fitur peninjauan kode jarak jauh (*Code Snapshot*).
-
-#### 3.3 Manfaat Kegiatan
-* **Bagi Mahasiswa Baru:** Tumbuhnya rasa percaya diri, hilangnya rasa takut terhadap koding, serta penguasaan portofolio proyek mini pertama.
-* **Bagi Dosen Pengampu:** Mahasiswa masuk ke kelas perkuliahan reguler dengan lingkungan laptop yang telah terkonfigurasi dan pemahaman logika yang seragam.
-* **Bagi Program Studi TRPL:** Mengurangi angka ketertinggalan akademik (*academic attrition*) pada semester awal.
+#### 3.2 Materi di Luar Cakupan (*Out-of-Scope*)
+1. Pemrograman Berorientasi Objek lanjut (*Class, Inheritance, Polymorphism*).
+2. Pengembangan antarmuka grafis pengguna (*GUI Desktop/Web*).
+3. Pengelolaan basis data relasional (*SQL/RDBMS*) dan jaringan eksternal.  
+*(Topik lanjutan tersebut menjadi materi mata kuliah resmi pada semester berjalan).*
 
 ---
 
-### 4. METODE DAN TAHAPAN PELAKSANAAN (*HOW*)
+### 4. METODE PELAKSANAAN (3 FASE)
 
-Pelaksanaan menggunakan metode **Two-Phase Blended Bootcamp**:
+Kegiatan dilaksanakan dalam tiga tahapan berurutan:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ FASE 1: LIVE INTERACTIVE WORKSHOP (DURASI 4 – 6 JAM)                       │
-│ Sifat   : Tatap Muka Terpusat (Ruang Pertemuan / Kelas / Auditorium)       │
-│ Pemandu : Ketua Divisi Pemrograman (Lead) didampingi Staf Divisi           │
-│ Materi  : Modul M0 s.d. M4 (Orientasi, Lingkungan Kerja, Logika, Variabel) │
+│ FASE 1: TEORI & LOGIKA DASAR (TATAP MUKA / OFFLINE)                        │
+│ Waktu   : Hari Ke-1 Matrikulasi (Pukul 10.55 – 11.55 WIB / 60 Menit)       │
+│ Tempat  : Ruang 7.3, Lantai 7, Gedung 2 Politeknik Kelapa Sawit CWE        │
+│ Pemandu : Ketua Divisi Pemrograman (Instruktur Utama)                      │
+│ Materi  : Logika pemrograman, analogi variabel, percabangan, dan otomasi   │
 └─────────────────────────────────────┬──────────────────────────────────────┘
                                       │
                                       ▼
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ FASE 2: GUIDED INDEPENDENT MASTERY (ASRAMA / TEMPAT TINGGAL)               │
-│ Sifat   : Pembelajaran Mandiri Fleksibel (Rentang 5 – 7 Hari)              │
-│ Bantuan : Auto-Grader Otomatis + Snapshot Kode "Minta Bantuan" ke Asisten  │
-│ Materi  : Modul M5 s.d. M8 (Looping, Fungsi, List Data, Proyek Kasir)      │
+│ FASE 2: PRAKTIK KODING, GAMES & TANYA JAWAB (TATAP MUKA / OFFLINE)         │
+│ Waktu   : Hari Ke-1 Matrikulasi (Pukul 11.55 – 12.25 WIB) dilanjutkan      │
+│           Post-Test (Pukul 12.25 – 12.40 WIB)                              │
+│ Tempat  : Ruang 7.3, Lantai 7, Gedung 2 Politeknik Kelapa Sawit CWE        │
+│ Pemandu : Instruktur Utama didampingi 4–6 Staf Asisten Divisi             │
+│ Aktivitas: Praktik koding di laptop, live demo, games kuis, dan tanya jawab│
+└─────────────────────────────────────┬──────────────────────────────────────┘
+                                      │
+                                      ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│ FASE 3: LATIHAN MANDIRI & SERTIFIKASI KELULUSAN (DARING / VIA WEBSITE)     │
+│ Waktu   : Hari Ke-2 s.d. Hari Ke-6 (Rentang 5 Hari Kerja di Asrama/Rumah)  │
+│ Media   : Platform Web Matrikulasi TRPL (Didukung Auto-Grader Otomatis)    │
+│ Aktivitas: Pengerjaan modul M5–M7, proyek akhir M8, tiket bantuan asisten, │
+│           dan penerbitan Sertifikat Kelulusan Resmi TRPL 2026 ber-QR Code  │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 4.1 Tahapan Alur Proyek
-1. **Tahap Persiapan (H-14 s.d. H-1):**
-   - Finalisasi materi kurikulum M0–M8 dan konfigurasi server platform.
-   - Pendaftaran dan sinkronisasi akun mahasiswa baru ke dalam database Firestore.
-   - Pengujian beban (*load test*) koneksi dan caching asset static Pyodide.
-2. **Tahap Eksekusi Fase 1 — Sesi Live Workshop (Hari-H, 4–6 Jam):**
-   - Pembukaan, aktivasi akun serempak, dan pemetaan awal (Modul M0 & M1).
-   - Live demo logika algoritma dan variabel (Modul M2 & M3).
-   - Praktik intensif logika percabangan keputusan *if-else* (Modul M4).
-   - Sosialisasi tata cara pengerjaan mandiri dan demo tombol "Minta Bantuan".
-3. **Tahap Eksekusi Fase 2 — Mandiri di Asrama (Hari ke-2 s.d. Hari ke-7):**
-   - Eksplorasi mandiri Modul M5 (Looping), M6 (Fungsi), dan M7 (List Data).
-   - Pengerjaan Capstone Mini Project Kasir Warkop TRPL (Modul M8) melalui scaffolding 3 fase.
-   - Pendampingan asinkron oleh tim asisten via tautan kode snapshot.
-4. **Tahap Evaluasi & Pelaporan (Hari ke-8 s.d. Hari ke-10):**
-   - Verifikasi data submission oleh tim panitia.
-   - Penerbitan Sertifikat Digital Kelulusan resmi ber-QR Code.
-   - Penyusunan Laporan Pertanggungjawaban (LPJ) dan profil kesiapan angkatan.
+#### 4.1 Rincian Tahapan
+1. **Fase 1 — Teori dan Konsep (Offline, 60 Menit):**
+   Instruktur menyampaikan pengantar pemrograman secara komunikatif: mengapa Python digunakan di TRPL, bagaimana komputer memproses data, konsep variabel dan tipe data, serta cara membaca pesan eror tanpa panik.
+2. **Fase 2 — Praktik Terbimbing dan Evaluasi (Offline, 45 Menit):**
+   Peserta membuka laptop untuk mempraktikkan kode dasar pada peramban web dan simulator terminal. Instruktur memandu *live-coding*, didampingi asisten yang berkeliling memberikan bimbingan teknis langsung meja ke meja. Sesi dilanjutkan kuis games logika singkat, tanya jawab, dan pengerjaan *post-test*.
+3. **Fase 3 — Mandiri dan Sertifikasi (Online, 5 Hari):**
+   Peserta melanjutkan modul lanjutan (perulangan, fungsi, dan *list*) serta proyek aplikasi kasir secara mandiri dari asrama. Apabila mahasiswa mengalami kebuntuan, mereka dapat menekan tombol **"Minta Bantuan"** di platform web untuk membagikan tautan kode ke asisten. Mahasiswa yang lulus pengujian kode 100% berhak mengunduh sertifikat digital kelulusan.
 
 ---
 
-### 5. JADWAL DAN TEMPAT PELAKSANAAN (*WHEN & WHERE*)
+### 5. JADWAL, TEMPAT, DAN KETENTUAN PERANGKAT
 
 #### 5.1 Tempat Pelaksanaan
-* **Fase 1 (Live Workshop):** Ruang Pertemuan Terpusat Kampus / Auditorium / Ruang Kelas Bersama (Disesuaikan dengan ketersediaan ruang prodi, dilengkapi proyektor, terminal stopkontak, dan koneksi internet stabil).
-* **Fase 2 (Mandiri):** Asrama Mahasiswa / Tempat Tinggal masing-masing peserta.
+* **Sesi Tatap Muka (Fase 1 & 2):** Ruang 7.3, Lantai 7, Gedung 2, Kampus Politeknik Kelapa Sawit Citra Widya Edukasi (CWE).
+* **Sesi Mandiri (Fase 3):** Asrama mahasiswa atau kediaman masing-masing peserta melalui peramban web.
 
-#### 5.2 Matriks Jadwal Kegiatan (Time Table)
+#### 5.2 Susunan Acara Sesi Pemrograman (Hari Ke-1)
 
-| No | Fase / Rangkaian Agenda | Durasi | Estimasi Tanggal | Tempat / Lokasi |
-| :---: | :--- | :---: | :---: | :--- |
-| 1 | Pengecekan Kesiapan Platform & Briefing Staf Divisi | 1 Hari | H-3 Pelaksanaan | Ruang Sekretariat / Daring |
-| 2 | **Fase 1: Live Interactive Workshop (M0–M4)** | 5 Jam | Hari-H (Pkl 08.00–13.00) | Ruang Tatap Muka Terpusat |
-| 3 | **Fase 2: Pengerjaan Mandiri Terpandu (M5–M8)** | 5 Hari | Hari-H+1 s.d. Hari-H+5 | Asrama / Kediaman Peserta |
-| 4 | Batas Akhir (*Deadline*) Submission Proyek M8 | — | Hari-H+5 (Pkl 23.59 WIB) | Platform Web Matrikulasi |
-| 5 | Rekapitulasi Nilai & Penerbitan Sertifikat Digital | 2 Hari | Hari-H+6 s.d. Hari-H+7 | Sistem Verifikasi Sertifikat |
-| 6 | Penyerahan Laporan Pertanggungjawaban ke Kaprodi | 1 Hari | Hari-H+8 | Ruang Prodi TRPL |
+| Waktu (WIB) | Durasi | Agenda Kegiatan | Keterangan & Pelaksana |
+| :---: | :---: | :--- | :--- |
+| **10.40 – 10.55** | 15 menit | **Pre-Test Pemrograman** | Pengerjaan soal awal untuk memetakan pemahaman dasar peserta *(Panitia)* |
+| **10.55 – 11.55** | **60 menit** | **Fase 1: Pemaparan Materi Teori** | Penyampaian konsep logika pemrograman dan sintaks dasar *(Instruktur Utama)* |
+| **11.55 – 12.25** | **30 menit** | **Fase 2: Praktik Koding & Diskusi** | Latihan koding langsung di laptop, games logika, dan tanya jawab *(Instruktur & Asisten)* |
+| **12.25 – 12.40** | 15 menit | **Post-Test Pemrograman** | Evaluasi hasil belajar sesi tatap muka *(Peserta)* |
+| **12.40 – 12.50** | 10 menit | **Penutupan & Pengarahan Fase 3** | Informasi pengerjaan mandiri daring di asrama *(MC & Divisi Pemrograman)* |
 
----
+#### 5.3 Linimasa Program Keseluruhan
 
-### 6. PRODUK DAN LUARAN KEGIATAN (*DELIVERABLES*)
+| No | Agenda / Tahapan | Rentang Waktu | Tempat / Sarana |
+| :---: | :--- | :---: | :--- |
+| 1 | Uji Coba Platform Web & Briefing Asisten | H-3 | Ruang Panitia / Daring |
+| 2 | Koordinasi Soal Pre/Post-Test & Materi | H-1 | Ruang Sekretariat Acara |
+| 3 | **Pelaksanaan Fase 1 & 2 (Tatap Muka)** | **Hari-H (10.40–12.50 WIB)** | **Ruang 7.3 Gedung 2 CWE** |
+| 4 | **Pelaksanaan Fase 3 (Mandiri di Asrama)** | **Hari-H+1 s.d. Hari-H+5** | **Platform Web Matrikulasi** |
+| 5 | Batas Akhir (*Deadline*) Proyek Akhir Kasir | Hari-H+5 (Pukul 23.59 WIB) | Platform Web Matrikulasi |
+| 6 | Rekapitulasi Nilai & Verifikasi Sertifikat | Hari-H+6 s.d. Hari-H+7 | Database Verifikasi Web |
+| 7 | Penyerahan Laporan Hasil ke Kaprodi TRPL | Hari-H+8 | Ruang Prodi TRPL CWE |
 
-1. **Sertifikat Digital Resmi Kelulusan Matrikulasi TRPL 2026:**
-   - Diterbitkan bagi peserta yang menuntaskan seluruh latihan M0–M8 dengan validasi 100% test cases.
-   - Dilengkapi nomor sertifikat unik dan QR Code verifikasi publik.
-2. **Karya Portofolio Proyek Konsol Mahasiswa:**
-   - Program aplikasi *Kasir Warkop TRPL 2026* fungsional karya masing-masing mahasiswa baru.
-3. **Laporan Pemetaan Profil Kesiapan Angkatan:**
-   - Dokumen analitik performa angkatan (rata-rata waktu penyelesaian modul, modul paling menantang, grafik sebaran nilai) sebagai rekomendasi awal bagi dosen pengampu mata kuliah semester ganjil.
-
----
-
-### 7. TIM PELAKSANA, EVALUASI, DAN IDENTIFIKASI KEAHLIAN (*WHO & SKILLS*)
-
-Keberhasilan program ditopang oleh pembagian peran terstruktur dan kualifikasi keahlian yang spesifik:
-
-| Peran / Posisi | Person In Charge (PIC) | Tanggung Jawab Utama | Standar Kualifikasi & Keahlian |
-| :--- | :--- | :--- | :--- |
-| **Penanggung Jawab** | Ketua Program Studi Sarjana Terapan TRPL | Pengarah kebijakan dan pengesah legalitas sertifikat kelulusan. | Pimpinan Prodi / Dosen Tetap |
-| **Pembina Program** | Dosen Pembina Kemahasiswaan / Dosen Pengampu | Supervisi keselarasan materi dengan kurikulum perkuliahan resmi. | Dosen Rumpun Rekayasa PL |
-| **Instruktur Utama (*Lead Instructor*)** | **Ketua Divisi Pemrograman Matrikulasi 2026** | Memimpin pengajaran langsung sesi live workshop (M0–M4), merancang kurikulum, dan mengarahkan live-coding. | • Mahasiswa Senior TRPL<br>• Keahlian Python, Web Dev, & Komputasi Awan<br>• Kemampuan *Public Speaking* & Mentoring Humanis |
-| **Fasilitator Lapangan (*Teaching Assistants*)** | **Staff Divisi Pemrograman TRPL** (4–6 Personil) | Memberikan asistensi teknis *one-on-one* saat sesi live dan memantau kode snapshot saat fase asrama. | • Mahasiswa TRPL Aktif<br>• Pemahaman sintaks Python & logika debugging<br>• Ketelitian analisis error algoritma |
-| **Tim Teknis & Infrastruktur** | Divisi Teknis Platform | Mengawal keandalan server Firestore, CDN Pyodide, dan monitoring performa web. | • Keahlian Next.js, Firebase, & Web Worker optimization |
+#### 5.4 Kebijakan Perangkat Koding
+1. **Laptop adalah Perangkat Utama:** Setiap mahasiswa baru diwajibkan menggunakan laptop saat sesi praktik koding tatap muka.
+2. **Penyediaan Laptop oleh Panitia:** Bagi mahasiswa baru yang belum memiliki atau tidak membawa laptop pada Hari-H, **panitia menyediakan unit laptop cadangan langsung di Ruang 7.3**.
+3. **Smartphone (HP) Hanya Sebagai Cadangan Darurat:** Akses melalui smartphone atau tablet hanya diperkenankan sebagai cadangan darurat apabila unit laptop cadangan panitia telah terpakai seluruhnya, didukung skema belajar berpasangan (*pair-programming*).
 
 ---
 
-### 8. MANAJEMEN RISIKO DAN MITIGASI ISU (*RISK MANAGEMENT*)
+### 6. LUARAN PROGRAM (*DELIVERABLES*)
 
-Untuk memastikan kegiatan berjalan lancar tanpa kendala fatal di lapangan, diidentifikasi potensi risiko serta rencana kontinjensi berikut:
+1. **Sertifikat Kelulusan Resmi Matrikulasi TRPL 2026:**
+   Diterbitkan digital bagi peserta yang menuntaskan seluruh latihan modul dan proyek akhir dengan validasi 100% pengujian *auto-grader*, lengkap dengan nomor registrasi dan QR Code verifikasi publik.
+2. **Karya Portofolio Kode Mahasiswa:**
+   Program aplikasi *Kasir Warkop TRPL 2026* fungsional karya mandiri setiap mahasiswa sebagai portofolio awal perkuliahan.
+3. **Laporan Pemetaan Kesiapan Angkatan:**
+   Dokumen analisis hasil belajar (perbandingan nilai *pre-test* dan *post-test*, modul yang paling membutuhkan pendampingan, serta rekapitulasi waktu penyelesaian) yang diserahkan kepada dosen pengampu semester ganjil.
 
-| Potensi Isu / Masalah | Tingkat Risiko | Dampak Operasional | Tindakan Pencegahan & Rencana Mitigasi |
+---
+
+### 7. STRUKTUR PELAKSANA DAN KOORDINASI
+
+| Peran | Pelaksana (PIC) | Tugas Utama |
+| :--- | :--- | :--- |
+| **Penanggung Jawab** | Ketua Program Studi Sarjana Terapan TRPL | Mengarahkan kebijakan dan melegalkan sertifikat kelulusan. |
+| **Pembina Program** | Dosen Pembina Kemahasiswaan TRPL | Memastikan materi selaras dengan kurikulum semester ganjil. |
+| **Instruktur Utama** | **Ketua Divisi Pemrograman Matrikulasi 2026**<br>*(Felich Pehagasa Ginting)* | Menyusun kurikulum, membawakan materi teori 60 menit, memandu praktik, dan mengarahkan asisten. |
+| **Asisten Lapangan** | **Staf Divisi Pemrograman TRPL**<br>*(4–6 Mahasiswa Senior)* | Memberikan asistensi meja ke meja saat praktik kelas, memandu games kuis, dan memantau tiket bantuan daring. |
+| **Tim Teknis Web** | Divisi Teknis Platform | Memastikan keandalan server peramban (Pyodide), database Firestore, dan generator sertifikat. |
+| **Narahubung Acara** | Dika Prasetyawan *(0821-6241-1486)* | Koordinasi integrasi susunan acara, tata tertib, dan logistik Ruang 7.3. |
+
+---
+
+### 8. MANAJEMEN RISIKO DAN MITIGASI
+
+| Potensi Kendala | Lokasi/Fase | Dampak | Rencana Mitigasi |
 | :--- | :---: | :--- | :--- |
-| **Jaringan Internet Kampus Drop / Lambat** | Sedang | Mahasiswa lambat mengunduh runtime Pyodide pertama kali. | • Engine Pyodide dan worker script telah dioptimasi dengan *browser caching immutable* dan CDN preconnect.<br>• Panitia menyediakan cadangan dedicated tethering hotspot untuk akses darurat. |
-| **Baterai Laptop Habis / Stopkontak Terbatas** | Tinggi | Laptop peserta mati di tengah sesi praktik koding. | • Panitia logistik menyediakan 10–15 unit kabel roll / colokan ekstensi di setiap deretan meja peserta.<br>• Mahasiswa diimbau mengisi daya penuh laptop sebelum hadir. |
-| **Peserta Tidak Memiliki Laptop pada Hari-H** | Rendah | Tidak bisa mengikuti sesi live koding mandiri. | • Platform responsif di tablet/smartphone via browser Safari/Chrome.<br>• Disediakan 3–5 unit laptop cadangan panitia atau diarahkan berpasangan (*pair-programming*). |
-| **Infinite Loop pada Kode Mahasiswa** | Tinggi | Browser tab membeku (*freeze*) akibat loop tak berujung. | • Sistem *pyodideRunner* dilengkapi Web Worker sandbox dengan timeout otomatis 7 detik yang memutus eksekusi dan memunculkan tips solusi. |
-| **Kebuntuan Logika saat di Asrama** | Sedang | Mahasiswa frustrasi dan berhenti melanjutkan tugas. | • Disediakan tombol **"Minta Bantuan"** yang merekam snapshot kode permanen untuk langsung dibahas bersama mentor di grup pendampingan. |
+| **Koneksi Internet Kampus Lambat** | Ruang 7.3 (Fase 2) | Pemuatan awal platform web terhambat. | Aset web telah dioptimasi dengan sistem penyimpanan lokal (*browser caching*); panitia menyiapkan hotspot tethering cadangan untuk darurat. |
+| **Daya Baterai Laptop Habis** | Ruang 7.3 (Fase 2) | Praktik koding terhenti. | Panitia menyediakan kabel roll dan colokan ekstensi di setiap baris meja Ruang 7.3; peserta diimbau mengisi penuh baterai sebelum hadir. |
+| **Peserta Tidak Membawa Laptop** | Ruang 7.3 (Fase 2) | Peserta kesulitan praktik mandiri. | Panitia meminjamkan unit laptop cadangan di ruangan; opsi akses via smartphone atau belajar berpasangan disiapkan sebagai cadangan darurat. |
+| **Eror Perulangan Tak Berujung (*Infinite Loop*)** | Fase 2 & 3 | Peramban membeku (*freeze*). | Engine web dilengkapi pembatas waktu otomatis 7 detik (*timeout*) yang memutus eksekusi dan memunculkan petunjuk perbaikan kode. |
+| **Kebuntuan Logika saat Belajar di Asrama** | Asrama (Fase 3) | Mahasiswa berhenti mengerjakan tugas. | Mahasiswa dapat menekan tombol **"Minta Bantuan"** di web editor untuk mengirimkan snapshot kode ke asisten divisi secara asinkron. |
 
 ---
 
-### 9. LOGISTIK DAN RENCANA ANGGARAN BIAYA (*HOW MUCH*)
+### 9. PELAPORAN DAN KEBERLANJUTAN
 
-Berikut adalah proyeksi Rencana Anggaran Biaya (RAB) operasional kegiatan matrikulasi:
-
-| No | Uraian Pengeluaran | Kuantitas / Satuan | Harga Satuan (Rp) | Total Estimasi (Rp) | Sumber Kebutuhan |
-| :---: | :--- | :---: | :---: | :---: | :--- |
-| **A** | **Logistik & Perlengkapan Acara** | | | | |
-| 1 | Stopkontak Ekstensi (Kabel Roll 10m) | 8 Unit | 75.000 | 600.000 | Inventaris Panitia / Sewa |
-| 2 | Banner / Backdrop Panggung Kegiatan (4x2 m) | 1 Buah | 200.000 | 200.000 | Percetakan |
-| 3 | ID Card Panitia & Tanda Pengenal Peserta | 120 Paket | 5.000 | 600.000 | ATK & Kesekretariatan |
-| **B** | **Konsumsi Sesi Tatap Muka (Live Workshop)** | | | | |
-| 4 | Snack Box Mahasiswa Baru & Panitia | 130 Kotak | 15.000 | 1.950.000 | Konsumsi Sesi Istirahat |
-| 5 | Air Mineral Gelas (Dus) | 6 Dus | 35.000 | 210.000 | Konsumsi Peserta |
-| 6 | Konsumsi Makan Siang Panitia & Instruktur | 15 Porsi | 30.000 | 450.000 | Pasca Sesi Live |
-| **C** | **Infrastruktur & Digital Rewards** | | | | |
-| 7 | Server Caching & Kuota Kupon API Firestore | 1 Paket | 300.000 | 300.000 | Operasional Cloud Web |
-| 8 | Reward Top 3 Angkatan di Leaderboard (Merchandise) | 3 Paket | 100.000 | 300.000 | Apresiasi Mahasiswa Terbaik |
-| 9 | Biaya Tak Terduga / Medis Ringan | 1 Paket | 300.000 | 300.000 | Kontinjensi Lapangan |
-| **TOTAL ESTIMASI ANGGARAN (RAB)** | | | | **Rp 4.910.000** | *(Empat Juta Sembilan Ratus Sepuluh Ribu Rupiah)* |
-
----
-
-### 10. PELAKSANA DAN PENANGGUNG JAWAB (*WHO*)
-
-* **Penanggung Jawab Umum:** Ketua Program Studi Sarjana Terapan TRPL
-* **Pengarah Teknis:** Dosen Pembina Kemahasiswaan TRPL
-* **Ketua Pelaksana Matrikulasi TRPL 2026:** Mahasiswa TRPL yang ditunjuk prodi/himpunan
-* **Ketua Divisi Pemrograman (*Lead Instructor*):** **Felich Pehagasa Ginting**
-* **Staf Divisi Pemrograman (*Teaching Assistants*):** Jajaran staf divisi mahasiswa senior TRPL
-* **Divisi Logistik & Konsumsi:** Staf Panitia Matrikulasi Angkatan 2026
-
----
-
-### 11. PELAPORAN DAN KEBERLANJUTAN PROGRAM (*SUSTAINABILITY*)
-
-#### 11.1 Penyusunan Laporan
-Setelah seluruh rangkaian Fase 1 dan Fase 2 rampung, Divisi Pemrograman menyusun **Laporan Pertanggungjawaban (LPJ)** yang memuat:
-1. Laporan realisasi anggaran dan dokumentasi pelaksanaan kegiatan.
-2. Statistik kelulusan mahasiswa baru (persentase kelulusan target: minimal 85%).
-3. Rekapitulasi submission proyek Kasir Warkop TRPL beserta catatan evaluasi kode.
-
-#### 11.2 Keberlanjutan Program (*Sustainability*)
-* **Transisi Menuju Perkuliahan Reguler:** Platform dan repository koding mahasiswa akan tetap aktif selama satu semester penuh sebagai media latihan (*sandbox*) dan referensi materi mandiri.
-* **Klinik Pemrograman HIMA TRPL:** Mekanisme snapshot "Minta Bantuan" akan diadopsi secara berkelanjutan sebagai infrastruktur *peer-mentoring* mingguan yang difasilitasi oleh Himpunan Mahasiswa TRPL.
-
----
-
-### LEMBAR PENGESAHAN
-
-Ditetapkan di : ____________________  
-Pada tanggal  : ____________________ 2026  
-
-<br>
-
-Menyetujui dan Mengesahkan,
-
-| Mengetahui,<br>Ketua Program Studi Sarjana Terapan TRPL | Menyetujui,<br>Ketua Pelaksana Matrikulasi 2026 | Yang Mengajukan,<br>Ketua Divisi Pemrograman Matrikulasi 2026 *(Lead Instructor)* |
-| :---: | :---: | :---: |
-| <br><br><br><br>____________________________________<br>**NIP. ........................................** | <br><br><br><br>____________________________________<br>**NIM. ........................................** | <br><br><br><br>____________________________________<br>**NIM. ........................................** |
+1. **Laporan Pertanggungjawaban (LPJ):** Disusun setelah penutupan pengumpulan tugas, memuat dokumentasi kegiatan, statistik kenaikan nilai *pre-test* ke *post-test*, persentase kelulusan (target minimal 85%), serta catatan evaluasi teknis.
+2. **Keberlanjutan Sistem:** Platform koding dan modul pembelajaran web tetap dibuka sepanjang semester ganjil sebagai sarana latihan mandiri dan diintegrasikan ke dalam program klinik bimbingan Himpunan Mahasiswa TRPL Politeknik Kelapa Sawit CWE.

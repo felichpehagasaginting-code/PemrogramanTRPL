@@ -1,13 +1,23 @@
 import os
+import base64
 from markdown_it import MarkdownIt
 from playwright.sync_api import sync_playwright
 
 md_path = r"f:\Projects\MatrikulasiPemrograman26\docs\TOR_Matrikulasi_Pemrograman_TRPL_2026.md"
 html_path = r"f:\Projects\MatrikulasiPemrograman26\docs\TOR_Matrikulasi_Pemrograman_TRPL_2026.html"
 pdf_path = r"f:\Projects\MatrikulasiPemrograman26\docs\TOR_Matrikulasi_Pemrograman_TRPL_2026.pdf"
+logo_cwe_path = r"f:\Projects\MatrikulasiPemrograman26\docs\logo_cwe.png"
+logo_trpl_path = r"f:\Projects\MatrikulasiPemrograman26\docs\logo_trpl.png"
 
 with open(md_path, "r", encoding="utf-8") as f:
     md_content = f.read()
+
+# Base64 encode logos
+with open(logo_cwe_path, "rb") as f:
+    b64_cwe = base64.b64encode(f.read()).decode("utf-8")
+
+with open(logo_trpl_path, "rb") as f:
+    b64_trpl = base64.b64encode(f.read()).decode("utf-8")
 
 md = MarkdownIt("commonmark").enable("table")
 rendered_body = md.render(md_content)
@@ -40,17 +50,17 @@ html_template = f"""<!DOCTYPE html>
   }}
 
   h1 {{
-    font-size: 16pt;
+    font-size: 15pt;
     font-weight: 800;
     text-align: center;
     color: #0F172A;
     margin: 0 0 4px 0;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
   }}
 
   h2 {{
-    font-size: 12.5pt;
+    font-size: 12pt;
     font-weight: 700;
     text-align: center;
     color: #EA580C;
@@ -146,24 +156,63 @@ html_template = f"""<!DOCTYPE html>
   }}
 
   .header-box {{
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     border-bottom: 3px double #0F172A;
     padding-bottom: 12px;
     margin-bottom: 16px;
+    gap: 16px;
+  }}
+
+  .header-logo {{
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+  }}
+
+  .header-center {{
+    flex-grow: 1;
+    text-align: center;
+  }}
+
+  .inst-title {{
+    font-size: 11pt;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 2px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }}
 
   .inst-name {{
-    font-size: 9.5pt;
+    font-size: 9pt;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 2px 0;
+    text-transform: uppercase;
+  }}
+
+  .inst-sub {{
+    font-size: 8.5pt;
     font-weight: 600;
-    color: #475569;
+    color: #EA580C;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }}
 </style>
 </head>
 <body>
 <div class="header-box">
-  <p class="inst-name">PROGRAM STUDI SARJANA TERAPAN TEKNOLOGI REKAYASA PERANGKAT LUNAK (TRPL)</p>
-  <p class="inst-name">PANITIA MATRIKULASI MAHASISWA BARU ANGKATAN 2026</p>
+  <img src="data:image/png;base64,{b64_cwe}" alt="Logo Politeknik CWE" class="header-logo" />
+  <div class="header-center">
+    <p class="inst-title">POLITEKNIK KELAPA SAWIT CITRA WIDYA EDUKASI</p>
+    <p class="inst-name">PROGRAM STUDI SARJANA TERAPAN TEKNOLOGI REKAYASA PERANGKAT LUNAK (TRPL)</p>
+    <p class="inst-sub">PANITIA MATRIKULASI MAHASISWA BARU ANGKATAN 2026</p>
+  </div>
+  <img src="data:image/png;base64,{b64_trpl}" alt="Logo HIMA TRPL" class="header-logo" />
 </div>
 {rendered_body}
 </body>
@@ -173,7 +222,7 @@ html_template = f"""<!DOCTYPE html>
 with open(html_path, "w", encoding="utf-8") as f:
     f.write(html_template)
 
-print("HTML generated successfully. Generating PDF via Playwright...")
+print("HTML generated successfully with both logos. Generating PDF via Playwright...")
 
 with sync_playwright() as p:
     browser = p.chromium.launch()
