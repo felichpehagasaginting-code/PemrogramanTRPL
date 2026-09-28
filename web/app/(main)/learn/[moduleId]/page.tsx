@@ -16,11 +16,13 @@ import {
   Bookmark,
   Sparkle,
   Printer,
+  Clock,
 } from "@phosphor-icons/react";
 import { InlineAnnotationThread } from "@/components/learning/InlineAnnotationThread";
 import { SeniorTipCard, SeniorTipData } from "@/components/learning/SeniorTipCard";
 import { PrintableSummaryModal } from "@/components/learning/PrintableSummaryModal";
 import { SkeletonDashboard } from "@/components/ui/Skeleton";
+import { prefetchPyodide } from "@/lib/pyodide/pyodideRunner";
 
 interface Slide {
   title: string;
@@ -233,6 +235,11 @@ export default function LearnModulePage() {
     "C:\\Users\\maba> _",
   ]);
   const [cliStep, setCliStep] = useState(0); // 0: initial, 1: cd done, 2: python done
+
+  useEffect(() => {
+    // Predictive prefetch of Pyodide WASM worker during slide reading
+    prefetchPyodide();
+  }, []);
 
   const [checklist, setChecklist] = useState({
     downloaded: false,
@@ -1901,20 +1908,48 @@ export default function LearnModulePage() {
         </button>
       </div>
 
-      {/* Progress indicators */}
-      <div style={{ display: "flex", gap: "6px", marginBottom: "var(--space-6)" }}>
-        {slides.map((_, idx) => (
-          <div
-            key={idx}
-            style={{
-              flex: 1,
-              height: "6px",
-              borderRadius: "3px",
-              background: idx <= currentSlideIndex ? "var(--color-primary-500)" : "var(--color-neutral-150)",
-              transition: "background var(--transition-fast)",
-            }}
-          />
-        ))}
+      {/* Interactive Guided Slide Stepper & Reading Time Indicator (Recommendation 5) */}
+      <div style={{ marginBottom: "var(--space-6)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--color-primary-500)", background: "rgba(255, 107, 0, 0.1)", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+              Langkah {currentSlideIndex + 1} dari {slides.length}
+            </span>
+            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+              • {currentSlide?.title || "Materi Belajar"}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "var(--text-muted)", background: "var(--bg-card)", padding: "3px 10px", borderRadius: "var(--radius-full)", border: "1px solid var(--border-color)" }}>
+            <Clock size={13} weight="bold" />
+            <span>Estimasi baca: ~{Math.max(1, Math.round(((slides.length - currentSlideIndex) * 1.5)))} menit tersisa</span>
+          </div>
+        </div>
+
+        {/* Progress indicators bar */}
+        <div style={{ display: "flex", gap: "6px" }}>
+          {slides.map((s, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setCurrentSlideIndex(idx)}
+              className="focus-ring"
+              title={`Loncat ke slide ${idx + 1}: ${s.title}`}
+              aria-label={`Slide ${idx + 1}: ${s.title}`}
+              style={{
+                flex: 1,
+                height: "8px",
+                borderRadius: "4px",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                background: idx <= currentSlideIndex ? "var(--color-primary-500)" : "var(--color-neutral-150)",
+                transition: "all var(--transition-fast)",
+                transform: idx === currentSlideIndex ? "scaleY(1.3)" : "none",
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Slide Container Card */}
@@ -2000,6 +2035,8 @@ export default function LearnModulePage() {
 
           <button
             onClick={handleNext}
+            onMouseEnter={prefetchPyodide}
+            onFocus={prefetchPyodide}
             aria-label={isLastSlide ? (moduleId === "M0" || moduleId === "M1" ? "Mulai kuis" : "Lanjut ke latihan") : "Lanjut ke slide berikutnya"}
             className="focus-ring"
             style={{

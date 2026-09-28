@@ -230,3 +230,31 @@ export async function runPythonCodeClient(
   });
 }
 
+let isPrefetched = false;
+
+/**
+ * Predictive prefetching for Pyodide Web Worker & WASM binaries.
+ * Warms up the worker during browser idle cycles so execution starts instantaneously.
+ */
+export function prefetchPyodide(): void {
+  if (typeof window === "undefined" || isPrefetched) return;
+  isPrefetched = true;
+
+  const trigger = () => {
+    try {
+      const worker = getWorker();
+      if (worker) {
+        worker.postMessage({ id: "prefetch-init", type: "INIT" });
+      }
+    } catch (err) {
+      // Non-blocking prefetch failure
+    }
+  };
+
+  if ("requestIdleCallback" in window) {
+    (window as any).requestIdleCallback(trigger, { timeout: 3500 });
+  } else {
+    setTimeout(trigger, 1200);
+  }
+}
+
