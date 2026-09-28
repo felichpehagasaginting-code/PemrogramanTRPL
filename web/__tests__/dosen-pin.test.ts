@@ -8,15 +8,15 @@ describe("Dosen Penguji PIN Dial Pad & Access Gate", () => {
     expect(/^\d{4}$/.test(DOSEN_SECRET_PIN)).toBe(true);
   });
 
-  it("fails authentication when wrong PIN is supplied", () => {
+  it("fails authentication when wrong PIN is supplied", async () => {
     const store = useUserStore.getState();
-    const success = store.loginAsDosenPenguji("9999");
+    const success = await store.loginAsDosenPenguji("9999");
     expect(success).toBe(false);
   });
 
-  it("authenticates as Dosen Penguji with full access and full progress matching creator", () => {
+  it("authenticates as Dosen Penguji with full access and full progress matching creator", async () => {
     const store = useUserStore.getState();
-    const success = store.loginAsDosenPenguji("1213");
+    const success = await store.loginAsDosenPenguji("1213");
     expect(success).toBe(true);
 
     const currentUser = useUserStore.getState().user;
