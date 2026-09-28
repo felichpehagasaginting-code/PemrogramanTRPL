@@ -4,30 +4,31 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![Python](https://img.shields.io/badge/Python-WASM%20Pyodide-yellow?style=for-the-badge&logo=python)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-orange?style=for-the-badge&logo=firebase)
-![Vitest](https://img.shields.io/badge/Vitest-58%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
+![Vitest](https://img.shields.io/badge/Vitest-60%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
-Platform pembelajaran pemrograman interaktif, adaptif, ramah pemula, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026**.
+Platform pembelajaran pemrograman interaktif, adaptif, ramah pemula, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026** di **Politeknik Kelapa Sawit Citra Widya Edukasi (CWE)**.
 
-Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dari nol mutlak hingga siap membangun aplikasi nyata, lengkap dengan **Pyodide WebAssembly (WASM)**, **Monaco Editor**, **PowerShell Lite 7.4 Simulator**, **Auto-Grader**, dan **Sistem Gamifikasi Lengkap**.
+Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dari nol mutlak hingga siap membangun aplikasi nyata, lengkap dengan **Pyodide WebAssembly (WASM)**, **Monaco Editor (SSR-Free & Lazy Tabs)**, **PowerShell Lite 7.4 Simulator**, **Auto-Grader**, **Studi Kasus Agro-Informatika Sawit**, dan **Sistem Gamifikasi Lengkap**.
 
 ---
 
 ## 🌟 Fitur Utama & Sistem Unggulan
 
 ### 💡 1. Friendly Senior Mentor & Sistem Pedagogi Maba
-- **Tips Senior & Contekan Cepat**: Di setiap slide materi (M0 hingga M8), tersedia tips trik praktis, contekan kode kilat, dan relevansi industri dunia kerja.
-- **Analogi Kehidupan Nyata**: Konsep teknis rumit dijelaskan dengan analogi santai (memasak mie instan, robot pelayan kopi, dompet pintar, kasir warkop TRPL).
+- **Tips Senior & Contekan Cepat**: Di setiap slide materi (M0 hingga M8), tersedia tips trik praktis, contekan kode kilat, dan relevansi industri agro-informatika.
+- **Analogi Kehidupan Nyata**: Konsep teknis rumit dijelaskan dengan analogi santai (memasak mie instan, robot pelayan kopi, dompet pintar, kasir warkop & koperasi kebun TRPL).
 - **Kamus Kata Gaul Pemrograman**: Glosarium istilah gaul (*syntax, bug, runtime error, infinite loop, return value*) yang mudah dipahami pemula.
-- **Proyek Kasir Warkop TRPL 2026 (M8)**: Scaffolding bertahap 3-Fase (*Fase 1: Hitung Total, Fase 2: Diskon Member & Validasi, Fase 3: Struk Rapi & Cetak Nota*).
+- **Proyek Kasir Warkop & Koperasi Sawit TRPL 2026 (M8)**: Scaffolding bertahap 3-Fase (*Fase 1: Hitung Total, Fase 2: Diskon Member & Validasi, Fase 3: Struk Rapi & Cetak Nota*).
 
 ### 🆘 2. Sistem "Minta Bantuan" & Snapshot Kode Instan
 - Mahasiswa yang mengalami error atau kebingungan dapat menekan tombol **"Minta Bantuan"**.
 - Menghasilkan tautan snapshot permanen (`/help/[snapshotId]`) yang menyimpan kode aktif, riwayat output terminal, dan penjelasan AI.
 - Senior mentor atau asisten dapat langsung membuka link tersebut, meninjau masalah dalam 1 klik, dan memberikan bimbingan terarah.
 
-### 💻 3. Client-Side Python WASM Engine (Pyodide)
+### 💻 3. Client-Side Python WASM Engine (Pyodide) & Predictive Prefetching
 - Menjalankan kode Python 3.11 100% di browser pengguna berbasis WebAssembly (0ms latency).
+- **Predictive Prefetching & Worker Preheating**: Memanaskan worker Pyodide di latar belakang secara non-blocking (*requestIdleCallback*) saat mahasiswa membaca materi slide atau hover pada tombol latihan.
 - Bebas dari ketergantungan server backend eksternal, anti-loop execution, dan aman dari sandbox escape.
 
 ### 🖥️ 4. PowerShell Lite 7.4 Terminal Simulator
@@ -49,11 +50,16 @@ Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dar
 - Penguji koding otomatis berbasis *Multi-Test-Case Verification* & *Structural Rule Check* (memeriksa keberadaan `for`, `while`, `def`, `return`).
 - Penilaian transparan lengkap dengan skor kecocokan output dan visualisasi perbedaan (*Code Diff Viewer*).
 
-### 🏆 8. Gamifikasi, Podium 3D & 13 Badge Eksklusif
+### 🏆 8. Gamifikasi, Podium 3D & Sertifikat Resmi Anti-AI-Slop
 - **Podium 3D Leaderboard**: Papan peringkat mahasiswa satu angkatan dengan efek podium 3D berkilau untuk peringkat 3 besar.
 - **Badge Prestasi**: 13 badge pencapaian (Langkah Pertama, Master Loop, Ahli Fungsi, Arsitek Kasir, dll).
 - **Label Creator Khusus**: Badge verifikasi eksklusif pada akun pembuat/senior.
-- **Sertifikat Digital Resmi**: Generator sertifikat kelulusan matrikulasi lengkap dengan QR Code verifikasi dan mode cetak PDF.
+- **Sertifikat Digital Resmi "Royal Deep Purple & Warm Gold"**:
+  - Warna solid non-gradien anti-AI-slop (`#180D30` & `#D4AF37`).
+  - Nama mahasiswa dicetak dengan tipografi huruf tegak bersambung (kaligrafi resmi Google Font `Great Vibes`).
+  - Dilengkapi nomor SK Kelulusan resmi prodi: `042/CWE-TRPL/SK-MATRIK/2026`.
+  - Tanda tangan Instruktur Utama (*Felich Pehagasa Ginting*) dan Dosen Pembina (disertai NIDN).
+  - Dynamic QR Code verifikasi online publik (`/verify/[certId]`) dan format kartu media sosial Story (9:16).
 
 ---
 
