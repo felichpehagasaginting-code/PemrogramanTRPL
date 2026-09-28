@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { useGameStore } from "@/lib/store/useGameStore";
 import Link from "next/link";
-import { Code, SignOut, User, Trophy, BookOpen, ShieldCheck } from "@phosphor-icons/react";
+import { Code, SignOut, User, Trophy, BookOpen, ShieldCheck, CheckSquareOffset } from "@phosphor-icons/react";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -51,6 +52,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const menuLinks = [
     { label: "Dasbor", href: "/dashboard", icon: <BookOpen size={20} weight="bold" /> },
+    { label: "Post-Test", href: "/post-test", icon: <CheckSquareOffset size={20} weight="bold" /> },
     { label: "Sandbox", href: "/sandbox", icon: <Code size={20} weight="bold" /> },
     { label: "Papan Peringkat", href: "/leaderboard", icon: <Trophy size={20} weight="bold" /> },
     { label: "Profil", href: "/profile", icon: <User size={20} weight="bold" /> },
@@ -69,10 +71,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }}
       >
         <div className="section-container" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-          {/* Brand Logo */}
-          <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", flexShrink: 0 }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--gradient-hero)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-glow-soft)", flexShrink: 0 }}>
-              <Code size={18} color="white" weight="bold" />
+          {/* Brand Logo with Institution Logos */}
+          <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ width: "28px", height: "22px", position: "relative" }}>
+                <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+              </div>
+              <div style={{ width: "20px", height: "20px", position: "relative" }}>
+                <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+              </div>
             </div>
             <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)", whiteSpace: "nowrap" }}>
               Matrikulasi <span className="gradient-text">TRPL</span>

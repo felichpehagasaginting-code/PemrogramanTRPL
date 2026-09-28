@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { MODULES_META } from "@/lib/content/modules-data";
 import Link from "next/link";
-import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket } from "@phosphor-icons/react";
+import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket, FileText, Sparkle } from "@phosphor-icons/react";
 import { BadgeIcon } from "@/components/ui";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { PointingPopup } from "@/components/ui/PointingPopup";
@@ -193,33 +194,160 @@ export default function DashboardPage() {
               <span>M8: Mini Project</span>
             </div>
 
-            {/* Certificate Link Banner */}
+            {/* Evaluasi Ujian (Pre-Test & Post-Test) Status Card */}
             <div
               style={{
                 marginTop: "16px",
-                padding: "12px 16px",
-                background: "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
-                border: "1px solid rgba(245, 158, 11, 0.4)",
+                padding: "16px",
+                background: "var(--bg-page-alt)",
+                border: "1px solid var(--border-color)",
                 borderRadius: "var(--radius-lg)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "10px",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem", color: "var(--text-primary)" }}>
-                <Trophy size={20} color="#F59E0B" weight="fill" />
-                <span>
-                  {percentage >= 80
-                    ? "🎉 Selamat! Kamu berhak mengklaim Sertifikat Kelulusan Resmi TRPL!"
-                    : "Selesaikan modul sampai M8 untuk membuka Sertifikat Kelulusan Resmi TRPL."}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "28px", height: "20px", position: "relative" }}>
+                    <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+                  </div>
+                  <div style={{ width: "20px", height: "20px", position: "relative" }}>
+                    <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+                  </div>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-primary)" }}>
+                    Evaluasi Standar Matrikulasi TRPL
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                  Syarat Wajib Sertifikat Kelulusan
                 </span>
               </div>
-              <Link href="/certificate" className="btn btn-sm btn-primary" style={{ padding: "4px 12px", fontSize: "0.75rem" }}>
-                {percentage >= 80 ? "Klaim Sertifikat 🎓" : "Lihat Sertifikat"}
-              </Link>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                {/* Pre-Test Card */}
+                {(() => {
+                  const isPreDone = Boolean(user.tests?.preTest?.completed);
+                  const prePct = user.tests?.preTest?.percentage ?? 0;
+                  return (
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>PRE-TEST (M0)</span>
+                        {isPreDone ? (
+                          <span style={{ fontSize: "0.7rem", color: "#22C55E", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                            Selesai ({prePct}%)
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: "0.7rem", color: "#F59E0B", fontWeight: 700, background: "rgba(245,158,11,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                            Wajib
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                        Diagnostik Pemetaan
+                      </div>
+                      <Link
+                        href="/learn/M0"
+                        className="btn btn-sm btn-secondary"
+                        style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px" }}
+                      >
+                        {isPreDone ? "Tinjau Pre-Test" : "Mulai Pre-Test 📝"}
+                      </Link>
+                    </div>
+                  );
+                })()}
+
+                {/* Post-Test Card */}
+                {(() => {
+                  const isPreDone = Boolean(user.tests?.preTest?.completed);
+                  const isPostDone = Boolean(user.tests?.postTest?.completed);
+                  const postPct = user.tests?.postTest?.percentage ?? 0;
+                  return (
+                    <div style={{
+                      background: "var(--bg-card)",
+                      border: isPostDone ? "1px solid rgba(34,197,94,0.3)" : !isPreDone ? "1px dashed var(--border-color)" : "1px solid var(--color-primary-400)",
+                      borderRadius: "var(--radius-md)",
+                      padding: "12px",
+                      opacity: !isPreDone ? 0.6 : 1,
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>POST-TEST AKHIR</span>
+                        {isPostDone ? (
+                          <span style={{ fontSize: "0.7rem", color: "#22C55E", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                            Lulus ({postPct}%)
+                          </span>
+                        ) : isPreDone ? (
+                          <span style={{ fontSize: "0.7rem", color: "var(--color-primary-500)", fontWeight: 700, background: "rgba(255,107,0,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                            Terbuka
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600 }}>
+                            Terkunci
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                        Ujian Evaluasi Akhir
+                      </div>
+                      {isPreDone ? (
+                        <Link
+                          href="/post-test"
+                          className="btn btn-sm btn-primary"
+                          style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px" }}
+                        >
+                          {isPostDone ? "Lihat Hasil Post-Test" : "Mulai Post-Test 🚀"}
+                        </Link>
+                      ) : (
+                        <button
+                          disabled
+                          className="btn btn-sm btn-secondary"
+                          style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px", opacity: 0.5, cursor: "not-allowed" }}
+                        >
+                          Selesaikan Pre-Test Dulu
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
+
+            {/* Certificate Link Banner */}
+            {(() => {
+              const requiredModules = ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"];
+              const allDone = requiredModules.every((k) => user.progress?.[k]?.status === "completed");
+              const preDone = Boolean(user.tests?.preTest?.completed);
+              const postDone = Boolean(user.tests?.postTest?.completed);
+              const isEligible = allDone && preDone && postDone;
+
+              return (
+                <div
+                  style={{
+                    marginTop: "16px",
+                    padding: "12px 16px",
+                    background: isEligible
+                      ? "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)"
+                      : "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
+                    border: isEligible ? "1px solid rgba(34, 197, 94, 0.4)" : "1px solid rgba(245, 158, 11, 0.4)",
+                    borderRadius: "var(--radius-lg)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem", color: "var(--text-primary)" }}>
+                    <Trophy size={20} color={isEligible ? "#22C55E" : "#F59E0B"} weight="fill" />
+                    <span>
+                      {isEligible
+                        ? "🎉 Selamat! Kamu telah menuntaskan Pre-Test, Semua Modul, dan Post-Test. Klaim Sertifikatmu sekarang!"
+                        : "Selesaikan Pre-Test, Seluruh Modul (M0–M8), dan Post-Test untuk membuka Sertifikat Resmi TRPL."}
+                    </span>
+                  </div>
+                  <Link href="/certificate" className="btn btn-sm btn-primary" style={{ padding: "4px 12px", fontSize: "0.75rem" }}>
+                    {isEligible ? "Klaim Sertifikat 🎓" : "Status Syarat Sertifikat"}
+                  </Link>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Interactive 3D/SVG Skill Tree */}

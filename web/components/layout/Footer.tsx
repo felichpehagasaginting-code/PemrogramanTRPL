@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Code, InstagramLogo, GithubLogo, Heart } from "@phosphor-icons/react";
 
@@ -25,18 +26,13 @@ export const Footer = memo(function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginBottom: "var(--space-4)" }}>
-              <div
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "10px",
-                  background: "var(--gradient-hero)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Code size={18} color="white" weight="bold" />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ width: "32px", height: "26px", position: "relative" }}>
+                  <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+                </div>
+                <div style={{ width: "24px", height: "24px", position: "relative" }}>
+                  <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+                </div>
               </div>
               <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "#FFFAF6" }}>
                 Matrikulasi <span className="gradient-text">TRPL</span>

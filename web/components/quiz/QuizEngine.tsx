@@ -15,7 +15,7 @@ export interface QuizQuestion {
 interface Props {
   questions: QuizQuestion[];
   moduleId: string;
-  onComplete: (score: number, total: number) => void;
+  onComplete: (score: number, total: number, answers?: Record<number, number>) => void;
   onBack?: () => void;
 }
 
@@ -25,6 +25,7 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
 
   const question = questions[currentQ];
 
@@ -32,6 +33,7 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
     if (answered) return;
     setSelected(idx);
     setAnswered(true);
+    setAnswers((prev) => ({ ...prev, [currentQ]: idx }));
     if (idx === question.correctIndex) {
       setScore((s) => s + 1);
     }
@@ -43,8 +45,10 @@ export function QuizEngine({ questions, moduleId, onComplete, onBack }: Props) {
       setSelected(null);
       setAnswered(false);
     } else {
+      const finalAnswers = selected !== null ? { ...answers, [currentQ]: selected } : answers;
+      const finalScore = score + (selected === question.correctIndex ? 1 : 0);
       setFinished(true);
-      onComplete(score + (selected === question.correctIndex ? 1 : 0), questions.length);
+      onComplete(finalScore, questions.length, finalAnswers);
     }
   };
 

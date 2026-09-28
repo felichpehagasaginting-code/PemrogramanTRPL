@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { List, X, Code } from "@phosphor-icons/react";
@@ -38,17 +39,15 @@ export const Navbar = memo(function Navbar() {
     >
       <div className="section-container">
         <nav className="flex items-center justify-between h-[70px]" aria-label="Navigasi utama">
-          <Link href="/" className="flex items-center gap-[10px] no-underline" aria-label="Beranda Matrikulasi TRPL">
-            <motion.div
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center focus-ring"
-              style={{
-                background: "var(--gradient-hero)",
-                boxShadow: "var(--shadow-glow-soft)",
-              }}
-            >
-              <Code size={20} color="white" weight="bold" />
-            </motion.div>
+          <Link href="/" className="flex items-center gap-[12px] no-underline" aria-label="Beranda Matrikulasi TRPL">
+            <div className="flex items-center gap-[6px]">
+              <div style={{ width: "32px", height: "24px", position: "relative" }}>
+                <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+              </div>
+              <div style={{ width: "24px", height: "24px", position: "relative" }}>
+                <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+              </div>
+            </div>
             <span
               className="font-bold text-[1.125rem]"
               style={{
