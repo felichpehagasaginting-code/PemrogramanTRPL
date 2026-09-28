@@ -1,4 +1,4 @@
-﻿# Tech Architecture
+# Tech Architecture
 ## Matrikulasi TRPL - Rencana Arsitektur Teknis, Keamanan & Infrastruktur
 
 ---
@@ -240,6 +240,28 @@ CREATE TABLE quiz_attempts (
   passed      BOOLEAN NOT NULL,
   attempt_no  INTEGER DEFAULT 1,
   created_at  TIMESTAMP DEFAULT NOW()
+);
+
+-- Evaluations (Pre-Test & Post-Test Answers Mapping 1:1)
+CREATE TABLE evaluations (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+  type        ENUM('pre-test', 'post-test') NOT NULL,
+  score       INTEGER NOT NULL,
+  answers     JSONB NOT NULL, -- { [questionId: string]: string }
+  submitted_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, type)
+);
+
+-- Certificate Issuance & Verification Logs
+CREATE TABLE certificate_logs (
+  cert_id     VARCHAR(50) PRIMARY KEY, -- Format: TRPL-2026-XXXX
+  user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_name   VARCHAR(255) NOT NULL,
+  user_nim    VARCHAR(50),
+  issued_at   TIMESTAMP DEFAULT NOW(),
+  qr_url      TEXT NOT NULL,
+  verified_count INTEGER DEFAULT 0
 );
 
 -- Gamification

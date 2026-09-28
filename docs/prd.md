@@ -1,4 +1,4 @@
-﻿# 📋 Product Requirements Document (PRD)
+# 📋 Product Requirements Document (PRD)
 ## Matrikulasi TRPL – Platform Belajar Pemrograman Interaktif
 
 ---
@@ -90,14 +90,15 @@ Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL)** menerima mahasiswa b
 
 | ID | Fitur | Deskripsi | Prioritas |
 |----|-------|-----------|-----------|
-| F01 | SSO Login | Autentikasi via Single Sign-On kampus | Critical |
-| F02 | Module System | Struktur modul pembelajaran bertahap | Critical |
-| F03 | Live Code Editor | Editor kode in-browser (Python & JS dasar) | Critical |
-| F04 | Interactive Quiz | Kuis pilihan ganda, isian, dan drag-and-drop | Critical |
-| F05 | Progress Tracker | Visualisasi kemajuan belajar per modul | Critical |
-| F06 | Gamification | Sistem poin, badge, dan level | Critical |
-| F07 | Dashboard Admin | Monitoring progres seluruh maba | Critical |
-| F08 | Responsive Design | Optimal di desktop dan mobile | Critical |
+| F01 | SSO & Google Login | Autentikasi via Google Auth & SSO kampus dengan PIN Dosen fallback | Critical |
+| F02 | Module System | Struktur modul pembelajaran bertahap (M1 s/d M8) | Critical |
+| F03 | Live Code Editor | Editor kode in-browser berbasis WebAssembly Python (Pyodide) | Critical |
+| F04 | Diagnostic Pre-Test & Post-Test | Evaluasi 15 butir soal selaras materi (Pre-Test di awal, Post-Test pasca Pre-Test) | Critical |
+| F05 | Strict Certificate Gating | Penerbitan sertifikat resmi ber-QR Code hanya jika M0–M8 dan Post-Test tuntas | Critical |
+| F06 | Realtime Admin Dashboard | Monitoring maba, struggle heatmap dinamis, gradebook, dan inspeksi detail jawaban butir soal | Critical |
+| F07 | Progress Tracker | Visualisasi kemajuan belajar per modul tersinkronisasi Firebase Firestore | Critical |
+| F08 | Gamification | Sistem poin, level, dan badge kelulusan | Critical |
+| F09 | Responsive Design & Branding | Tampilan responsif dilengkapi logo resmi institusi CWE & TRPL | Critical |
 
 ### 5.2 Secondary Features (Nice to Have)
 

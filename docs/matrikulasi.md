@@ -95,10 +95,12 @@ Setelah modul ini, mahasiswa dapat:
 - Tur interaktif platform (guided tour dengan tooltip)
 - Video perkenalan koordinator matrikulasi
 
-**Sub-modul 0.2: Pre-Test Diagnostik**
-- 20 soal pilihan ganda (campuran: logika, matematika dasar, tech literacy)
-- Tidak ada jawaban salah/benar yang dinilai – hanya untuk mapping level
-- Hasil: kategori (Pemula Total, Ada Sedikit Pengalaman, Sudah Pernah Coding)
+**Sub-modul 0.2: Pre-Test Diagnostik & Penyelarasan Evaluasi**
+- 15 butir soal terstandarisasi (logika, workspace, tipe data, branching, looping, fungsi, list, dan error handling).
+- Soal disusun 1:1 identik dengan Post-Test untuk mengukur lonjakan pemahaman belajar (*normalized gain*) secara akurat dan objektif.
+- Seluruh kunci jawaban 15 butir soal dijamin 100% diajarkan di dalam modul M1 hingga M8.
+- Menyelesaikan Pre-Test membuka akses mahasiswa ke Post-Test mandiri.
+- Hasil: Pemetaan baseline kemampuan maba (skor awal terintegrasi langsung ke Admin Dashboard secara real-time).
 
 **Sub-modul 0.3: Setup Profil**
 - Upload foto (opsional)
@@ -615,9 +617,9 @@ Fitur bonus:
 
 ## 13. Metadata & Estimasi Durasi
 
-| Modul | Judul | Durasi | Sub-modul | Kuis | Poin Max |
-|-------|-------|--------|-----------|------|----------|
-| M0 | Pre-Test & Orientasi | 30 menit | 3 | 1 | 0 |
+| Modul | Judul | Durasi | Sub-modul | Kuis / Evaluasi | Poin Max |
+|-------|-------|--------|-----------|-----------------|----------|
+| M0 | Pre-Test Diagnostik & Orientasi | 30 menit | 3 | 1 (15 Soal) | 0 |
 | M1 | Dasar Komputer & Workspace | 90 menit | 5 | 1 | 80 |
 | M2 | Logika & Algoritma | 120 menit | 4 | 1 | 100 |
 | M3 | Variabel & Tipe Data | 120 menit | 4 | 1 | 120 |
@@ -625,8 +627,10 @@ Fitur bonus:
 | M5 | Perulangan | 150 menit | 5 | 1 | 150 |
 | M6 | Fungsi & Prosedur | 150 menit | 5 | 1 | 150 |
 | M7 | Array & List | 120 menit | 5 | 1 | 120 |
-| M8 | Mini Project | 180 menit | 4 | 0 | 300 |
-| **TOTAL** | | **~18.5 jam** | **39** | **8** | **1170** |
+| M8 | Mini Project Kasir Warkop | 180 menit | 4 | Proyek Live Editor | 300 |
+| Post-Test | Evaluasi Hasil Belajar | 20 menit | - | 1 (15 Soal Identik) | 150 |
+| Sertifikat | Verifikasi QR & Kelulusan | Otomatis | - | Syarat: M0–M8 + Post-Test | 200 |
+| **TOTAL** | | **~19 jam** | **39** | **10** | **1520** |
 
 ---
 
