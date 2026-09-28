@@ -24,6 +24,8 @@ import {
   ArrowsIn,
   FloppyDisk,
   ArrowsClockwise,
+  DotsThreeVertical,
+  Gear,
 } from "@phosphor-icons/react";
 import { QuizEngine, QuizQuestion } from "@/components/quiz/QuizEngine";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -267,6 +269,23 @@ export default function PracticeClient() {
 
   // Code History state and hook
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
+  const optionsMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (optionsMenuRef.current && !optionsMenuRef.current.contains(e.target as Node)) {
+        setIsOptionsMenuOpen(false);
+      }
+    };
+    if (isOptionsMenuOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOptionsMenuOpen]);
+
   const {
     history,
     saveRevision,
@@ -630,13 +649,13 @@ export default function PracticeClient() {
             <ArrowLeft size={16} /> Kembali ke materi
           </button>
 
-          {/* Description & Theme Switcher Toolbar */}
+          {/* Description & Compact Action Toolbar */}
           <div
             style={{
               background: "var(--bg-card)",
               border: "1px solid var(--border-color)",
               borderRadius: "var(--radius-lg)",
-              padding: "var(--space-4)",
+              padding: "var(--space-3) var(--space-4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -644,92 +663,27 @@ export default function PracticeClient() {
               gap: "12px",
             }}
           >
-            <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: 0, flex: 1 }}>
-              {content.description}
-            </p>
-            
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {/* Monaco Theme Switcher */}
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <PaintBrush size={16} color="var(--text-muted)" />
-                <select
-                  value={selectedTheme}
-                  onChange={(e) => setSelectedTheme(e.target.value)}
-                  style={{
-                    background: "var(--bg-secondary)",
-                    color: "var(--text-primary)",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "4px 8px",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  <option value="vs-dark">VS Dark</option>
-                  <option value="dracula">🧛 Dracula Pro</option>
-                  <option value="one-dark-pro">✨ One Dark Pro</option>
-                  <option value="monokai">🌴 Monokai Classic</option>
-                  <option value="github-dark">🐙 GitHub Dark</option>
-                </select>
-              </div>
-
-              {/* Auto-Save Status Badge & Reset Draft Button */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "260px" }}>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                {content.description}
+              </p>
               <div
+                title={autoSaveStatus === "saving" ? "Menyimpan draf..." : "Draf otomatis tersimpan lokal"}
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
-                  fontSize: "0.75rem",
-                  padding: "4px 8px",
-                  borderRadius: "var(--radius-md)",
-                  background: "var(--bg-page-alt)",
-                  border: "1px solid var(--border-color)",
+                  gap: "4px",
+                  fontSize: "0.7rem",
+                  color: "var(--text-muted)",
+                  flexShrink: 0,
                 }}
               >
-                <FloppyDisk size={14} color={autoSaveStatus === "saving" ? "#F59E0B" : "#22C55E"} weight="fill" />
-                <span style={{ color: "var(--text-secondary)" }}>
-                  {autoSaveStatus === "saving" ? "Menyimpan..." : "Draf Lokal Tersimpan"}
-                </span>
-                {hasDraft && (
-                  <button
-                    onClick={handleResetToInitial}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#EF4444",
-                      fontSize: "0.72rem",
-                      cursor: "pointer",
-                      padding: "0 4px",
-                      textDecoration: "underline",
-                      fontWeight: 600,
-                    }}
-                    title="Hapus draf lokal dan kembalikan ke kode awal modul"
-                  >
-                    Reset Awal
-                  </button>
-                )}
+                <FloppyDisk size={12} color={autoSaveStatus === "saving" ? "#F59E0B" : "#22C55E"} weight="fill" />
+                <span className="hidden sm:inline">{autoSaveStatus === "saving" ? "Menyimpan..." : "Draf tersimpan"}</span>
               </div>
+            </div>
 
-              <button
-                onClick={() => setIsHistoryOpen(true)}
-                className="btn btn-sm btn-ghost focus-ring"
-                style={{
-                  color: "var(--text-primary)",
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border-color)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontWeight: 600,
-                }}
-                aria-label="Buka Riwayat Versi Kode"
-                title="Buka Riwayat Versi Kode"
-              >
-                <ClockCounterClockwise size={16} weight="bold" />
-                <span>Riwayat</span>
-              </button>
-
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <button
                 onClick={() => setShowHintDrawer(true)}
                 className="btn btn-sm btn-ghost focus-ring"
@@ -739,12 +693,14 @@ export default function PracticeClient() {
                   border: "1px solid rgba(245, 158, 11, 0.3)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "5px",
                   fontWeight: 700,
+                  fontSize: "0.78rem",
+                  padding: "4px 10px",
                 }}
                 aria-label="Buka Petunjuk Bertingkat (3-Tier Hint)"
               >
-                <Lightbulb size={16} weight="fill" color="#F59E0B" /> 💡 3-Tier Hint
+                <Lightbulb size={15} weight="fill" color="#F59E0B" /> 💡 3-Tier Hint
               </button>
 
               {/* Zen Fullscreen Mode Toggle */}
@@ -757,66 +713,144 @@ export default function PracticeClient() {
                   border: isFullscreen ? "1px solid #F59E0B" : "1px solid var(--border-color)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
-                  fontWeight: 700,
+                  gap: "5px",
+                  fontWeight: 600,
+                  fontSize: "0.78rem",
+                  padding: "4px 10px",
                 }}
                 aria-label={isFullscreen ? "Keluar dari Zen Focus Mode" : "Aktifkan Zen Focus Mode"}
                 title={isFullscreen ? "Keluar dari Zen Mode (Esc)" : "Masuk ke Zen Focus Mode (Editor Penuh)"}
               >
-                {isFullscreen ? <ArrowsIn size={16} weight="bold" /> : <ArrowsOut size={16} weight="bold" />}
-                <span>{isFullscreen ? "Keluar Zen" : "Zen Mode"}</span>
+                {isFullscreen ? <ArrowsIn size={15} weight="bold" /> : <ArrowsOut size={15} weight="bold" />}
+                <span>{isFullscreen ? "Keluar" : "Zen Mode"}</span>
               </button>
+
+              {/* Options Popover Menu (Theme, History, Reset) */}
+              <div style={{ position: "relative" }} ref={optionsMenuRef}>
+                <button
+                  onClick={() => setIsOptionsMenuOpen(!isOptionsMenuOpen)}
+                  className="btn btn-sm btn-ghost focus-ring"
+                  style={{
+                    color: "var(--text-primary)",
+                    background: isOptionsMenuOpen ? "var(--bg-secondary)" : "var(--bg-card)",
+                    border: "1px solid var(--border-color)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontWeight: 600,
+                    fontSize: "0.78rem",
+                    padding: "4px 10px",
+                  }}
+                  title="Opsi & Pengaturan Editor"
+                >
+                  <DotsThreeVertical size={16} weight="bold" />
+                  <span>Opsi</span>
+                </button>
+
+                {isOptionsMenuOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: 0,
+                      top: "calc(100% + 6px)",
+                      zIndex: 50,
+                      background: "var(--bg-card)",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "var(--radius-lg)",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.25)",
+                      minWidth: "220px",
+                      padding: "8px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                    }}
+                  >
+                    <div style={{ padding: "4px 8px", fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>
+                      Tema Monaco
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "0 8px 6px" }}>
+                      <PaintBrush size={14} color="var(--text-muted)" />
+                      <select
+                        value={selectedTheme}
+                        onChange={(e) => setSelectedTheme(e.target.value)}
+                        style={{
+                          width: "100%",
+                          background: "var(--bg-secondary)",
+                          color: "var(--text-primary)",
+                          border: "1px solid var(--border-color)",
+                          borderRadius: "var(--radius-md)",
+                          padding: "4px 8px",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="vs-dark">VS Dark</option>
+                        <option value="dracula">🧛 Dracula Pro</option>
+                        <option value="one-dark-pro">✨ One Dark Pro</option>
+                        <option value="monokai">🌴 Monokai Classic</option>
+                        <option value="github-dark">🐙 GitHub Dark</option>
+                      </select>
+                    </div>
+
+                    <div style={{ height: "1px", background: "var(--border-color)", margin: "2px 0" }} />
+
+                    <button
+                      onClick={() => {
+                        setIsOptionsMenuOpen(false);
+                        setIsHistoryOpen(true);
+                      }}
+                      className="dropdown-item-hover"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "6px 8px",
+                        fontSize: "0.78rem",
+                        color: "var(--text-primary)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <ClockCounterClockwise size={15} weight="bold" />
+                      <span>Riwayat Versi Kode</span>
+                    </button>
+
+                    {hasDraft && (
+                      <button
+                        onClick={() => {
+                          setIsOptionsMenuOpen(false);
+                          handleResetToInitial();
+                        }}
+                        className="dropdown-item-hover"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "6px 8px",
+                          fontSize: "0.78rem",
+                          color: "#EF4444",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          borderRadius: "var(--radius-sm)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <ArrowsClockwise size={15} weight="bold" />
+                        <span>Reset ke Kode Awal</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-
-          {/* Anti-Paste Muscle-Memory Alert */}
-          {showPasteToast && (
-            <div
-              style={{
-                background: "rgba(245, 158, 11, 0.12)",
-                border: "1px solid rgba(245, 158, 11, 0.35)",
-                borderRadius: "var(--radius-md)",
-                padding: "8px 12px",
-                fontSize: "0.8rem",
-                color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <Sparkle size={16} color="#F59E0B" weight="fill" />
-              <span>
-                <strong>Tips Senior Mentor:</strong> Kamu baru saja paste kode dalam jumlah besar! Coba ketik manual per baris ya biar logikanya nempel di <em>muscle memory</em> kamu. 🧠✨
-              </span>
-            </div>
-          )}
-
-          {/* Real-time Syntax Lint Warning Banner */}
-          {lintWarnings.length > 0 && (
-            <div
-              style={{
-                background: "rgba(239, 68, 68, 0.08)",
-                border: "1px solid rgba(239, 68, 68, 0.25)",
-                borderRadius: "var(--radius-md)",
-                padding: "8px 12px",
-                fontSize: "0.8rem",
-                color: "#EF4444",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <Warning size={16} weight="fill" />
-                <span>{lintWarnings[0].message} • <em>{lintWarnings[0].fixSuggestion}</em></span>
-              </div>
-              {lintWarnings.length > 1 && (
-                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>
-                  (+{lintWarnings.length - 1} peringatan lain)
-                </span>
-              )}
-            </div>
-          )}
 
           {/* Code Editor Container with Zen Mode & Split Resizer */}
           <div
@@ -836,6 +870,72 @@ export default function PracticeClient() {
                   }
             }
           >
+            {/* Floating Non-Shifting Overlay for Anti-Paste & Linter Toasts */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: isFullscreen ? "30px" : "24px",
+                right: "16px",
+                zIndex: 35,
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                maxWidth: "420px",
+                pointerEvents: "none",
+              }}
+            >
+              {showPasteToast && (
+                <div
+                  style={{
+                    pointerEvents: "auto",
+                    background: "var(--bg-card)",
+                    border: "1px solid #F59E0B",
+                    borderRadius: "var(--radius-md)",
+                    padding: "10px 14px",
+                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
+                    fontSize: "0.8rem",
+                    color: "var(--text-primary)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Sparkle size={18} color="#F59E0B" weight="fill" style={{ flexShrink: 0 }} />
+                  <span>
+                    <strong>Tips Senior Mentor:</strong> Paste kode besar terdeteksi. Coba ketik mandiri per baris agar melatih ingatan sintaks Python ya! 🧠✨
+                  </span>
+                </div>
+              )}
+
+              {lintWarnings.length > 0 && (
+                <div
+                  style={{
+                    pointerEvents: "auto",
+                    background: "var(--bg-card)",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "8px 12px",
+                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
+                    fontSize: "0.78rem",
+                    color: "#EF4444",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Warning size={16} weight="fill" style={{ flexShrink: 0 }} />
+                    <span>{lintWarnings[0].message} • <em>{lintWarnings[0].fixSuggestion}</em></span>
+                  </div>
+                  {lintWarnings.length > 1 && (
+                    <span style={{ fontSize: "0.72rem", opacity: 0.8, whiteSpace: "nowrap" }}>
+                      (+{lintWarnings.length - 1})
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             {isFullscreen && (
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", background: "rgba(255,255,255,0.05)", padding: "10px 16px", borderRadius: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#F8FAFC", fontWeight: 700, fontSize: "0.9rem" }}>
@@ -959,116 +1059,137 @@ export default function PracticeClient() {
             </button>
           </div>
 
-          {/* Tabs header: Terminal | Visual Debugger | Visual RAM | Auto-Grader */}
-          <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border-color)", flexWrap: "wrap" }}>
-            <button
-              onClick={() => setActiveTab("terminal")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "terminal" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "terminal" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "terminal" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <Terminal size={16} /> Terminal Output
-            </button>
-            <button
-              onClick={() => setActiveTab("debugger")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "debugger" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "debugger" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "debugger" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <Bug size={16} /> Visual Debugger
-            </button>
-            <button
-              onClick={() => setActiveTab("ram")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "ram" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "ram" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "ram" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <Cpu size={16} /> Visual Memory RAM
-            </button>
-            <button
-              onClick={() => setActiveTab("flowchart")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "flowchart" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "flowchart" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "flowchart" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <GitCommit size={16} /> Flowchart Builder
-            </button>
-            <button
-              onClick={() => setActiveTab("tdd")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "tdd" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "tdd" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "tdd" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <Flask size={16} /> Mini TDD Explorer
-            </button>
-            <button
-              onClick={() => setActiveTab("grader")}
-              style={{
-                padding: "8px 16px",
-                background: activeTab === "grader" ? "var(--bg-card)" : "transparent",
-                border: "none",
-                borderBottom: activeTab === "grader" ? "2px solid var(--primary-color)" : "none",
-                color: activeTab === "grader" ? "var(--primary-color)" : "var(--text-secondary)",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <CheckCircle size={16} /> Auto-Grader Report
-            </button>
+          {/* Tabs header: Terminal | Visual Debugger | Auto-Grader | Alat Visual */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-color)", flexWrap: "wrap", gap: "8px" }}>
+            <div style={{ display: "flex", gap: "4px" }}>
+              <button
+                onClick={() => setActiveTab("terminal")}
+                style={{
+                  padding: "8px 14px",
+                  background: activeTab === "terminal" ? "var(--bg-card)" : "transparent",
+                  border: "none",
+                  borderBottom: activeTab === "terminal" ? "2px solid var(--primary-color)" : "2px solid transparent",
+                  color: activeTab === "terminal" ? "var(--primary-color)" : "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Terminal size={15} /> Terminal Output
+              </button>
+              <button
+                onClick={() => setActiveTab("debugger")}
+                style={{
+                  padding: "8px 14px",
+                  background: activeTab === "debugger" ? "var(--bg-card)" : "transparent",
+                  border: "none",
+                  borderBottom: activeTab === "debugger" ? "2px solid var(--primary-color)" : "2px solid transparent",
+                  color: activeTab === "debugger" ? "var(--primary-color)" : "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Bug size={15} /> Visual Debugger
+              </button>
+              <button
+                onClick={() => setActiveTab("grader")}
+                style={{
+                  padding: "8px 14px",
+                  background: activeTab === "grader" ? "var(--bg-card)" : "transparent",
+                  border: "none",
+                  borderBottom: activeTab === "grader" ? "2px solid var(--primary-color)" : "2px solid transparent",
+                  color: activeTab === "grader" ? "var(--primary-color)" : "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <CheckCircle size={15} /> Auto-Grader
+              </button>
+              <button
+                onClick={() => {
+                  if (activeTab !== "ram" && activeTab !== "flowchart" && activeTab !== "tdd") {
+                    setActiveTab("ram");
+                  }
+                }}
+                style={{
+                  padding: "8px 14px",
+                  background: (activeTab === "ram" || activeTab === "flowchart" || activeTab === "tdd") ? "var(--bg-card)" : "transparent",
+                  border: "none",
+                  borderBottom: (activeTab === "ram" || activeTab === "flowchart" || activeTab === "tdd") ? "2px solid var(--primary-color)" : "2px solid transparent",
+                  color: (activeTab === "ram" || activeTab === "flowchart" || activeTab === "tdd") ? "var(--primary-color)" : "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Cpu size={15} /> Alat Visual & TDD
+              </button>
+            </div>
+
+            {/* Sub-tools Pill Selector when Alat Visual is Active */}
+            {(activeTab === "ram" || activeTab === "flowchart" || activeTab === "tdd") && (
+              <div style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 0" }}>
+                <button
+                  onClick={() => setActiveTab("ram")}
+                  style={{
+                    padding: "3px 8px",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.72rem",
+                    fontWeight: 600,
+                    border: "1px solid var(--border-color)",
+                    background: activeTab === "ram" ? "var(--color-primary-500)" : "var(--bg-card)",
+                    color: activeTab === "ram" ? "white" : "var(--text-secondary)",
+                    cursor: "pointer",
+                  }}
+                >
+                  RAM Explorer
+                </button>
+                <button
+                  onClick={() => setActiveTab("flowchart")}
+                  style={{
+                    padding: "3px 8px",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.72rem",
+                    fontWeight: 600,
+                    border: "1px solid var(--border-color)",
+                    background: activeTab === "flowchart" ? "var(--color-primary-500)" : "var(--bg-card)",
+                    color: activeTab === "flowchart" ? "white" : "var(--text-secondary)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Flowchart
+                </button>
+                <button
+                  onClick={() => setActiveTab("tdd")}
+                  style={{
+                    padding: "3px 8px",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.72rem",
+                    fontWeight: 600,
+                    border: "1px solid var(--border-color)",
+                    background: activeTab === "tdd" ? "var(--color-primary-500)" : "var(--bg-card)",
+                    color: activeTab === "tdd" ? "white" : "var(--text-secondary)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Mini TDD
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Tab Content */}
