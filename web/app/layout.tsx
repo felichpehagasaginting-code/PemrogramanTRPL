@@ -42,19 +42,19 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pemrograman-trpl.verc
 
 export const metadata: Metadata = {
   title: {
-    default: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+    default: "Matrikulasi TRPL 2026 — Platform Pembelajaran Pemrograman",
     template: "%s | Matrikulasi TRPL",
   },
   description:
-    "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL. Live coding, gamifikasi, kuis seru, dan meme relevan. Mulai coding sekarang!",
-  keywords: ["matrikulasi", "TRPL", "belajar coding", "pemrograman", "Python", "gamifikasi", "kampus", "mahasiswa"],
+    "Platform pembelajaran pemrograman resmi Mahasiswa Baru D4 TRPL. Praktik Python langsung di browser dengan WebAssembly, kurikulum 9 modul terstruktur, dan auto-grader instan.",
+  keywords: ["matrikulasi", "TRPL", "belajar coding", "pemrograman", "Python", "Politeknik CWE", "mahasiswa baru", "software engineering"],
   authors: [{ name: "Divisi Pemrograman Matrikulasi TRPL" }],
   creator: "Felich Pehagasa Ginting",
-  publisher: "HIMA TRPL",
+  publisher: "HIMA TRPL Politeknik Kelapa Sawit CWE",
   metadataBase: new URL(appUrl),
   openGraph: {
-    title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
-    description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL. Live coding, gamifikasi, kuis seru, dan meme relevan.",
+    title: "Matrikulasi TRPL 2026 — Platform Pembelajaran Pemrograman",
+    description: "Platform pembelajaran pemrograman resmi Mahasiswa Baru D4 TRPL. Praktik Python di browser, kurikulum 9 modul terstruktur, dan auto-grader instan.",
     url: appUrl,
     siteName: "Matrikulasi TRPL",
     locale: "id_ID",
@@ -64,14 +64,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
+        alt: "Matrikulasi TRPL 2026 — Platform Pembelajaran Pemrograman",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Matrikulasi TRPL – Platform Belajar Coding Anti-Boring",
-    description: "Platform belajar pemrograman interaktif untuk mahasiswa baru TRPL.",
+    title: "Matrikulasi TRPL 2026 — Platform Pembelajaran Pemrograman",
+    description: "Platform pembelajaran pemrograman resmi Mahasiswa Baru D4 TRPL. Praktik Python di browser & auto-grader instan.",
     images: ["/og-image.png"],
   },
   icons: {

@@ -8,14 +8,17 @@ WEB_DIR = os.path.dirname(SCRIPT_DIR)
 PUBLIC_DIR = os.path.join(WEB_DIR, "public")
 PUBLIC_ICONS_DIR = os.path.join(PUBLIC_DIR, "icons")
 APP_DIR = os.path.join(WEB_DIR, "app")
+IMAGES_DIR = os.path.join(PUBLIC_DIR, "images")
 
 os.makedirs(PUBLIC_ICONS_DIR, exist_ok=True)
 os.makedirs(APP_DIR, exist_ok=True)
 
 # Fonts
 FONT_SEGOE_BOLD = "C:/Windows/Fonts/segoeuib.ttf"
+FONT_SEGOE_SEMIBOLD = "C:/Windows/Fonts/segoeuisl.ttf"
 FONT_SEGOE_REG = "C:/Windows/Fonts/segoeui.ttf"
 FONT_CONSOLAS_BOLD = "C:/Windows/Fonts/consolab.ttf"
+FONT_CONSOLAS_REG = "C:/Windows/Fonts/consola.ttf"
 FONT_ARIAL_BOLD = "C:/Windows/Fonts/arialbd.ttf"
 
 def get_font(path, size):
@@ -120,158 +123,291 @@ def generate_brand_icon():
     final_icon = Image.composite(bg, final_icon, bg_mask)
     return final_icon
 
+def draw_check_icon(draw, cx, cy, size, color):
+    r = size // 2
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(color[0], color[1], color[2], 35), outline=color, width=2)
+    scale = size / 26
+    p1 = (cx - int(7 * scale), cy)
+    p2 = (cx - int(2 * scale), cy + int(5 * scale))
+    p3 = (cx + int(7 * scale), cy - int(5 * scale))
+    draw.line([p1, p2, p3], fill=color, width=max(2, int(3 * scale)), joint="curve")
+
+def draw_bolt_icon(draw, cx, cy, size, color):
+    r = size // 2
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(color[0], color[1], color[2], 35), outline=color, width=2)
+    scale = size / 26
+    pts = [
+        (cx + int(1 * scale), cy - int(9 * scale)),
+        (cx - int(6 * scale), cy + int(1 * scale)),
+        (cx - int(1 * scale), cy + int(1 * scale)),
+        (cx - int(2 * scale), cy + int(9 * scale)),
+        (cx + int(6 * scale), cy - int(1 * scale)),
+        (cx + int(1 * scale), cy - int(1 * scale)),
+    ]
+    draw.polygon(pts, fill=color)
+
+def draw_cert_icon(draw, cx, cy, size, color):
+    r = size // 2
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(color[0], color[1], color[2], 35), outline=color, width=2)
+    scale = size / 26
+    pts = [
+        (cx, cy - int(6 * scale)),
+        (cx + int(5 * scale), cy),
+        (cx, cy + int(6 * scale)),
+        (cx - int(5 * scale), cy)
+    ]
+    draw.polygon(pts, fill=color)
+
 # ----------------------------------------------------
 # 2. GENERATE OPEN GRAPH IMAGE (2400x1260 -> 1200x630)
 # ----------------------------------------------------
 def generate_og_image():
     W, H = 2400, 1260
-    img = Image.new("RGBA", (W, H), (10, 13, 20, 255))
+    # Clean obsidian-slate base
+    img = Image.new("RGBA", (W, H), (9, 13, 22, 255))
+    
+    # 1. Subtle, Architectural Atmospheric Glows
+    glow_indigo = create_radial_glow(W, H, 420, 360, 1100, (124, 58, 237, 40))
+    glow_amber = create_radial_glow(W, H, 1900, 680, 1050, (249, 115, 22, 32))
+    glow_depth = create_radial_glow(W, H, 1200, 630, 950, (15, 23, 42, 60))
+    
+    img = Image.alpha_composite(img, glow_indigo)
+    img = Image.alpha_composite(img, glow_amber)
+    img = Image.alpha_composite(img, glow_depth)
     draw = ImageDraw.Draw(img)
     
-    # Background Cyber Gradients & Radial Glows
-    glow1 = create_radial_glow(W, H, 300, 300, 900, (255, 107, 0, 90)) # Orange top-left
-    glow2 = create_radial_glow(W, H, 2000, 950, 1000, (0, 229, 255, 70)) # Cyan bottom-right
-    glow3 = create_radial_glow(W, H, 1200, 630, 800, (255, 61, 0, 40)) # Center orange soft
+    # 2. Sleek Top Border (Vibrant gradient strip)
+    for x in range(W):
+        ratio = x / W
+        r = int(147 + (249 - 147) * ratio)
+        g = int(51 + (115 - 51) * ratio)
+        b = int(234 + (22 - 234) * ratio)
+        draw.line([(x, 0), (x, 6)], fill=(r, g, b, 255), width=1)
+
+    # ----------------------------------------------------
+    # LEFT COLUMN: Institutional Branding & Value Proposition
+    # ----------------------------------------------------
+    x_left = 130
+    y_curr = 120
     
-    img = Image.alpha_composite(img, glow1)
-    img = Image.alpha_composite(img, glow2)
-    img = Image.alpha_composite(img, glow3)
-    draw = ImageDraw.Draw(img)
+    # Institutional Header Pill with Logos
+    logo_cwe_path = os.path.join(IMAGES_DIR, "logo_kiri_cwe.png")
+    logo_trpl_path = os.path.join(IMAGES_DIR, "logo_kanan_trpl.png")
     
-    # Draw subtle cyber grid pattern
-    grid_color = (255, 255, 255, 8)
-    grid_size = 80
-    for x in range(0, W, grid_size):
-        draw.line([(x, 0), (x, H)], fill=grid_color, width=2)
-    for y in range(0, H, grid_size):
-        draw.line([(0, y), (W, y)], fill=grid_color, width=2)
+    logo_h = 66
+    try:
+        im_cwe = Image.open(logo_cwe_path).convert("RGBA")
+        im_trpl = Image.open(logo_trpl_path).convert("RGBA")
         
-    # --- LEFT SIDE CONTENT ---
-    x_left = 120
-    y_curr = 140
+        cwe_w = int(im_cwe.width * (logo_h / im_cwe.height))
+        im_cwe_res = im_cwe.resize((cwe_w, logo_h), Image.Resampling.LANCZOS)
+        
+        trpl_w = int(im_trpl.width * (logo_h / im_trpl.height))
+        im_trpl_res = im_trpl.resize((trpl_w, logo_h), Image.Resampling.LANCZOS)
+        
+        pill_w = cwe_w + trpl_w + 630
+        pill_h = logo_h + 24
+        draw_rounded_rect(draw, [x_left, y_curr, x_left + pill_w, y_curr + pill_h], radius=pill_h // 2,
+                          fill=(15, 23, 42, 220), outline=(255, 255, 255, 22), width=1)
+        
+        img.paste(im_cwe_res, (x_left + 16, y_curr + 12), im_cwe_res)
+        img.paste(im_trpl_res, (x_left + cwe_w + 26, y_curr + 12), im_trpl_res)
+        
+        font_inst = get_font(FONT_SEGOE_BOLD, 23)
+        font_sub_inst = get_font(FONT_SEGOE_REG, 21)
+        tx_inst = x_left + cwe_w + trpl_w + 40
+        draw.text((tx_inst, y_curr + 15), "POLITEKNIK KELAPA SAWIT CITRA WIDYA EDUKASI", font=font_inst, fill=(248, 250, 252, 245))
+        draw.text((tx_inst, y_curr + 44), "Himpunan Mahasiswa D4 Teknologi Rekayasa Perangkat Lunak", font=font_sub_inst, fill=(148, 163, 184, 230))
+    except Exception as e:
+        print("Logos error:", e)
+        
+    y_curr += 140
     
-    # 1. Top Badge Capsule
-    badge_text = "🚀  PLATFORM BELAJAR CODING TRPL 2026"
-    font_badge = get_font(FONT_SEGOE_BOLD, 36)
-    bbox_b = font_badge.getbbox(badge_text)
-    bw = bbox_b[2] - bbox_b[0] + 60
-    bh = 70
+    # Official Program Badge Pill
+    font_badge = get_font(FONT_SEGOE_BOLD, 27)
+    badge_label = "MATRIKULASI PEMROGRAMAN 2026"
+    bb = font_badge.getbbox(badge_label)
+    bw = (bb[2] - bb[0]) + 68
+    bh = 50
     
-    draw_rounded_rect(draw, [x_left, y_curr, x_left + bw, y_curr + bh], radius=35, fill=(255, 107, 0, 35), outline=(255, 107, 0, 160), width=3)
-    draw.text((x_left + 30, y_curr + 15), badge_text, font=font_badge, fill=(255, 170, 100, 255))
-    
-    y_curr += 120
-    
-    # 2. Main Title: "Matrikulasi TRPL"
-    font_title = get_font(FONT_SEGOE_BOLD, 120)
-    draw.text((x_left, y_curr), "Matrikulasi ", font=font_title, fill=(255, 255, 255, 255))
-    
-    bbox_m = font_title.getbbox("Matrikulasi ")
-    x_trpl = x_left + (bbox_m[2] - bbox_m[0])
-    draw.text((x_trpl, y_curr), "TRPL", font=font_title, fill=(255, 130, 20, 255))
-    
-    y_curr += 150
-    
-    # 3. Subtitle: "Platform Belajar Coding Anti-Boring"
-    font_sub = get_font(FONT_SEGOE_BOLD, 54)
-    draw.text((x_left, y_curr), "Platform Belajar Coding Anti-Boring", font=font_sub, fill=(226, 232, 240, 255))
+    draw_rounded_rect(draw, [x_left, y_curr, x_left + bw, y_curr + bh], radius=25,
+                      fill=(124, 58, 237, 28), outline=(167, 139, 250, 160), width=2)
+    draw.ellipse([x_left + 20, y_curr + 19, x_left + 32, y_curr + 31], fill=(34, 197, 94, 255))
+    draw.text((x_left + 44, y_curr + 10), badge_label, font=font_badge, fill=(221, 214, 254, 255))
     
     y_curr += 90
     
-    # 4. Description line
-    font_desc = get_font(FONT_SEGOE_REG, 40)
-    draw.text((x_left, y_curr), "Interaktif • Gamifikasi EXP • Live Runner • Kuis & Meme", font=font_desc, fill=(148, 163, 184, 255))
+    # Main Headline
+    font_h1 = get_font(FONT_SEGOE_BOLD, 92)
+    draw.text((x_left, y_curr), "Matrikulasi", font=font_h1, fill=(255, 255, 255, 255))
+    m_bb = font_h1.getbbox("Matrikulasi ")
+    x_trpl = x_left + (m_bb[2] - m_bb[0])
+    draw.text((x_trpl, y_curr), "TRPL", font=font_h1, fill=(255, 140, 40, 255))
     
-    y_curr += 140
+    y_curr += 105
     
-    # 5. Feature Badges Row
-    features = [
-        ("🐍 Python 3", (40, 180, 100, 40), (74, 222, 128, 255)),
-        ("⚡ Live Code Runner", (255, 107, 0, 40), (255, 160, 80, 255)),
-        ("🎮 Gamifikasi & Rank", (168, 85, 247, 40), (216, 180, 254, 255)),
-        ("🔥 HIMA TRPL", (239, 68, 68, 40), (252, 165, 165, 255)),
+    draw.text((x_left, y_curr), "Platform Pemrograman", font=font_h1, fill=(255, 255, 255, 255))
+    y_curr += 130
+    
+    # Subtitle / Value Proposition
+    font_tag1 = get_font(FONT_SEGOE_SEMIBOLD, 40)
+    draw.text((x_left, y_curr), "Fondasi Koding Nyata Calon Software Engineer.", font=font_tag1, fill=(241, 245, 249, 255))
+    y_curr += 58
+    
+    font_tag2 = get_font(FONT_SEGOE_REG, 33)
+    draw.text((x_left, y_curr), "Praktik Python langsung di browser, didukung auto-grader", font=font_tag2, fill=(148, 163, 184, 240))
+    y_curr += 44
+    draw.text((x_left, y_curr), "instan, 9 modul terstruktur & sertifikat resmi kelulusan.", font=font_tag2, fill=(148, 163, 184, 240))
+    y_curr += 85
+    
+    # Feature Pills
+    features_list = [
+        ("WebAssembly Python (0ms Latency)", draw_bolt_icon, (168, 85, 247), (124, 58, 237, 24)),
+        ("Automated Grader & Real-Time Feedback", draw_check_icon, (74, 222, 128), (34, 197, 94, 24)),
+        ("9 Modul Kurikulum & Sertifikat Resmi", draw_cert_icon, (251, 146, 60), (234, 88, 12, 24)),
     ]
     
-    font_feat = get_font(FONT_SEGOE_BOLD, 36)
-    fx = x_left
-    fy = y_curr
-    for ftext, bg_col, txt_col in features:
-        fb = font_feat.getbbox(ftext)
-        fw = fb[2] - fb[0] + 50
-        fh = 66
-        draw_rounded_rect(draw, [fx, fy, fx + fw, fy + fh], radius=20, fill=bg_col, outline=txt_col, width=2)
-        draw.text((fx + 25, fy + 12), ftext, font=font_feat, fill=txt_col)
-        fx += fw + 24
-        if fx > 1150:
-            fx = x_left
-            fy += 90
-            
-    # --- RIGHT SIDE CONTENT: IDE / CODE CARD ---
-    card_x0, card_y0, card_x1, card_y1 = 1260, 160, 2260, 1100
+    font_chip = get_font(FONT_SEGOE_BOLD, 28)
+    chip_y = y_curr
+    for text, draw_fn, stroke_col, bg_col in features_list:
+        c_bb = font_chip.getbbox(text)
+        cw = (c_bb[2] - c_bb[0]) + 86
+        ch = 56
+        draw_rounded_rect(draw, [x_left, chip_y, x_left + cw, chip_y + ch], radius=16,
+                          fill=(15, 23, 42, 220), outline=stroke_col, width=2)
+        draw_fn(draw, x_left + 30, chip_y + 28, 26, stroke_col)
+        draw.text((x_left + 56, chip_y + 11), text, font=font_chip, fill=(241, 245, 249, 255))
+        chip_y += 72
+        
+    # Domain Footer Pill
+    font_url = get_font(FONT_SEGOE_BOLD, 26)
+    url_text = "pemrograman-trpl.vercel.app"
+    u_bb = font_url.getbbox(url_text)
+    uw = (u_bb[2] - u_bb[0]) + 48
+    uh = 46
+    draw_rounded_rect(draw, [x_left, H - 90, x_left + uw, H - 90 + uh], radius=23,
+                      fill=(18, 24, 38, 220), outline=(255, 255, 255, 25), width=1)
+    draw.text((x_left + 24, H - 82), url_text, font=font_url, fill=(148, 163, 184, 255))
+
+    # ----------------------------------------------------
+    # RIGHT COLUMN: Clean Code Editor & Auto-Grader Output
+    # ----------------------------------------------------
+    card_x0, card_y0 = 1220, 120
+    card_x1, card_y1 = 2270, 1140
     
-    # Card Shadow
-    shadow_layer = Image.new("RGBA", (W, H), (0,0,0,0))
+    # 1. Soft Ambient Card Shadow
+    shadow_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     s_draw = ImageDraw.Draw(shadow_layer)
-    s_draw.rounded_rectangle([card_x0 + 10, card_y0 + 20, card_x1 + 10, card_y1 + 20], radius=40, fill=(0, 0, 0, 160))
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(30))
+    s_draw.rounded_rectangle([card_x0 + 10, card_y0 + 20, card_x1 + 10, card_y1 + 20], radius=36, fill=(0, 0, 0, 200))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(36))
     img = Image.alpha_composite(img, shadow_layer)
     draw = ImageDraw.Draw(img)
     
-    # Card Background
-    draw_rounded_rect(draw, [card_x0, card_y0, card_x1, card_y1], radius=40, fill=(18, 24, 38, 240), outline=(255, 255, 255, 30), width=3)
+    # 2. Main IDE Window Card
+    draw_rounded_rect(draw, [card_x0, card_y0, card_x1, card_y1], radius=32,
+                      fill=(13, 18, 30, 248), outline=(255, 255, 255, 28), width=2)
+                      
+    # Top Window Chrome Header
+    header_h = 74
+    draw_rounded_rect(draw, [card_x0, card_y0, card_x1, card_y0 + header_h], radius=32, fill=(20, 27, 45, 255))
+    draw.rectangle([card_x0, card_y0 + 32, card_x1, card_y0 + header_h], fill=(20, 27, 45, 255))
+    draw.line([(card_x0, card_y0 + header_h), (card_x1, card_y0 + header_h)], fill=(255, 255, 255, 18), width=2)
     
-    # Window Header Bar
-    bar_h = 80
-    draw_rounded_rect(draw, [card_x0, card_y0, card_x1, card_y0 + bar_h], radius=40, fill=(28, 36, 56, 255))
-    # Cover bottom rounded corners of top bar
-    draw.rectangle([card_x0, card_y0 + 40, card_x1, card_y0 + bar_h], fill=(28, 36, 56, 255))
-    draw.line([(card_x0, card_y0 + bar_h), (card_x1, card_y0 + bar_h)], fill=(255, 255, 255, 20), width=2)
-    
-    # Window Dots (Mac style)
-    dots = [(card_x0 + 40, (239, 68, 68)), (card_x0 + 75, (245, 158, 11)), (card_x0 + 110, (34, 197, 94))]
+    # Traffic Lights
+    dots = [
+        (card_x0 + 40, (239, 68, 68, 220)),
+        (card_x0 + 70, (245, 158, 11, 220)),
+        (card_x0 + 100, (34, 197, 94, 220)),
+    ]
     for dx, dcol in dots:
-        draw.ellipse([dx - 12, card_y0 + 40 - 12, dx + 12, card_y0 + 40 + 12], fill=dcol)
+        draw.ellipse([dx - 9, card_y0 + 37 - 9, dx + 9, card_y0 + 37 + 9], fill=dcol)
         
-    # Tab title
-    font_tab = get_font(FONT_SEGOE_BOLD, 32)
-    draw.text((card_x0 + 160, card_y0 + 22), "🐍 main.py — Matrikulasi TRPL", font=font_tab, fill=(148, 163, 184, 255))
+    # Tab Title
+    font_tab = get_font(FONT_SEGOE_BOLD, 26)
+    draw.text((card_x0 + 135, card_y0 + 22), "modul_05_fungsi.py", font=font_tab, fill=(226, 232, 240, 255))
     
-    # Code snippet inside IDE
-    code_lines = [
-        [("# --- Modul Pemrograman TRPL ---", (100, 116, 139))],
-        [("class ", (244, 63, 94)), ("MahasiswaTRPL", (56, 189, 248)), (":", (255, 255, 255))],
-        [("    def ", (244, 63, 94)), ("__init__", (255, 184, 0)), ("(self, nama):", (255, 255, 255))],
-        [("        self.", (255, 255, 255)), ("nama", (56, 189, 248)), (" = nama", (255, 255, 255))],
-        [("        self.", (255, 255, 255)), ("exp", (56, 189, 248)), (" = ", (255, 255, 255)), ("1000", (74, 222, 128))],
-        [("        self.", (255, 255, 255)), ("status", (56, 189, 248)), (" = ", (255, 255, 255)), ('"Jago Coding 🚀"', (251, 146, 60))],
-        [(" ", (0,0,0))],
-        [("    def ", (244, 63, 94)), ("belajar", (255, 184, 0)), ("(self, modul):", (255, 255, 255))],
-        [("        print", (255, 184, 0)), ('("Lulus " + modul + "!")', (251, 146, 60))],
-        [(" ", (0,0,0))],
-        [("# Jalankan Matrikulasi Sekarang!", (74, 222, 128))],
-        [("user ", (56, 189, 248)), ("= ", (255, 255, 255)), ("MahasiswaTRPL", (56, 189, 248)), ('("Mahasiswa Baru")', (251, 146, 60))],
-        [("user.", (255, 255, 255)), ("belajar", (255, 184, 0)), ('("Python 101")', (251, 146, 60))]
+    # Compiler pill
+    comp_pill = "Python 3.12 (Pyodide WASM)"
+    font_pill = get_font(FONT_SEGOE_BOLD, 23)
+    pbb = font_pill.getbbox(comp_pill)
+    pw = (pbb[2] - pbb[0]) + 32
+    px = card_x1 - pw - 26
+    draw_rounded_rect(draw, [px, card_y0 + 18, px + pw, card_y0 + 56], radius=14,
+                      fill=(30, 41, 59, 220), outline=(71, 85, 105, 180), width=1)
+    draw.text((px + 16, card_y0 + 23), comp_pill, font=font_pill, fill=(148, 163, 184, 255))
+    
+    # 3. Code Content
+    code_tokens = [
+        [("# Modul 05: Definisi Fungsi & Evaluasi Logika", (100, 116, 139))],
+        [("def ", (192, 132, 252)), ("evaluasi_kelulusan", (56, 189, 248)), ("(mhs: ", (226, 232, 240)), ("dict", (74, 222, 128)), (") -> ", (226, 232, 240)), ("dict", (74, 222, 128)), (":", (226, 232, 240))],
+        [("    tugas = mhs.get(", (226, 232, 240)), ('"nilai_tugas"', (251, 146, 60)), (", [])", (226, 232, 240))],
+        [("    rata2 = sum(tugas) / len(tugas) ", (226, 232, 240)), ("if ", (192, 132, 252)), ("tugas ", (226, 232, 240)), ("else ", (192, 132, 252)), ("0.0", (251, 146, 60))],
+        [("    ", (226, 232, 240))],
+        [("    return {", (226, 232, 240))],
+        [('        "nim"', (251, 146, 60)), (": mhs[", (226, 232, 240)), ('"nim"', (251, 146, 60)), ( "],", (226, 232, 240))],
+        [('        "lulus"', (251, 146, 60)), (": rata2 >= ", (226, 232, 240)), ("75.0", (251, 146, 60)), (",", (226, 232, 240))],
+        [('        "grade"', (251, 146, 60)), (': "', (226, 232, 240)), ("A", (74, 222, 128)), ('" if rata2 >= 85 else "', (226, 232, 240)), ("B", (251, 146, 60)), ('",', (226, 232, 240))],
+        [('        "status"', (251, 146, 60)), (': "', (226, 232, 240)), ("Kompeten TRPL", (74, 222, 128)), ('"', (226, 232, 240))],
+        [("    }", (226, 232, 240))],
     ]
     
-    font_code_ide = get_font(FONT_CONSOLAS_BOLD, 36)
-    cy = card_y0 + bar_h + 40
-    for line in code_lines:
-        cx = card_x0 + 40
-        for token, color in line:
-            draw.text((cx, cy), token, font=font_code_ide, fill=color + (255,))
-            tb = font_code_ide.getbbox(token)
-            cx += (tb[2] - tb[0])
-        cy += 50
-        
-    # Floating EXP Badge on bottom right of code card
-    exp_x0, exp_y0 = card_x1 - 320, card_y1 - 100
-    draw_rounded_rect(draw, [exp_x0, exp_y0, exp_x0 + 280, exp_y0 + 80], radius=24, fill=(255, 107, 0, 240), outline=(255, 255, 255, 100), width=3)
-    font_exp = get_font(FONT_SEGOE_BOLD, 38)
-    draw.text((exp_x0 + 30, exp_y0 + 18), "⚡ +500 EXP", font=font_exp, fill=(255, 255, 255, 255))
+    font_code = get_font(FONT_CONSOLAS_BOLD, 30)
+    cy = card_y0 + header_h + 32
+    line_no = 1
+    font_num = get_font(FONT_CONSOLAS_REG, 25)
     
-    # Downscale from 2400x1260 to 1200x630 for ultimate anti-aliased quality
-    og_res = img.resize((1200, 630), resample=Image.Resampling.LANCZOS)
-    return og_res
+    for line in code_tokens:
+        draw.text((card_x0 + 34, cy + 3), f"{line_no:2d}", font=font_num, fill=(71, 85, 105, 200))
+        cx = card_x0 + 96
+        for text, col in line:
+            draw.text((cx, cy), text, font=font_code, fill=col + (255,))
+            cx += (font_code.getbbox(text)[2] - font_code.getbbox(text)[0])
+        cy += 46
+        line_no += 1
+        
+    # 4. Integrated Auto-Grader / Terminal Results Window
+    term_y0 = card_y1 - 330
+    draw_rounded_rect(draw, [card_x0, term_y0, card_x1, card_y1], radius=32, fill=(10, 14, 24, 255))
+    draw.rectangle([card_x0, term_y0, card_x1, term_y0 + 32], fill=(10, 14, 24, 255))
+    draw.line([(card_x0, term_y0), (card_x1, term_y0)], fill=(255, 255, 255, 22), width=2)
+    
+    # Terminal Header
+    font_term_title = get_font(FONT_SEGOE_BOLD, 25)
+    draw_bolt_icon(draw, card_x0 + 44, term_y0 + 30, 20, (251, 146, 60))
+    draw.text((card_x0 + 64, term_y0 + 17), "AUTO-GRADER & UNIT TEST RUNNER", font=font_term_title, fill=(148, 163, 184, 255))
+    
+    # Passing Badge
+    font_pass = get_font(FONT_SEGOE_BOLD, 23)
+    pass_text = "100/100 PASSED"
+    p_bb = font_pass.getbbox(pass_text)
+    p_w = (p_bb[2] - p_bb[0]) + 52
+    p_x = card_x1 - p_w - 30
+    draw_rounded_rect(draw, [p_x, term_y0 + 14, p_x + p_w, term_y0 + 50], radius=14,
+                      fill=(34, 197, 94, 30), outline=(74, 222, 128, 200), width=1)
+    draw_check_icon(draw, p_x + 20, term_y0 + 32, 18, (74, 222, 128))
+    draw.text((p_x + 36, term_y0 + 19), pass_text, font=font_pass, fill=(74, 222, 128, 255))
+    
+    # Test details
+    font_term_code = get_font(FONT_CONSOLAS_BOLD, 25)
+    test_lines = [
+        ("Test 1: Validasi struktur data mahasiswa .... PASSED (0.012s)", (74, 222, 128)),
+        ("Test 2: Edge case penanganan list kosong ...... PASSED (0.008s)", (74, 222, 128)),
+        ("Test 3: Logika ambang batas predikat kelulusan . PASSED (0.009s)", (74, 222, 128)),
+        ("Status: Kode terverifikasi otomatis & memenuhi silabus TRPL.", (148, 163, 184)),
+    ]
+    
+    ty = term_y0 + 72
+    for ttext, tcol in test_lines:
+        if "PASSED" in ttext:
+            draw_check_icon(draw, card_x0 + 44, ty + 15, 18, (74, 222, 128))
+        else:
+            draw.ellipse([card_x0 + 40, ty + 12, card_x0 + 48, ty + 20], fill=(148, 163, 184))
+        draw.text((card_x0 + 64, ty), ttext, font=font_term_code, fill=tcol + (255,))
+        ty += 39
+
+    # Supersampled anti-aliased resize to 1200x630
+    final_res = img.resize((1200, 630), resample=Image.Resampling.LANCZOS)
+    return final_res
 
 # ----------------------------------------------------
 # MAIN EXECUTION & FILE SAVING
