@@ -16,11 +16,18 @@ const MODULE_XP_REWARDS: Record<string, { xp: number; badgeId?: string }> = {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { moduleId, scorePercentage, passed } = body;
+    const { moduleId, scorePercentage, passed, code } = body;
 
     if (!moduleId || !MODULE_XP_REWARDS[moduleId]) {
       return NextResponse.json(
         { error: "Modul ID tidak valid." },
+        { status: 400 }
+      );
+    }
+
+    if (typeof scorePercentage !== "number" || isNaN(scorePercentage) || scorePercentage < 0 || scorePercentage > 100) {
+      return NextResponse.json(
+        { error: "Nilai persentase skor tidak valid (harus 0 - 100)." },
         { status: 400 }
       );
     }
@@ -46,7 +53,7 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Gagal memverifikasi submission." },
+      { error: error?.message || "Gagal memverifikasi submission." },
       { status: 500 }
     );
   }

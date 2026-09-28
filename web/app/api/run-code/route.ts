@@ -22,15 +22,90 @@ function checkRateLimit(ip: string): boolean {
 }
 
 function safeEval(expr: string, vars: VarStore): string | number {
-  let resolved = expr;
+  let resolved = expr.trim();
   // Replace variables with numeric or boolean values
   for (const [key, val] of Object.entries(vars)) {
     const strVal = typeof val === "string" ? `"${val}"` : String(val);
     resolved = resolved.replace(new RegExp(`\\b${key}\\b`, "g"), strVal);
   }
+
+  // Handle string literals or string concatenation e.g. "Halo " + "Dunia"
+  if (resolved.includes('"') || resolved.includes("'")) {
+    const stringParts = resolved.split(/\s*\+\s*/);
+    let allStrings = true;
+    let combined = "";
+    for (const part of stringParts) {
+      const trimmed = part.trim();
+      if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+        combined += trimmed.slice(1, -1);
+      } else if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
+        combined += trimmed;
+      } else {
+        allStrings = false;
+        break;
+      }
+    }
+    if (allStrings) return combined;
+  }
+
+  // Strict whitelist for arithmetic expressions: only digits, dots, whitespace, +, -, *, /, %, (, )
+  if (!/^[\d\s+\-*/%().]+$/.test(resolved)) {
+    return expr;
+  }
+
+  // Safe arithmetic evaluator (Shunting-yard algorithm) without eval or new Function
   try {
-    const result = new Function(`"use strict"; return (${resolved})`)();
-    return typeof result === "number" ? result : String(result);
+    const tokens = resolved.match(/(\d+(\.\d+)?|[+\-*/%()])/g);
+    if (!tokens) return expr;
+
+    const precedence: Record<string, number> = { "+": 1, "-": 1, "*": 2, "/": 2, "%": 2 };
+    const values: number[] = [];
+    const ops: string[] = [];
+
+    const applyOp = () => {
+      const op = ops.pop();
+      const b = values.pop();
+      const a = values.pop();
+      if (op === undefined || a === undefined || b === undefined) return;
+      switch (op) {
+        case "+": values.push(a + b); break;
+        case "-": values.push(a - b); break;
+        case "*": values.push(a * b); break;
+        case "/": values.push(b !== 0 ? a / b : 0); break;
+        case "%": values.push(b !== 0 ? a % b : 0); break;
+      }
+    };
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (/^\d+(\.\d+)?$/.test(token)) {
+        values.push(parseFloat(token));
+      } else if (token === "(") {
+        ops.push(token);
+      } else if (token === ")") {
+        while (ops.length > 0 && ops[ops.length - 1] !== "(") {
+          applyOp();
+        }
+        ops.pop();
+      } else if (["+", "-", "*", "/", "%"].includes(token)) {
+        if (token === "-" && (i === 0 || tokens[i - 1] === "(" || ["+", "-", "*", "/", "%"].includes(tokens[i - 1]))) {
+          values.push(0);
+        }
+        while (ops.length > 0 && ops[ops.length - 1] !== "(" && precedence[ops[ops.length - 1]] >= precedence[token]) {
+          applyOp();
+        }
+        ops.push(token);
+      }
+    }
+
+    while (ops.length > 0) {
+      applyOp();
+    }
+
+    if (values.length === 1 && !isNaN(values[0])) {
+      return values[0];
+    }
+    return expr;
   } catch {
     return expr;
   }
