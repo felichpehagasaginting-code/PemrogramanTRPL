@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { WarningCircle, Clock, CheckCircle, Flame, Users } from "@phosphor-icons/react";
+import { UserProfile } from "@/lib/store/useUserStore";
 
 export interface ModuleStruggleMetric {
   moduleId: string;
@@ -12,19 +13,62 @@ export interface ModuleStruggleMetric {
   struggleLevel: "low" | "medium" | "high";
 }
 
-const DEFAULT_METRICS: ModuleStruggleMetric[] = [
-  { moduleId: "M0", moduleName: "Pre-Test & Orientasi", avgTimeMinutes: 12, failureRatePercent: 5, totalAttempts: 120, struggleLevel: "low" },
-  { moduleId: "M1", moduleName: "Dasar Komputer & Workspace", avgTimeMinutes: 24, failureRatePercent: 12, totalAttempts: 118, struggleLevel: "low" },
-  { moduleId: "M2", moduleName: "Logika & Algoritma", avgTimeMinutes: 38, failureRatePercent: 28, totalAttempts: 115, struggleLevel: "medium" },
-  { moduleId: "M3", moduleName: "Variabel & Tipe Data", avgTimeMinutes: 42, failureRatePercent: 34, totalAttempts: 110, struggleLevel: "medium" },
-  { moduleId: "M4", moduleName: "Percabangan (If-Else)", avgTimeMinutes: 48, failureRatePercent: 41, totalAttempts: 104, struggleLevel: "medium" },
-  { moduleId: "M5", moduleName: "Perulangan (Loops)", avgTimeMinutes: 65, failureRatePercent: 62, totalAttempts: 98, struggleLevel: "high" },
-  { moduleId: "M6", moduleName: "Fungsi & Prosedur", avgTimeMinutes: 72, failureRatePercent: 58, totalAttempts: 92, struggleLevel: "high" },
-  { moduleId: "M7", moduleName: "Array & List Data", avgTimeMinutes: 60, failureRatePercent: 49, totalAttempts: 88, struggleLevel: "medium" },
-  { moduleId: "M8", moduleName: "Mini Project Akhir", avgTimeMinutes: 95, failureRatePercent: 35, totalAttempts: 76, struggleLevel: "medium" },
+const MODULE_DEFS = [
+  { id: "M0", name: "Pre-Test & Orientasi", defaultMinutes: 10 },
+  { id: "M1", name: "Dasar Komputer & Workspace", defaultMinutes: 15 },
+  { id: "M2", name: "Logika & Algoritma", defaultMinutes: 15 },
+  { id: "M3", name: "Variabel & Tipe Data", defaultMinutes: 20 },
+  { id: "M4", name: "Percabangan (If-Else)", defaultMinutes: 25 },
+  { id: "M5", name: "Perulangan (Loops)", defaultMinutes: 30 },
+  { id: "M6", name: "Fungsi & Prosedur", defaultMinutes: 30 },
+  { id: "M7", name: "Array & List Data", defaultMinutes: 25 },
+  { id: "M8", name: "Mini Project Akhir", defaultMinutes: 40 },
 ];
 
-export function StruggleHeatmap({ metrics = DEFAULT_METRICS }: { metrics?: ModuleStruggleMetric[] }) {
+export function calculateRealStruggleMetrics(users: UserProfile[]): ModuleStruggleMetric[] {
+  const total = users.length;
+  if (total === 0) {
+    return MODULE_DEFS.map((m) => ({
+      moduleId: m.id,
+      moduleName: m.name,
+      avgTimeMinutes: 0,
+      failureRatePercent: 0,
+      totalAttempts: 0,
+      struggleLevel: "low" as const,
+    }));
+  }
+
+  return MODULE_DEFS.map((m) => {
+    const completedCount = users.filter((u) => u.progress?.[m.id]?.status === "completed").length;
+    const activeCount = users.filter((u) => u.progress?.[m.id]?.status === "active").length;
+    const attemptedCount = completedCount + activeCount;
+    const notCompletedPercent = Math.round(((total - completedCount) / total) * 100);
+    const struggleLevel = notCompletedPercent > 60 ? "high" : notCompletedPercent > 30 ? "medium" : "low";
+
+    return {
+      moduleId: m.id,
+      moduleName: m.name,
+      avgTimeMinutes: m.defaultMinutes,
+      failureRatePercent: notCompletedPercent,
+      totalAttempts: attemptedCount,
+      struggleLevel,
+    };
+  });
+}
+
+export function StruggleHeatmap({
+  users,
+  metrics,
+}: {
+  users?: UserProfile[];
+  metrics?: ModuleStruggleMetric[];
+}) {
+  const computedMetrics = useMemo(() => {
+    if (metrics && metrics.length > 0) return metrics;
+    if (users) return calculateRealStruggleMetrics(users);
+    return calculateRealStruggleMetrics([]);
+  }, [users, metrics]);
+
   return (
     <div
       style={{
@@ -39,27 +83,27 @@ export function StruggleHeatmap({ metrics = DEFAULT_METRICS }: { metrics?: Modul
         <div>
           <h3 style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
             <Flame size={22} color="#EF4444" weight="fill" />
-            Matriks Kesulitan Mahasiswa (Struggle Heatmap)
+            Matriks Kesulitan Mahasiswa Real-Time
           </h3>
           <p style={{ fontSize: "0.825rem", color: "var(--text-secondary)", marginTop: "4px", margin: 0 }}>
-            Memantau modul dan materi kuliah yang membutuhkan review tambahan dari tim dosen.
+            Dihitung langsung dari data progres nyata mahasiswa di Cloud Firestore.
           </p>
         </div>
         <div style={{ display: "flex", gap: "12px", fontSize: "0.75rem" }}>
           <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#10B981" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10B981" }} /> Mudah (&lt;30%)
+            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10B981" }} /> Mudah (&lt;30% blm selesai)
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#F59E0B" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#F59E0B" }} /> Sedang (30-50%)
+            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#F59E0B" }} /> Sedang (30-60%)
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#EF4444" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#EF4444" }} /> Butuh Bimbingan (&gt;50%)
+            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#EF4444" }} /> Butuh Bimbingan (&gt;60%)
           </span>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
-        {metrics.map((m) => {
+        {computedMetrics.map((m) => {
           const bg =
             m.struggleLevel === "high"
               ? "rgba(239, 68, 68, 0.12)"
@@ -95,7 +139,7 @@ export function StruggleHeatmap({ metrics = DEFAULT_METRICS }: { metrics?: Modul
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                   <span style={{ fontWeight: 800, fontSize: "0.85rem", color: tagColor }}>{m.moduleId}</span>
                   <span style={{ fontSize: "0.75rem", fontWeight: 700, color: tagColor, background: "rgba(0,0,0,0.2)", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
-                    Tingkat Kesulitan: {m.failureRatePercent}%
+                    Belum Selesai: {m.failureRatePercent}%
                   </span>
                 </div>
                 <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)" }}>
@@ -105,10 +149,10 @@ export function StruggleHeatmap({ metrics = DEFAULT_METRICS }: { metrics?: Modul
 
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "var(--text-secondary)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "10px" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <Clock size={14} /> {m.avgTimeMinutes} menit avg
+                  <Clock size={14} /> Estimasi {m.avgTimeMinutes} mnt
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <Users size={14} /> {m.totalAttempts} maba
+                  <Users size={14} /> {m.totalAttempts} aktif/selesai
                 </span>
               </div>
             </div>

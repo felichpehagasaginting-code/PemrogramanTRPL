@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useUserStore, BADGES, LEVELS, isAdmin } from "@/lib/store/useUserStore";
 import { SkeletonAdmin } from "@/components/ui/Skeleton";
 import {
@@ -10,6 +11,7 @@ import {
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
   Student, ChartBar, CheckCircle, LockKey, SignOut, Code,
   PencilSimpleLine, TrashSimple, UserPlus, ArrowLeft, PlayCircle,
+  FileText,
 } from "@phosphor-icons/react";
 
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
@@ -19,6 +21,7 @@ import { PlagiarismDetector } from "@/components/admin/PlagiarismDetector";
 import { BroadcastManager } from "@/components/admin/BroadcastManager";
 import { TestCaseEditor } from "@/components/admin/TestCaseEditor";
 import { AcademicGradebookModal } from "@/components/admin/AcademicGradebookModal";
+import { TestAnswerDetailModal } from "@/components/admin/TestAnswerDetailModal";
 import { CodePlaybackPlayer } from "@/components/editor/CodePlaybackPlayer";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useSessionTimeout } from "@/lib/auth/useSessionTimeout";
@@ -47,11 +50,15 @@ export default function AdminPage() {
   const addUser = useUserStore((s) => s.addUser);
   const updateUser = useUserStore((s) => s.updateUser);
   const deleteUser = useUserStore((s) => s.deleteUser);
+  const subscribeAllUsersRealtime = useUserStore((s) => s.subscribeAllUsersRealtime);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"users" | "analytics" | "helpdesk" | "plagiarism" | "broadcast" | "testcases">("users");
   const [academicModalOpen, setAcademicModalOpen] = useState(false);
   const [dosenGateModalOpen, setDosenGateModalOpen] = useState(false);
+  const [testDetailModalOpen, setTestDetailModalOpen] = useState(false);
+  const [testDetailUser, setTestDetailUser] = useState<any | null>(null);
+  const [testDetailInitialTab, setTestDetailInitialTab] = useState<"preTest" | "postTest">("preTest");
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [awardModal, setAwardModal] = useState<string | null>(null);
   const [awardAmount, setAwardAmount] = useState(50);
@@ -61,9 +68,20 @@ export default function AdminPage() {
   const [playbackStartTime, setPlaybackStartTime] = useState<number>(0);
   const [formData, setFormData] = useState(INITIAL_FORM);
 
+  const openTestDetail = (targetUser: any, tab: "preTest" | "postTest" = "preTest") => {
+    setTestDetailUser(targetUser);
+    setTestDetailInitialTab(tab);
+    setTestDetailModalOpen(true);
+  };
+
   useEffect(() => {
-    Promise.all([fetchLeaderboard(), fetchAllUsers()]).finally(() => setLoading(false));
-  }, [fetchLeaderboard, fetchAllUsers]);
+    fetchLeaderboard();
+    fetchAllUsers().finally(() => setLoading(false));
+    const unsubscribe = subscribeAllUsersRealtime();
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchLeaderboard, fetchAllUsers, subscribeAllUsersRealtime]);
 
   const resetForm = () => setFormData(INITIAL_FORM);
 
@@ -198,16 +216,40 @@ export default function AdminPage() {
   const sorted = [...allUsers].sort((a, b) => b.xp - a.xp);
 
   const exportCSV = () => {
-    const header = ["Nama", "Email", "XP", "Level", "Streak", "Badges", ...allModuleKeys.map((k) => MODULE_LABELS[k])];
-    const rows = sorted.map((u) => [
-      u.name, u.email, u.xp, u.level, u.streak || 0, u.badges.length,
-      ...allModuleKeys.map((k) => u.progress[k]?.status || "locked"),
-    ]);
+    const header = [
+      "Nama", "Email", "XP", "Level", "Streak", "Badges",
+      "PreTest_Skor", "PreTest_Pct", "PostTest_Skor", "PostTest_Pct", "Status_Sertifikat",
+      ...allModuleKeys.map((k) => MODULE_LABELS[k])
+    ];
+    const rows = sorted.map((u) => {
+      const preTest = u.tests?.preTest;
+      const postTest = u.tests?.postTest;
+      const isEligibleCert = Boolean(
+        preTest?.completed &&
+        allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") &&
+        postTest?.completed
+      );
+
+      return [
+        `"${u.name.replace(/"/g, '""')}"`,
+        u.email,
+        u.xp,
+        u.level,
+        u.streak || 0,
+        u.badges.length,
+        preTest?.score ?? "-",
+        preTest ? `${preTest.percentage}%` : "-",
+        postTest?.score ?? "-",
+        postTest ? `${postTest.percentage}%` : "-",
+        isEligibleCert ? "LULUS_SERTIFIKAT" : "BELUM_LULUS",
+        ...allModuleKeys.map((k) => u.progress[k]?.status || "locked"),
+      ];
+    });
     const csv = [header.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "matrikulasi-progress.csv"; a.click();
+    a.href = url; a.download = `matrikulasi-rekap-evaluasi-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -222,11 +264,16 @@ export default function AdminPage() {
       }}>
         <div className="section-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "60px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--gradient-hero)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <ShieldCheck size={16} color="white" weight="fill" />
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ width: "28px", height: "22px", position: "relative" }}>
+                <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
+              </div>
+              <div style={{ width: "20px", height: "20px", position: "relative" }}>
+                <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+              </div>
             </div>
             <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>
-              Admin <span className="gradient-text">Panel</span>
+              Admin <span className="gradient-text">Panel TRPL</span>
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -383,7 +430,7 @@ export default function AdminPage() {
         ) : viewMode === "analytics" ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             <AnalyticsDashboard users={allUsers} />
-            <StruggleHeatmap />
+            <StruggleHeatmap users={allUsers} />
           </div>
         ) : (
           <>
@@ -477,6 +524,8 @@ export default function AdminPage() {
                   <th style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700 }}>Email</th>
                   <th style={{ padding: "10px 12px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700 }}>XP</th>
                   <th style={{ padding: "10px 12px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700 }}>Level</th>
+                  <th style={{ padding: "10px 8px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.75rem" }} title="Pre-Test (M0)">Pre-Test</th>
+                  <th style={{ padding: "10px 8px", textAlign: "center", color: "var(--color-primary-500)", fontWeight: 700, fontSize: "0.75rem" }} title="Post-Test Evaluasi Akhir">Post-Test</th>
                   {allModuleKeys.map((k) => (
                     <th key={k} style={{ padding: "10px 6px", textAlign: "center", color: "var(--text-muted)", fontWeight: 600, fontSize: "0.7rem" }} title={MODULE_LABELS[k]}>{k}</th>
                   ))}
@@ -485,8 +534,11 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {filteredUsers.length === 0 ? (
-                  <tr><td colSpan={15} style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Tidak ada data mahasiswa</td></tr>
-                ) : (filteredUsers.map((u, i) => (
+                  <tr><td colSpan={17} style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Tidak ada data mahasiswa</td></tr>
+                ) : (filteredUsers.map((u, i) => {
+                  const pre = u.tests?.preTest;
+                  const post = u.tests?.postTest;
+                  return (
                   <tr
                     key={u.uid}
                     style={{
@@ -501,6 +553,61 @@ export default function AdminPage() {
                     <td style={{ padding: "8px 12px", color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>{u.email}</td>
                     <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "var(--color-primary-600)" }}>{u.xp}</td>
                     <td style={{ padding: "8px 12px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.75rem" }}>{u.level}</td>
+                    
+                    {/* Pre-Test Score Badge */}
+                    <td style={{ padding: "8px 8px", textAlign: "center", fontSize: "0.75rem" }}>
+                      {pre ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openTestDetail(u, "preTest");
+                          }}
+                          style={{
+                            background: "rgba(34,197,94,0.12)",
+                            border: "1px solid rgba(34,197,94,0.4)",
+                            color: "#22C55E",
+                            fontWeight: 800,
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "0.75rem",
+                          }}
+                          title="Klik untuk melihat lembar jawaban Pre-Test"
+                        >
+                          {pre.percentage}% 🔍
+                        </button>
+                      ) : (
+                        <span style={{ color: "var(--text-muted)" }}>-</span>
+                      )}
+                    </td>
+
+                    {/* Post-Test Score Badge */}
+                    <td style={{ padding: "8px 8px", textAlign: "center", fontSize: "0.75rem" }}>
+                      {post ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openTestDetail(u, "postTest");
+                          }}
+                          style={{
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: post.percentage >= 60 ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+                            color: post.percentage >= 60 ? "#22C55E" : "#EF4444",
+                            border: `1px solid ${post.percentage >= 60 ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)"}`,
+                            fontWeight: 800,
+                            cursor: "pointer",
+                            fontSize: "0.75rem",
+                          }}
+                          title="Klik untuk melihat lembar jawaban Post-Test"
+                        >
+                          {post.percentage}% 🔍
+                        </button>
+                      ) : (
+                        <span style={{ color: "var(--text-muted)" }}>-</span>
+                      )}
+                    </td>
+
                     {allModuleKeys.map((k) => {
                       const status = u.progress[k]?.status || "locked";
                       return (
@@ -557,7 +664,8 @@ export default function AdminPage() {
                       </div>
                     </td>
                   </tr>
-                )))}
+                );
+              }))}
               </tbody>
             </table>
           </div>
@@ -582,6 +690,77 @@ export default function AdminPage() {
                     <span><strong>XP:</strong> {selectedUser.xp}</span>
                     <span><strong>Level:</strong> {selectedUser.level}</span>
                     <span><strong>Streak:</strong> {selectedUser.streak || 0} hari</span>
+                  </div>
+
+                  <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px dashed var(--border-color)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "0.75rem", color: "var(--color-primary-500)", fontWeight: 800 }}>
+                        📝 REKAP UJIAN EVALUASI
+                      </span>
+                      {(selectedUser.tests?.preTest || selectedUser.tests?.postTest) && (
+                        <button
+                          onClick={() => openTestDetail(selectedUser, selectedUser.tests?.postTest ? "postTest" : "preTest")}
+                          className="btn btn-sm btn-primary"
+                          style={{ padding: "3px 8px", fontSize: "0.7rem", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                        >
+                          <FileText size={12} /> Buka Lembar Jawaban
+                        </button>
+                      )}
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.825rem", marginBottom: "6px" }}>
+                      <span>Pre-Test Diagnostik:</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <strong style={{ color: selectedUser.tests?.preTest ? "#22C55E" : "var(--text-muted)" }}>
+                          {selectedUser.tests?.preTest ? `${selectedUser.tests.preTest.score}/${selectedUser.tests.preTest.totalQuestions} (${selectedUser.tests.preTest.percentage}%)` : "Belum Mengerjakan"}
+                        </strong>
+                        {selectedUser.tests?.preTest && (
+                          <button
+                            onClick={() => openTestDetail(selectedUser, "preTest")}
+                            style={{
+                              background: "rgba(34,197,94,0.12)",
+                              border: "1px solid rgba(34,197,94,0.3)",
+                              borderRadius: "4px",
+                              padding: "1px 5px",
+                              cursor: "pointer",
+                              color: "#22C55E",
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                            }}
+                            title="Lihat Detail Jawaban Pre-Test"
+                          >
+                            Detail
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.825rem" }}>
+                      <span>Post-Test Akhir:</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <strong style={{ color: selectedUser.tests?.postTest?.percentage && selectedUser.tests.postTest.percentage >= 60 ? "#22C55E" : selectedUser.tests?.postTest ? "#EF4444" : "var(--text-muted)" }}>
+                          {selectedUser.tests?.postTest ? `${selectedUser.tests.postTest.score}/${selectedUser.tests.postTest.totalQuestions} (${selectedUser.tests.postTest.percentage}%)` : "Belum Mengerjakan"}
+                        </strong>
+                        {selectedUser.tests?.postTest && (
+                          <button
+                            onClick={() => openTestDetail(selectedUser, "postTest")}
+                            style={{
+                              background: "rgba(255,107,0,0.12)",
+                              border: "1px solid rgba(255,107,0,0.3)",
+                              borderRadius: "4px",
+                              padding: "1px 5px",
+                              cursor: "pointer",
+                              color: "var(--color-primary-500)",
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                            }}
+                            title="Lihat Detail Jawaban Post-Test"
+                          >
+                            Detail
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div style={{ background: "var(--bg-card)", padding: "var(--space-4)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-color)" }}>
@@ -780,6 +959,14 @@ export default function AdminPage() {
           isOpen={academicModalOpen}
           onClose={() => setAcademicModalOpen(false)}
           users={allUsers}
+        />
+
+        {/* Detailed Examination Answer Sheet Modal */}
+        <TestAnswerDetailModal
+          isOpen={testDetailModalOpen}
+          onClose={() => setTestDetailModalOpen(false)}
+          user={testDetailUser}
+          initialTab={testDetailInitialTab}
         />
       </div>
     </div>

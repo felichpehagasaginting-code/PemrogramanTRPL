@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   Printer,
   X,
@@ -31,10 +32,14 @@ export function AcademicGradebookModal({
       (p) => p.status === "completed"
     ).length;
 
-    // Scale score based on XP and module completion (Max 100)
-    const progressScore = (completedCount / totalModules) * 60; // 60% weight from modules
-    const xpBonus = Math.min(40, ((u.xp || 0) / 1200) * 40); // 40% weight from XP
-    const finalScore = Math.round(progressScore + xpBonus);
+    const preTestPct = u.tests?.preTest?.percentage ?? 0;
+    const postTestPct = u.tests?.postTest?.percentage ?? 0;
+
+    // Scale score: 50% modules + 25% Post-Test + 25% XP
+    const progressScore = (completedCount / totalModules) * 50;
+    const postTestScore = (postTestPct / 100) * 25;
+    const xpBonus = Math.min(25, ((u.xp || 0) / 1200) * 25);
+    const finalScore = Math.round(progressScore + postTestScore + xpBonus);
 
     let letterGrade = "E";
     let gradePoint = 0.0;
@@ -67,6 +72,8 @@ export function AcademicGradebookModal({
       email: u.email,
       completedCount,
       xp: u.xp || 0,
+      preTestPct,
+      postTestPct,
       finalScore,
       letterGrade,
       gradePoint,
@@ -191,24 +198,39 @@ export function AcademicGradebookModal({
                 color: "#111827",
               }}
             >
-              {/* University / Prodi Letterhead */}
+              {/* University / Prodi Letterhead with Official Logos */}
               <div
                 style={{
                   borderBottom: "2px solid #111827",
-                  paddingBottom: "12px",
+                  paddingBottom: "14px",
                   marginBottom: "20px",
-                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "16px",
                 }}
               >
-                <h2 style={{ fontSize: "1.1rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", margin: 0 }}>
-                  PROGRAM STUDI SARJANA TERAPAN TEKNOLOGI REKAYASA PERANGKAT LUNAK (TRPL)
-                </h2>
-                <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#374151", margin: "4px 0 0" }}>
-                  BERITA ACARA & REKAPITULASI NILAI AKHIR MATRIKULASI PEMROGRAMAN 2026
-                </h3>
-                <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                  Tahun Akademik 2026/2027 • Status: Terverifikasi Sistem Auto-Grader
-                </span>
+                {/* Logo Kiri: CWE */}
+                <div style={{ width: "70px", height: "55px", position: "relative", flexShrink: 0 }}>
+                  <Image src="/images/logo_kiri_cwe.png" alt="Logo Politeknik CWE" fill style={{ objectFit: "contain" }} />
+                </div>
+
+                <div style={{ textAlign: "center", flex: 1 }}>
+                  <h2 style={{ fontSize: "1.05rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px", margin: 0, color: "#111827" }}>
+                    POLITEKNIK KELAPA SAWIT CWE • SARJANA TERAPAN TRPL
+                  </h2>
+                  <h3 style={{ fontSize: "0.925rem", fontWeight: 700, color: "#374151", margin: "4px 0 0" }}>
+                    BERITA ACARA &amp; REKAPITULASI EVALUASI PRE-TEST &amp; POST-TEST MATRIKULASI 2026
+                  </h3>
+                  <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                    Tahun Akademik 2026/2027 • Status: Terverifikasi Sistem Evaluasi Pemrograman
+                  </span>
+                </div>
+
+                {/* Logo Kanan: TRPL */}
+                <div style={{ width: "55px", height: "55px", position: "relative", flexShrink: 0 }}>
+                  <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
+                </div>
               </div>
 
               {/* Summary KPIs */}
@@ -286,10 +308,12 @@ export function AcademicGradebookModal({
                       <th style={{ padding: "6px 8px" }}>No</th>
                       <th style={{ padding: "6px 8px" }}>Nama Mahasiswa</th>
                       <th style={{ padding: "6px 8px" }}>Email / Akun</th>
-                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Modul Selesai</th>
+                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Modul</th>
+                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Pre-Test</th>
+                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Post-Test</th>
                       <th style={{ padding: "6px 8px", textAlign: "center" }}>XP</th>
-                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Skor Angka</th>
-                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Nilai Huruf</th>
+                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Nilai Akhir</th>
+                      <th style={{ padding: "6px 8px", textAlign: "center" }}>Grade</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -306,6 +330,12 @@ export function AcademicGradebookModal({
                         <td style={{ padding: "6px 8px", color: "#6b7280" }}>{s.email}</td>
                         <td style={{ padding: "6px 8px", textAlign: "center" }}>
                           {s.completedCount} / 9
+                        </td>
+                        <td style={{ padding: "6px 8px", textAlign: "center", color: "#6b7280" }}>
+                          {s.preTestPct}%
+                        </td>
+                        <td style={{ padding: "6px 8px", textAlign: "center", fontWeight: 700, color: s.postTestPct >= 60 ? "#16a34a" : "#dc2626" }}>
+                          {s.postTestPct > 0 ? `${s.postTestPct}%` : "-"}
                         </td>
                         <td style={{ padding: "6px 8px", textAlign: "center" }}>{s.xp}</td>
                         <td style={{ padding: "6px 8px", textAlign: "center", fontWeight: 700 }}>
