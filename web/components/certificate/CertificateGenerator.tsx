@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import {
   SealCheck,
   Printer,
@@ -109,18 +110,42 @@ export function CertificateGenerator({
           }}
         />
 
-        {/* Header Badges */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ background: "#F59E0B", color: "#000", padding: "6px 12px", borderRadius: "6px", fontWeight: 800, fontSize: "0.85rem", letterSpacing: "1px" }}>
-              TRPL 2026
+        {/* Header Badges with Official Logos */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", position: "relative", zIndex: 2 }}>
+          {/* Logo Sisi Kiri: Institusi CWE */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ width: "65px", height: "48px", position: "relative" }}>
+              <Image
+                src="/images/logo_kiri_cwe.png"
+                alt="Logo Kampus CWE"
+                fill
+                style={{ objectFit: "contain" }}
+                priority
+              />
             </div>
-            <span style={{ fontSize: "0.8rem", color: "#94A3B8" }}>Program Studi Teknologi Rekayasa Perangkat Lunak</span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "0.85rem", letterSpacing: "1px", color: "#F59E0B" }}>
+                POLITEKNIK KELAPA SAWIT CWE
+              </div>
+              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Program Studi Sarjana Terapan TRPL</span>
+            </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#F59E0B", fontSize: "0.8rem", fontWeight: 700 }}>
-            <SealCheck size={18} weight="fill" />
-            <span>TERVERIFIKASI RESMI</span>
+          {/* Logo Sisi Kanan: TRPL & Seal */}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#F59E0B", fontSize: "0.75rem", fontWeight: 700, background: "rgba(245, 158, 11, 0.1)", padding: "4px 10px", borderRadius: "20px", border: "1px solid rgba(245, 158, 11, 0.3)" }}>
+              <SealCheck size={16} weight="fill" />
+              <span>TERVERIFIKASI RESMI</span>
+            </div>
+            <div style={{ width: "48px", height: "48px", position: "relative" }}>
+              <Image
+                src="/images/logo_kanan_trpl.png"
+                alt="Logo TRPL"
+                fill
+                style={{ objectFit: "contain" }}
+                priority
+              />
+            </div>
           </div>
         </div>
 
