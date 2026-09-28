@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { MODULES_META } from "@/lib/content/modules-data";
 import Link from "next/link";
 import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket, FileText, Sparkle } from "@phosphor-icons/react";
 import { BadgeIcon } from "@/components/ui";
-import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
-import { PointingPopup } from "@/components/ui/PointingPopup";
-import { DASHBOARD_FEATURES, POINTING_FEATURES } from "@/lib/features";
 import { SkillTree } from "@/components/learning/SkillTree";
 import { DailyStreakWidget } from "@/components/dashboard/DailyStreakWidget";
-import { DailyLogicBiteModal } from "@/components/learning/DailyLogicBiteModal";
-
 import { SkeletonDashboard } from "@/components/ui/Skeleton";
 
 const moduleIconMap: Record<string, React.ReactNode> = {
@@ -31,6 +26,8 @@ export default function DashboardPage() {
   const leaderboard = useUserStore((s) => s.leaderboard);
   const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
   const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
+
+  const [skillTreeOpen, setSkillTreeOpen] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -94,161 +91,143 @@ export default function DashboardPage() {
       >
         {/* Left: Main Progress and Modules */}
         <div>
-          {/* Welcome Card */}
-          <div className="fade-in" style={{
-              background: "var(--gradient-hero)",
-              borderRadius: "var(--radius-xl)",
-              padding: "var(--space-6)",
-              color: "white",
-              boxShadow: "var(--shadow-card)",
-              marginBottom: "var(--space-8)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "20px",
-            }}
-          >
-            <div>
-              <span
-                style={{
-                  background: "rgba(255, 255, 255, 0.2)",
-                  padding: "4px 12px",
-                  borderRadius: "var(--radius-full)",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                👋 Selamat Datang
-              </span>
-              <h2
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "1.875rem",
-                  fontWeight: 800,
-                  color: "rgba(255, 255, 255, 0.95)",
-                  margin: "8px 0 4px",
-                }}
-              >
-                Halo, {user.name}!
-              </h2>
-              <p style={{ color: "rgba(255, 250, 246, 0.8)", fontSize: "0.9375rem" }}>
-                Saatnya melanjutkan petualangan kodingmu hari ini. Kamu ada di rank <strong>#{userRank}</strong>.
-              </p>
-            </div>
-            {/* Level badge */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.15)",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
-                borderRadius: "var(--radius-lg)",
-                padding: "var(--space-4) var(--space-6)",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "rgba(255, 255, 255, 0.7)" }}>
-                Level Saat Ini
-              </div>
-              <div style={{ fontSize: "1.25rem", fontWeight: 800, fontFamily: "var(--font-heading)" }}>
-                {user.level}
-              </div>
-            </div>
-          </div>
-
-          {/* Overall Progress */}
+          {/* Compact Executive Summary Card */}
           <div
+            className="fade-in"
             style={{
               background: "var(--bg-card)",
               borderRadius: "var(--radius-xl)",
               border: "1px solid var(--border-color)",
-              padding: "var(--space-6)",
+              padding: "var(--space-5) var(--space-6)",
               boxShadow: "var(--shadow-sm)",
-              marginBottom: "var(--space-8)",
+              marginBottom: "var(--space-6)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-3)" }}>
-              <h3 style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                Progres Kurikulum Matrikulasi
-              </h3>
-              <span style={{ fontSize: "1.0625rem", fontWeight: 800, color: "var(--color-primary-600)" }}>
-                {percentage}% Selesai
-              </span>
-            </div>
-            {/* Bar */}
-            <div style={{ width: "100%", height: "10px", background: "var(--color-neutral-150)", borderRadius: "var(--radius-full)", overflow: "hidden" }}>
-              <div
-                className="progress-bar-fill"
-                style={{
-                  width: `${percentage}%`,
-                  height: "100%",
-                  background: "var(--gradient-hero)",
-                  borderRadius: "var(--radius-full)",
-                }}
-              />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "8px" }}>
-              <span>M0: Orientasi</span>
-              <span>{completedCount} dari 9 Modul Selesai</span>
-              <span>M8: Mini Project</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "14px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)" }}>
+                    Halo, {user.name}! 👋
+                  </h2>
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, padding: "2px 8px", borderRadius: "var(--radius-full)", background: "rgba(255,107,0,0.1)", color: "var(--color-primary-600)" }}>
+                    Rank #{userRank}
+                  </span>
+                </div>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: "4px 0 0" }}>
+                  Lanjutkan modul matrikulasi TRPL kodingmu hari ini.
+                </p>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Level & XP</div>
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)" }}>
+                    {user.level} <span style={{ fontSize: "0.8rem", color: "var(--color-primary-600)", fontWeight: 700 }}>({user.xp} XP)</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Evaluasi Ujian (Pre-Test & Post-Test) Status Card */}
+            {/* Progress Bar Tipis & Ramping */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", marginBottom: "6px" }}>
+                <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>
+                  Progres Kurikulum ({completedCount}/9 Modul)
+                </span>
+                <span style={{ fontWeight: 800, color: "var(--color-primary-600)" }}>
+                  {percentage}% Selesai
+                </span>
+              </div>
+              <div style={{ width: "100%", height: "7px", background: "var(--color-neutral-150)", borderRadius: "var(--radius-full)", overflow: "hidden" }}>
+                <div
+                  className="progress-bar-fill"
+                  style={{
+                    width: `${percentage}%`,
+                    height: "100%",
+                    background: "var(--gradient-hero)",
+                    borderRadius: "var(--radius-full)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Evaluasi Standar (Pre-Test & Post-Test Side-by-Side) */}
             <div
               style={{
                 marginTop: "16px",
-                padding: "16px",
+                padding: "14px",
                 background: "var(--bg-page-alt)",
                 border: "1px solid var(--border-color)",
                 borderRadius: "var(--radius-lg)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "28px", height: "20px", position: "relative" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: "24px", height: "18px", position: "relative" }}>
                     <Image src="/images/logo_kiri_cwe.png" alt="Logo CWE" fill style={{ objectFit: "contain" }} />
                   </div>
-                  <div style={{ width: "20px", height: "20px", position: "relative" }}>
+                  <div style={{ width: "18px", height: "18px", position: "relative" }}>
                     <Image src="/images/logo_kanan_trpl.png" alt="Logo TRPL" fill style={{ objectFit: "contain" }} />
                   </div>
-                  <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--text-primary)" }}>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--text-primary)" }}>
                     Evaluasi Standar Matrikulasi TRPL
                   </span>
                 </div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                  Syarat Wajib Sertifikat Kelulusan
-                </span>
+                {/* Certificate inline trigger */}
+                {(() => {
+                  const requiredModules = ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"];
+                  const allDone = requiredModules.every((k) => user.progress?.[k]?.status === "completed");
+                  const preDone = Boolean(user.tests?.preTest?.completed);
+                  const postDone = Boolean(user.tests?.postTest?.completed);
+                  const isEligible = allDone && preDone && postDone;
+                  return (
+                    <Link
+                      href="/certificate"
+                      style={{
+                        fontSize: "0.73rem",
+                        fontWeight: 700,
+                        color: isEligible ? "#16a34a" : "var(--text-muted)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <Trophy size={14} weight="fill" color={isEligible ? "#16a34a" : "var(--text-muted)"} />
+                      {isEligible ? "Klaim Sertifikat 🎓" : "Status Sertifikat"}
+                    </Link>
+                  );
+                })()}
               </div>
 
+              {/* Side-by-side Dual Cards for Pre-Test & Post-Test */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 {/* Pre-Test Card */}
                 {(() => {
                   const isPreDone = Boolean(user.tests?.preTest?.completed);
                   const prePct = user.tests?.preTest?.percentage ?? 0;
                   return (
-                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "12px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>PRE-TEST (M0)</span>
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "10px 12px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                        <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--text-muted)" }}>PRE-TEST (M0)</span>
                         {isPreDone ? (
-                          <span style={{ fontSize: "0.7rem", color: "#22C55E", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                          <span style={{ fontSize: "0.68rem", color: "#16a34a", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
                             Selesai ({prePct}%)
                           </span>
                         ) : (
-                          <span style={{ fontSize: "0.7rem", color: "#F59E0B", fontWeight: 700, background: "rgba(245,158,11,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                          <span style={{ fontSize: "0.68rem", color: "#d97706", fontWeight: 700, background: "rgba(245,158,11,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
                             Wajib
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-primary)" }}>
                         Diagnostik Pemetaan
                       </div>
                       <Link
                         href="/learn/M0"
                         className="btn btn-sm btn-secondary"
-                        style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px" }}
+                        style={{ marginTop: "8px", width: "100%", fontSize: "0.72rem", padding: "4px" }}
                       >
-                        {isPreDone ? "Tinjau Pre-Test" : "Mulai Pre-Test 📝"}
+                        {isPreDone ? "Tinjau Hasil Pre-Test" : "Mulai Pre-Test 📝"}
                       </Link>
                     </div>
                   );
@@ -264,33 +243,33 @@ export default function DashboardPage() {
                       background: "var(--bg-card)",
                       border: isPostDone ? "1px solid rgba(34,197,94,0.3)" : !isPreDone ? "1px dashed var(--border-color)" : "1px solid var(--color-primary-400)",
                       borderRadius: "var(--radius-md)",
-                      padding: "12px",
+                      padding: "10px 12px",
                       opacity: !isPreDone ? 0.6 : 1,
                     }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>POST-TEST AKHIR</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                        <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--text-muted)" }}>POST-TEST AKHIR</span>
                         {isPostDone ? (
-                          <span style={{ fontSize: "0.7rem", color: "#22C55E", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                          <span style={{ fontSize: "0.68rem", color: "#16a34a", fontWeight: 700, background: "rgba(34,197,94,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
                             Lulus ({postPct}%)
                           </span>
                         ) : isPreDone ? (
-                          <span style={{ fontSize: "0.7rem", color: "var(--color-primary-500)", fontWeight: 700, background: "rgba(255,107,0,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
+                          <span style={{ fontSize: "0.68rem", color: "var(--color-primary-600)", fontWeight: 700, background: "rgba(255,107,0,0.1)", padding: "2px 6px", borderRadius: "4px" }}>
                             Terbuka
                           </span>
                         ) : (
-                          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600 }}>
+                          <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", fontWeight: 600 }}>
                             Terkunci
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-primary)" }}>
                         Ujian Evaluasi Akhir
                       </div>
                       {isPreDone ? (
                         <Link
                           href="/post-test"
                           className="btn btn-sm btn-primary"
-                          style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px" }}
+                          style={{ marginTop: "8px", width: "100%", fontSize: "0.72rem", padding: "4px" }}
                         >
                           {isPostDone ? "Lihat Hasil Post-Test" : "Mulai Post-Test 🚀"}
                         </Link>
@@ -298,7 +277,7 @@ export default function DashboardPage() {
                         <button
                           disabled
                           className="btn btn-sm btn-secondary"
-                          style={{ marginTop: "10px", width: "100%", fontSize: "0.75rem", padding: "4px", opacity: 0.5, cursor: "not-allowed" }}
+                          style={{ marginTop: "8px", width: "100%", fontSize: "0.72rem", padding: "4px", opacity: 0.5, cursor: "not-allowed" }}
                         >
                           Selesaikan Pre-Test Dulu
                         </button>
@@ -308,51 +287,38 @@ export default function DashboardPage() {
                 })()}
               </div>
             </div>
-
-            {/* Certificate Link Banner */}
-            {(() => {
-              const requiredModules = ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"];
-              const allDone = requiredModules.every((k) => user.progress?.[k]?.status === "completed");
-              const preDone = Boolean(user.tests?.preTest?.completed);
-              const postDone = Boolean(user.tests?.postTest?.completed);
-              const isEligible = allDone && preDone && postDone;
-
-              return (
-                <div
-                  style={{
-                    marginTop: "16px",
-                    padding: "12px 16px",
-                    background: isEligible
-                      ? "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)"
-                      : "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
-                    border: isEligible ? "1px solid rgba(34, 197, 94, 0.4)" : "1px solid rgba(245, 158, 11, 0.4)",
-                    borderRadius: "var(--radius-lg)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "10px",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem", color: "var(--text-primary)" }}>
-                    <Trophy size={20} color={isEligible ? "#22C55E" : "#F59E0B"} weight="fill" />
-                    <span>
-                      {isEligible
-                        ? "🎉 Selamat! Kamu telah menuntaskan Pre-Test, Semua Modul, dan Post-Test. Klaim Sertifikatmu sekarang!"
-                        : "Selesaikan Pre-Test, Seluruh Modul (M0–M8), dan Post-Test untuk membuka Sertifikat Resmi TRPL."}
-                    </span>
-                  </div>
-                  <Link href="/certificate" className="btn btn-sm btn-primary" style={{ padding: "4px 12px", fontSize: "0.75rem" }}>
-                    {isEligible ? "Klaim Sertifikat 🎓" : "Status Syarat Sertifikat"}
-                  </Link>
-                </div>
-              );
-            })()}
           </div>
 
-          {/* Interactive 3D/SVG Skill Tree */}
-          <div style={{ marginBottom: "var(--space-8)" }}>
-            <SkillTree progress={user.progress} />
+          {/* Collapsible Skill Tree Toggle */}
+          <div style={{ marginBottom: "var(--space-6)" }}>
+            <button
+              onClick={() => setSkillTreeOpen(!skillTreeOpen)}
+              className="btn btn-sm btn-secondary"
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 14px",
+                fontSize: "0.82rem",
+                borderRadius: "var(--radius-lg)",
+                background: "var(--bg-card)",
+                border: "1px solid var(--border-color)",
+                color: "var(--text-secondary)",
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                🌳 Peta Jalur Kompetensi (Skill Tree)
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                {skillTreeOpen ? "▲ Tutup Peta" : "▼ Tampilkan Peta"}
+              </span>
+            </button>
+            {skillTreeOpen && (
+              <div style={{ marginTop: "12px" }}>
+                <SkillTree progress={user.progress} />
+              </div>
+            )}
           </div>
 
           {/* Module list heading */}
@@ -703,9 +669,6 @@ export default function DashboardPage() {
           .module-card h4 { white-space: normal !important; }
         }
       `}</style>
-      <FeaturePopupQueue features={DASHBOARD_FEATURES} delay={6000} />
-      <PointingPopup {...POINTING_FEATURES.moduleStart} delay={9000} position="right" />
-      <DailyLogicBiteModal />
     </div>
   );
 }
