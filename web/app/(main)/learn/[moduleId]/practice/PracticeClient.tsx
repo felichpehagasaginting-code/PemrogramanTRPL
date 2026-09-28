@@ -41,6 +41,7 @@ import { lintPythonCode, LintWarning } from "@/lib/linter/simplePythonLinter";
 import { PaintBrush } from "@phosphor-icons/react";
 import { useCodeHistory } from "@/lib/recorder/useCodeHistory";
 import { CodeHistoryDrawer } from "@/components/editor/CodeHistoryDrawer";
+import { EVALUATION_QUESTIONS } from "@/lib/content/modules-data";
 
 type PracticeMode = "coding" | "quiz" | "parsons";
 
@@ -67,23 +68,14 @@ interface PracticeData {
 const PRACTICE_CONTENT: Record<string, PracticeData> = {
   M0: {
     mode: "quiz",
-    description: "Pre-test diagnostik untuk memetakan kemampuan awal kamu.",
-    questions: [
-      {
-        id: "m0-q1",
-        question: "Manakah dari berikut ini yang BUKAN termasuk bahasa pemrograman?",
-        options: ["Python", "Java", "Microsoft Word", "JavaScript"],
-        correctIndex: 2,
-        explanation: "Microsoft Word adalah aplikasi pengolah kata, bukan bahasa pemrograman.",
-      },
-      {
-        id: "m0-q2",
-        question: "Apa kepanjangan dari IDE?",
-        options: ["Integrated Development Environment", "Internet Data Explorer", "Internal Design Engine", "Integrated Debug Environment"],
-        correctIndex: 0,
-        explanation: "IDE adalah singkatan dari Integrated Development Environment, software yang menyediakan tools untuk menulis dan menguji kode.",
-      },
-    ],
+    description: "Pre-Test Diagnostik TRPL 2026: Ukur pemahaman awal logika & dasar pemrograman kamu.",
+    questions: EVALUATION_QUESTIONS.map((q) => ({
+      id: q.id,
+      question: q.question,
+      options: q.options,
+      correctIndex: q.correctIndex,
+      explanation: q.explanation,
+    })),
   },
   M1: {
     mode: "parsons",
@@ -394,8 +386,7 @@ export default function PracticeClient() {
       setGradingResult(res);
 
       if (res.passed) {
-        completeSubModule(moduleId as string, `practice-${moduleId}`);
-        addXP(50);
+        completeSubModule(moduleId as string, `practice-${moduleId}`, 50);
       }
     } catch (err: any) {
       setOutput([`Error Auto-Grader: ${err.message}`]);
@@ -409,19 +400,26 @@ export default function PracticeClient() {
     setAiHint(hint);
   };
 
-  const handleQuizComplete = (score: number, total: number) => {
-    completeSubModule(moduleId as string, `quiz-${moduleId}`);
-    if (score > 0) addXP(score * 10);
+  const handleQuizComplete = (score: number, total: number, answers?: Record<number, number>) => {
+    const xpReward = score > 0 ? score * 10 : 0;
+    completeSubModule(moduleId as string, `quiz-${moduleId}`, xpReward);
     setQuizComplete(true);
     if (moduleId === "M0") {
       completeModule("M0");
+      useUserStore.getState().saveTestResult("preTest", {
+        completed: true,
+        score,
+        totalQuestions: total,
+        percentage: Math.round((score / total) * 100),
+        submittedAt: new Date().toISOString(),
+        answers: answers || {},
+      });
       router.push(`/learn/M1`);
     }
   };
 
   const handleParsonsSuccess = () => {
-    completeSubModule(moduleId as string, `practice-${moduleId}`);
-    addXP(50);
+    completeSubModule(moduleId as string, `practice-${moduleId}`, 50);
     setTimeout(() => {
       router.push(`/learn/${moduleId}`);
     }, 1500);

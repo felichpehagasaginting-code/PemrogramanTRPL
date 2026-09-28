@@ -16,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { fireConfetti } from "@/lib/confetti";
 import { getRandomMemes, Meme } from "@/lib/content/memes";
+import { EVALUATION_QUESTIONS } from "@/lib/content/modules-data";
 
 interface QuestionData {
   text: string;
@@ -43,87 +44,17 @@ export default function QuizPage() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [answersRecord, setAnswersRecord] = useState<Record<number, number>>({});
 
   if (!user) return null;
 
   const quizData: Record<string, QuestionData[]> = {
-    M0: [
-      {
-        text: "Apa perintah yang digunakan untuk menampilkan tulisan atau output ke layar di Python?",
-        options: ["print()", "input()", "show()", "write()"],
-        correctIndex: 0,
-        explanation: "Fungsi print() adalah fungsi dasar bawaan Python yang digunakan untuk mencetak teks atau nilai ke layar."
-      },
-      {
-        text: "Manakah dari pilihan berikut yang merupakan contoh penulisan string (teks) yang benar di Python?",
-        options: ["Halo", "\"Halo\"", "123", "True"],
-        correctIndex: 1,
-        explanation: "String di Python harus diapit oleh tanda kutip (tunggal maupun ganda), contohnya \"Halo\"."
-      },
-      {
-        text: "Jika kita ingin menyimpan nilai angka bulat seperti 10, tipe data apa yang paling tepat digunakan?",
-        options: ["String", "Float", "Integer", "Boolean"],
-        correctIndex: 2,
-        explanation: "Integer (int) digunakan untuk menyimpan bilangan bulat tanpa pecahan, seperti 10, -5, atau 0."
-      },
-      {
-        text: "Tipe data apakah yang hanya memiliki dua kemungkinan nilai, yaitu True (Benar) atau False (Salah)?",
-        options: ["Boolean", "Integer", "Float", "String"],
-        correctIndex: 0,
-        explanation: "Boolean (bool) adalah tipe data logika yang hanya bernilai True or False."
-      },
-      {
-        text: "Apa fungsi dari tanda pagar (#) di awal baris kode Python?",
-        options: [
-          "Untuk membuat baris kode tersebut menjadi judul program",
-          "Untuk menandai baris komentar agar tidak dieksekusi oleh komputer",
-          "Untuk mempercepat jalannya program",
-          "Untuk menghapus variabel"
-        ],
-        correctIndex: 1,
-        explanation: "Karakter # digunakan untuk menulis komentar. Komputer akan mengabaikan baris komentar saat menjalankan kode program."
-      },
-      {
-        text: "Manakah simbol operator matematika yang digunakan untuk melakukan operasi penjumlahan?",
-        options: ["*", "/", "-", "+"],
-        correctIndex: 3,
-        explanation: "Operator '+' digunakan untuk menjumlahkan dua bilangan atau menggabungkan string."
-      },
-      {
-        text: "Apa yang dimaksud dengan 'Syntax Error' dalam pemrograman?",
-        options: [
-          "Kesalahan dalam logika berpikir program",
-          "Kesalahan penulisan aturan tata bahasa kode sehingga program tidak bisa dijalankan",
-          "Kesalahan karena komputer mati mendadak",
-          "Aplikasi berjalan tapi hasilnya salah"
-        ],
-        correctIndex: 1,
-        explanation: "Syntax Error terjadi jika kode melanggar aturan tata bahasa (sintaksis) bahasa pemrograman tersebut, sehingga interpreter/compiler tidak dapat memahaminya."
-      },
-      {
-        text: "Siapa atau bagian komputer apa yang mengeksekusi instruksi dari script program Python?",
-        options: ["Keyboard", "Layar Monitor", "Interpreter Python melalui CPU", "Harddisk"],
-        correctIndex: 2,
-        explanation: "Interpreter Python menerjemahkan baris demi baris script kode kita menjadi bahasa mesin yang kemudian dieksekusi oleh CPU."
-      },
-      {
-        text: "Fungsi bawaan Python manakah yang digunakan untuk meminta input teks dari pengguna lewat keyboard?",
-        options: ["print()", "input()", "read()", "scan()"],
-        correctIndex: 1,
-        explanation: "Fungsi input() menghentikan jalannya program sementara untuk menunggu pengguna mengetikkan teks lalu menekan Enter."
-      },
-      {
-        text: "Mengapa variabel sangat penting dalam pemrograman komputer?",
-        options: [
-          "Untuk menghias tampilan aplikasi agar cantik",
-          "Sebagai wadah penyimpanan sementara agar data bisa digunakan kembali di baris kode selanjutnya",
-          "Untuk mempercepat koneksi internet",
-          "Untuk menyimpan program di dalam flashdisk"
-        ],
-        correctIndex: 1,
-        explanation: "Tanpa variabel, program tidak bisa mengingat data yang telah dihitung atau diinput sebelumnya untuk diproses di langkah selanjutnya."
-      }
-    ],
+    M0: EVALUATION_QUESTIONS.map((q) => ({
+      text: q.question,
+      options: q.options,
+      correctIndex: q.correctIndex,
+      explanation: q.explanation,
+    })),
     M1: [
       {
         text: "Dari pilihan berikut, manakah lokasi folder yang paling aman dan disarankan untuk membuat folder proyek coding?",
@@ -789,6 +720,7 @@ export default function QuizPage() {
     if (isAnswered) return;
     setSelectedIdx(idx);
     setIsAnswered(true);
+    setAnswersRecord((prev) => ({ ...prev, [currentIdx]: idx }));
 
     if (idx === currentQuestion.correctIndex) {
       setScore(score + 1);
@@ -796,6 +728,7 @@ export default function QuizPage() {
   };
 
   const handleNext = () => {
+    const finalAnswers = selectedIdx !== null ? { ...answersRecord, [currentIdx]: selectedIdx } : answersRecord;
     setSelectedIdx(null);
     setIsAnswered(false);
 
@@ -820,6 +753,17 @@ export default function QuizPage() {
         completeSubModule(moduleId as string, `quiz-${moduleId}`);
         completeModule(moduleId as string);
 
+        if (moduleId === "M0") {
+          useUserStore.getState().saveTestResult("preTest", {
+            completed: true,
+            score,
+            totalQuestions: questions.length,
+            percentage: Math.round((score / questions.length) * 100),
+            submittedAt: new Date().toISOString(),
+            answers: finalAnswers,
+          });
+        }
+
         // If they got 100%, unlock perfectionist badge
         if (score === questions.length) {
           unlockBadge("perfectionist");
@@ -834,6 +778,7 @@ export default function QuizPage() {
     setIsAnswered(false);
     setScore(0);
     setQuizFinished(false);
+    setAnswersRecord({});
   };
 
   return (

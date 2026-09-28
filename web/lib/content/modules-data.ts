@@ -125,47 +125,228 @@ export const MODULES_DATA: ModuleData[] = [
   },
 ];
 
+export interface EvaluationQuestion {
+  id: string;
+  category: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export type PostTestQuestion = EvaluationQuestion;
+
+export const EVALUATION_QUESTIONS: EvaluationQuestion[] = [
+  {
+    id: "pt-1",
+    category: "Dasar & Workspace",
+    question: "Mengapa nama folder proyek coding sebaiknya TIDAK menggunakan karakter spasi atau simbol aneh?",
+    options: [
+      "Agar tidak menimbulkan error pembacaan path saat dieksekusi di terminal atau tools compiler",
+      "Karena sistem operasi komputer akan otomatis menghapus folder tersebut",
+      "Karena bahasa Python hanya dapat disimpan di folder default 'root'",
+      "Karena memori laptop akan berkurang drastis jika ada spasi"
+    ],
+    correctIndex: 0,
+    explanation: "Spasi pada nama folder sering memecah argumen di CLI/terminal secara tidak sengaja, sehingga program gagal dieksekusi."
+  },
+  {
+    id: "pt-2",
+    category: "Logika & Algoritma",
+    question: "Salah satu syarat penting dari sebuah algoritma adalah harus berhenti setelah menjalankan sejumlah tahapan langkah. Sifat ini dikenal sebagai...",
+    options: [
+      "Infinite Loop (Perulangan Tak Hingga)",
+      "Finiteness (Keterbatasan / Memiliki Titik Akhir)",
+      "Randomness (Ketidakpastian Jalur)",
+      "Complexity (Tingkat Kerumitan)"
+    ],
+    correctIndex: 1,
+    explanation: "Finiteness menjamin bahwa algoritma pasti akan berhenti dan menghasilkan output akhir setelah sejumlah langkah terhingga."
+  },
+  {
+    id: "pt-3",
+    category: "Logika & Flowchart",
+    question: "Simbol bangun datar pada diagram alir (flowchart) yang digunakan untuk menentukan keputusan bersyarat (kondisi Ya / Tidak) adalah...",
+    options: [
+      "Persegi Panjang (Proses Eksekusi)",
+      "Belah Ketupat / Diamond (Keputusan Kondisional)",
+      "Oval / Elips (Mulai / Selesai)",
+      "Jajar Genjang (Input / Output)"
+    ],
+    correctIndex: 1,
+    explanation: "Belah Ketupat (Decision) digunakan untuk percabangan logika kondisi Ya/Tidak."
+  },
+  {
+    id: "pt-4",
+    category: "Tipe Data & Variabel",
+    question: "Diberikan kode Python: a = \"10\" dan b = 5. Berapakah hasil dari operasi: int(a) + b?",
+    options: [
+      "15",
+      "\"105\"",
+      "\"15\"",
+      "Error: Tipe data tidak bisa dijumlahkan"
+    ],
+    correctIndex: 0,
+    explanation: "Fungsi int(a) mengubah teks \"10\" menjadi angka 10. Operasi 10 + 5 menghasilkan 15 bertipe Integer."
+  },
+  {
+    id: "pt-5",
+    category: "Input Python",
+    question: "Ketika kita menggunakan perintah input(\"Masukkan nama: \") di Python, tipe data bawaan apa yang selalu dihasilkan?",
+    options: [
+      "int (Bilangan Bulat)",
+      "str (String / Teks)",
+      "float (Bilangan Desimal)",
+      "bool (Boolean)"
+    ],
+    correctIndex: 1,
+    explanation: "Fungsi input() di Python selalu mengembalikan nilai dalam bentuk String (str)."
+  },
+  {
+    id: "pt-6",
+    category: "Percabangan (If-Else)",
+    question: "Perhatikan kode Python berikut:\n\nnilai = 80\nif nilai >= 75:\n    print(\"Lulus\")\nelse:\n    print(\"Remedial\")\n\nApa teks yang akan dicetak ke layar?",
+    options: [
+      "Lulus",
+      "Remedial",
+      "80",
+      "Error sintaks"
+    ],
+    correctIndex: 0,
+    explanation: "Karena nilai adalah 80 dan kondisi (80 >= 75) bernilai Benar (True), maka blok if dijalankan dan mencetak 'Lulus'."
+  },
+  {
+    id: "pt-7",
+    category: "Perulangan (Loop)",
+    question: "Berapa kali kata \"TRPL\" akan dicetak oleh kode perulangan berikut?\n\nfor i in range(3):\n    print(\"TRPL\")",
+    options: [
+      "1 kali",
+      "2 kali",
+      "3 kali",
+      "4 kali"
+    ],
+    correctIndex: 2,
+    explanation: "range(3) menghasilkan 3 iterasi (untuk indeks i = 0, 1, dan 2), sehingga mencetak 'TRPL' sebanyak 3 kali."
+  },
+  {
+    id: "pt-8",
+    category: "Kontrol Perulangan",
+    question: "Kata kunci (keyword) manakah yang digunakan untuk menghentikan jalannya perulangan loop secara seketika?",
+    options: [
+      "break",
+      "continue",
+      "pass",
+      "return"
+    ],
+    correctIndex: 0,
+    explanation: "Keyword 'break' memutus jalannya loop seketika dan langsung melompat keluar dari blok perulangan."
+  },
+  {
+    id: "pt-9",
+    category: "Fungsi Dasar",
+    question: "Perhatikan potongan kode fungsi berikut:\n\ndef hitung(a, b):\n    return a + b\n\nhasil = hitung(4, 6)\nprint(hasil)\n\nBerapakah angka yang dicetak ke layar konsol?",
+    options: [
+      "24",
+      "10",
+      "46",
+      "4"
+    ],
+    correctIndex: 1,
+    explanation: "Fungsi hitung menjumlahkan argumen 4 dan 6 (4 + 6 = 10) lalu mengembalikan nilai 10 ke variabel hasil."
+  },
+  {
+    id: "pt-10",
+    category: "Fungsi & Nilai Balik",
+    question: "Perintah apa yang digunakan di dalam fungsi untuk mengirimkan nilai hasil pemrosesan kembali ke pemanggil fungsi?",
+    options: [
+      "return",
+      "print",
+      "output",
+      "send"
+    ],
+    correctIndex: 0,
+    explanation: "Keyword 'return' digunakan oleh fungsi untuk memberikan nilai keluaran yang dapat disimpan ke dalam variabel."
+  },
+  {
+    id: "pt-11",
+    category: "List & Indexing",
+    question: "Diberikan list: prodi = [\"TRPL\", \"Informatika\", \"Sistem Informasi\"]. Perintah manakah yang tepat untuk mengambil elemen pertama (\"TRPL\")?",
+    options: [
+      "prodi[1]",
+      "prodi.first()",
+      "prodi[0]",
+      "prodi[3]"
+    ],
+    correctIndex: 2,
+    explanation: "Indeks list di bahasa Python selalu dimulai dari angka 0, sehingga elemen pertama adalah prodi[0]."
+  },
+  {
+    id: "pt-12",
+    category: "Operasi List",
+    question: "Metode (method) bawaan list manakah yang digunakan untuk menambahkan elemen baru di urutan paling akhir?",
+    options: [
+      "list.add(item)",
+      "list.append(item)",
+      "list.push(item)",
+      "list.insert_end(item)"
+    ],
+    correctIndex: 1,
+    explanation: "Metode .append() adalah cara standar di Python untuk memasukkan item baru ke bagian paling ujung/akhir list."
+  },
+  {
+    id: "pt-13",
+    category: "Operator Perbandingan",
+    question: "Operator manakah di bahasa Python yang digunakan untuk memeriksa apakah dua nilai bernilai SAMA?",
+    options: [
+      "==",
+      "=",
+      "!=",
+      "<="
+    ],
+    correctIndex: 0,
+    explanation: "Simbol == (double equals) adalah operator perbandingan kesetaraan, sedangkan = adalah operator penugasan nilai (assignment)."
+  },
+  {
+    id: "pt-14",
+    category: "Debugging & Error",
+    question: "Pesan error 'SyntaxError' pada saat menjalankan script Python biasanya menandakan...",
+    options: [
+      "Koneksi WiFi ke internet terputus",
+      "Kesalahan penulisan tata bahasa kode (misal lupa tanda kurung tutup atau titik dua :)",
+      "Memori harddisk laptop penuh",
+      "Program mencoba membagi angka dengan nol"
+    ],
+    correctIndex: 1,
+    explanation: "SyntaxError muncul ketika interpreter tidak memahami kode karena melanggar aturan sintaks atau tata bahasa Python."
+  },
+  {
+    id: "pt-15",
+    category: "Engineering Mindset",
+    question: "Ketika program koding mengalami error atau pesan warna merah saat dijalankan, sikap awal seorang calon Software Engineer yang benar adalah...",
+    options: [
+      "Menyalahkan laptop atau menganggap komputer rusak",
+      "Langsung menghapus seluruh folder proyek dan putus asa",
+      "Membaca baris pesan error traceback dengan tenang untuk mencari nomor baris dan penyebab errornya",
+      "Menyalin kode orang lain secara acak tanpa memahaminya"
+    ],
+    correctIndex: 2,
+    explanation: "Membaca traceback pesan error secara cermat adalah kemampuan dasar paling penting yang membedakan engineer profesional dengan pemula."
+  }
+];
+
+export const POST_TEST_QUESTIONS = EVALUATION_QUESTIONS;
+
 export const PRACTICE_CONTENT: PracticeContent = {
   M0: {
     mode: "quiz",
-    description: "Kuis pemetaan santai untuk mengenal kemampuan awal dan gaya belajar kodingmu.",
-    questions: [
-      {
-        id: "m0-q1",
-        question: "Manakah dari berikut ini yang BUKAN termasuk bahasa pemrograman?",
-        options: ["Python", "Java", "Microsoft Word", "JavaScript"],
-        correctIndex: 2,
-        explanation: "Microsoft Word adalah aplikasi pengolah kata, sedangkan Python, Java, dan JS adalah bahasa pemrograman.",
-      },
-      {
-        id: "m0-q2",
-        question: "Apa kepanjangan dari IDE?",
-        options: ["Integrated Development Environment", "Internet Data Explorer", "Internal Design Engine", "Integrated Debug Environment"],
-        correctIndex: 0,
-        explanation: "IDE adalah Integrated Development Environment, tempat serbaguna programmer menulis dan menguji kodingan (contoh: VS Code).",
-      },
-      {
-        id: "m0-q3",
-        question: "Fungsi dari debugger dalam pemrograman adalah...",
-        options: ["Menulis kode lebih cepat", "Mencari dan memperbaiki error dalam kode", "Mendesain tampilan aplikasi", "Mengompilasi kode menjadi binary"],
-        correctIndex: 1,
-        explanation: "Debugger membantu programmer menemukan dan memperbaiki bug atau kesalahan logika dalam kode.",
-      },
-      {
-        id: "m0-q4",
-        question: "Algoritma + Struktur Data = ?",
-        options: ["Program Komputer", "Situs Web", "Basis Data", "Jaringan"],
-        correctIndex: 0,
-        explanation: "Program Komputer = Algoritma + Struktur Data (Niklaus Wirth). Keduanya adalah pondasi utama software engineering!",
-      },
-      {
-        id: "m0-q5",
-        question: "Apa fungsi utama compiler / interpreter dalam bahasa pemrograman?",
-        options: ["Menjalankan kode baris per baris", "Menerjemahkan kode manusia ke bahasa yang dimengerti mesin komputer", "Menyimpan data ke database", "Mendesain antarmuka pengguna"],
-        correctIndex: 1,
-        explanation: "Compiler/Interpreter bertugas menerjemahkan baris kode manusia ke instruksi mesin yang bisa dieksekusi oleh processor.",
-      },
-    ],
+    description: "Pre-Test Diagnostik TRPL 2026: Ukur pemahaman awal logika & dasar pemrograman kamu.",
+    questions: EVALUATION_QUESTIONS.map((q) => ({
+      id: q.id,
+      question: q.question,
+      options: q.options,
+      correctIndex: q.correctIndex,
+      explanation: q.explanation,
+    })),
   },
   M2: {
     mode: "coding",
@@ -258,3 +439,6 @@ export const MODULES_META: ModuleMetaItem[] = [
   { id: "M7", code: "M7", title: "Rak Menu & List Data", duration: "10 mnt", icon: "ListNumbers", color: "#FF8C42", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
   { id: "M8", code: "M8", title: "Mini Project Kasir Warkop", duration: "15 mnt", icon: "Rocket", color: "#FF6B00", phase: "independent", phaseLabel: "Fase 2: Mandiri Asrama" },
 ];
+
+
+

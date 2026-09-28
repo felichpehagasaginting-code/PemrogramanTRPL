@@ -1773,16 +1773,26 @@ export default function LearnModulePage() {
         {
           title: "Tips Debugging & Alur Kerja Profesional",
           type: "text",
+          tipData: {
+            analogy: "Membaca error itu seperti membaca resep dokter: jangan panik melihat tulisan merah! Cari baris terbawah (Traceback) untuk tahu letak 'penyakit' kodemu.",
+            cheatSheet: '# Contoh SyntaxError karena lupa tanda kurung atau titik dua (:)\nif total >= 30000:  # Titik dua wajib ada di akhir baris kondisi!\n    print("Dapat Diskon")\n\n# Membaca Traceback: perhatikan line number paling bawah!',
+            industryContext: "Software Engineer profesional menghabiskan 70% waktunya membaca error traceback dan memperbaiki bug daripada mengetik kode baru dari nol.",
+            glossary: [
+              { term: "SyntaxError", meaning: "Pesan kesalahan tata bahasa kode Python (seperti lupa tanda kurung tutup, tanda petik, atau titik dua :)." },
+              { term: "Traceback", meaning: "Peta jejak laporan error yang menunjukkan file dan nomor baris tempat terjadinya kesalahan kode." }
+            ]
+          },
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75 }}>
-                Sebelum mulai menulis kode di editor praktek, ikuti tips senior berikut agar pengerjaanmu lancar dan menyenangkan:
+                Sebelum mulai menulis kode di editor praktek, pahami alur kerja dan mentalitas problem solving seorang Software Engineer:
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "14px" }}>
                 {[
                   { step: "1", judul: "Ketik Bertahap", desc: "Tulis variabel harga dan jumlah pesanan terlebih dahulu, lalu klik Jalankan Kode untuk memastikan tidak ada typo." },
-                  { step: "2", judul: "Cek Rumus Diskon", desc: "Pastikan percabangan `if total >= 30000:` menghitung diskon `total * 0.10` dengan benar." },
-                  { step: "3", judul: "Uji Sebelum Kirim", desc: "Klik tombol 'Jalankan Kode' di editor. Jika output sudah sesuai dengan format struk, langsung klik 'Kirim Jawaban'!" },
+                  { step: "2", judul: "Pahami SyntaxError", desc: "Jika muncul pesan 'SyntaxError', itu artinya melanggar tata bahasa Python (misal: lupa titik dua ':' setelah if/for/def atau lupa tanda kurung tutup)." },
+                  { step: "3", judul: "Baca Pesan Error (Traceback) dengan Tenang", desc: "Saat kode mengalami error merah, jangan panik atau menyalahkan laptop! Baca baris traceback paling bawah secara cermat untuk menemukan nomor baris dan penyebab errornya." },
+                  { step: "4", judul: "Uji Sebelum Kirim", desc: "Klik tombol 'Jalankan Kode' di editor. Jika output sudah sesuai dengan format struk, langsung klik 'Kirim Jawaban'!" },
                 ].map((item) => (
                   <div key={item.step} style={{ display: "flex", gap: "12px", background: "var(--bg-page-alt)", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "0.85rem", alignItems: "flex-start" }}>
                     <span style={{ background: "var(--color-primary-500)", color: "white", width: "22px", height: "22px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 800, flexShrink: 0 }}>{item.step}</span>
