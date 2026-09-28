@@ -5,8 +5,6 @@ import { useUserStore, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
 import { AvatarIcon } from "@/components/ui";
-import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
-import { LEADERBOARD_FEATURES } from "@/lib/features";
 import { soundFX } from "@/lib/audio";
 import { SkeletonLeaderboard } from "@/components/ui/Skeleton";
 
@@ -66,53 +64,47 @@ export default function LeaderboardPage() {
     : "#1";
 
   return (
-    <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-4)" }}>
-      {/* Page Header */}
-      <div style={{ textAlign: "center", marginBottom: "var(--space-8)" }}>
-        <span className="badge badge-amber" style={{ marginBottom: "var(--space-3)" }}>
-          <Trophy size={12} weight="fill" /> PAPAN PERINGKAT KELAS
-        </span>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>
-          Peringkat Kelas TRPL 2026
+    <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-6)" }}>
+      {/* Page Header Minimalis */}
+      <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+          Papan Peringkat Kelas TRPL 2026
         </h2>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "6px" }}>
-          Persaingan sehat antarmaba. Selesaikan modul kuis untuk kumpulkan XP lebih cepat!
+        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "4px" }}>
+          Persaingan sehat antarmahasiswa. Kumpulkan XP dari kuis dan auto-grader!
         </p>
       </div>
 
-      {/* Class Statistics Row */}
-      <div className="lb-stats"
+      {/* Single-Line Compact Stats Bar */}
+      <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: "12px",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-full)",
+          padding: "8px 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-around",
           marginBottom: "var(--space-6)",
+          boxShadow: "var(--shadow-sm)",
+          flexWrap: "wrap",
+          gap: "12px",
         }}
       >
-        {[
-          { label: "Peringkat Kamu", value: userRank, color: "var(--color-primary-500)" },
-          { label: "Rata-rata XP Kelas", value: `${avgXP} XP`, color: "#FF9D00" },
-          { label: "Total Mahasiswa", value: sortedList.length.toString(), color: "#22C55E" },
-        ].map((stat, idx) => (
-          <div
-            key={idx}
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border-color)",
-              padding: "16px var(--space-4)",
-              borderRadius: "var(--radius-lg)",
-              textAlign: "center",
-              boxShadow: "var(--shadow-sm)",
-            }}
-          >
-            <div style={{ fontSize: "1.375rem", fontWeight: 800, color: stat.color, fontFamily: "var(--font-heading)" }}>
-              {stat.value}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, marginTop: "4px" }}>
-              {stat.label}
-            </div>
-          </div>
-        ))}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.82rem" }}>
+          <span style={{ color: "var(--text-muted)" }}>Posisi Kamu:</span>
+          <strong style={{ color: "var(--color-primary-600)", fontWeight: 800 }}>{userRank}</strong>
+        </div>
+        <div style={{ width: "1px", height: "16px", background: "var(--border-color)" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.82rem" }}>
+          <span style={{ color: "var(--text-muted)" }}>Rata-rata Kelas:</span>
+          <strong style={{ color: "var(--text-primary)", fontWeight: 800 }}>{avgXP} XP</strong>
+        </div>
+        <div style={{ width: "1px", height: "16px", background: "var(--border-color)" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.82rem" }}>
+          <span style={{ color: "var(--text-muted)" }}>Total Mahasiswa:</span>
+          <strong style={{ color: "#16a34a", fontWeight: 800 }}>{sortedList.length} Orang</strong>
+        </div>
       </div>
 
       {/* Podium Top 3 Grid */}
@@ -342,7 +334,6 @@ export default function LeaderboardPage() {
           .lb-stats { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
-      <FeaturePopupQueue features={LEADERBOARD_FEATURES} delay={5000} />
     </div>
   );
 }

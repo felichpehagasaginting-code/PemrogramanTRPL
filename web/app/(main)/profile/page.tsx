@@ -3,10 +3,8 @@
 import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { User, Medal, Calendar, ShieldCheck, GameController, Star, SignOut } from "@phosphor-icons/react";
+import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
 import { AvatarIcon, BadgeIcon } from "@/components/ui";
-import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
-import { PROFILE_FEATURES } from "@/lib/features";
 import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
 import { SkillRadarChart } from "@/components/profile/SkillRadarChart";
 import { SkeletonProfile } from "@/components/ui/Skeleton";
@@ -35,52 +33,38 @@ export default function ProfilePage() {
   const currentAvatarInfo = AVATARS.find((a) => a.id === selectedAvatar) || AVATARS[0];
 
   return (
-    <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-4)" }}>
-      {/* Cover / Profile Banner */}
-      <div
-        style={{
-          background: "var(--gradient-hero)",
-          height: "140px",
-          borderRadius: "var(--radius-xl) var(--radius-xl) 0 0",
-          position: "relative",
-          boxShadow: "var(--shadow-sm)",
-        }}
-      >
-        {/* Avatar badge floating */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-40px",
-            left: "var(--space-6)",
-            width: "84px",
-            height: "84px",
-            borderRadius: "50%",
-            background: "var(--bg-card)",
-            border: "4px solid var(--bg-page)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "var(--shadow-md)",
-            zIndex: 2,
-          }}
-        >
-          <AvatarIcon id={selectedAvatar} size={64} />
-        </div>
-      </div>
-
-      {/* Profile Details Container */}
+    <div className="section-container" style={{ maxWidth: "680px", paddingTop: "var(--space-6)" }}>
+      {/* Integrated Profile Card Header */}
       <div
         style={{
           background: "var(--bg-card)",
           border: "1px solid var(--border-color)",
-          borderRadius: "0 0 var(--radius-xl) var(--radius-xl)",
-          padding: "var(--space-12) var(--space-6) var(--space-6)",
+          borderRadius: "var(--radius-xl)",
+          padding: "var(--space-6)",
           boxShadow: "var(--shadow-sm)",
-          marginBottom: "var(--space-8)",
+          marginBottom: "var(--space-6)",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", alignItems: "flex-start" }}>
-          <div>
+        <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap" }}>
+          {/* Avatar Icon */}
+          <div
+            style={{
+              width: "72px",
+              height: "72px",
+              borderRadius: "50%",
+              background: "var(--bg-secondary)",
+              border: "2px solid var(--border-color)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "var(--shadow-sm)",
+              flexShrink: 0,
+            }}
+          >
+            <AvatarIcon id={selectedAvatar} size={56} />
+          </div>
+
+          <div style={{ flex: 1, minWidth: "220px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
               <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
                 {user.name}
@@ -243,47 +227,11 @@ export default function ProfilePage() {
         <SkillRadarChart studentLevel={user.level || "TRPL Cadet"} />
       </div>
 
-      {/* Account Settings / Logout */}
-      <div style={{ marginTop: "var(--space-8)", textAlign: "center" }}>
-        <button
-          onClick={() => {
-            const { logout } = useUserStore.getState();
-            logout();
-            window.location.href = "/login";
-          }}
-          className="focus-ring"
-          style={{
-            background: "rgba(239, 68, 68, 0.08)",
-            border: "1.5px solid rgba(239, 68, 68, 0.3)",
-            color: "#EF4444",
-            padding: "12px 24px",
-            borderRadius: "var(--radius-full)",
-            fontWeight: 700,
-            fontSize: "0.9rem",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)";
-          }}
-        >
-          <SignOut size={20} weight="bold" />
-          Keluar dari Akun (Logout)
-        </button>
-      </div>
-
       <style jsx>{`
         @media (max-width: 640px) {
           .badges-cabinet-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-      <FeaturePopupQueue features={PROFILE_FEATURES} delay={5000} />
     </div>
   );
 }
