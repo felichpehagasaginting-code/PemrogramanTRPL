@@ -107,5 +107,54 @@ describe("useUserStore", () => {
     await fetchLeaderboard();
     expect(useUserStore.getState().isLeaderboardReady).toBe(true);
   });
+
+  it("should update profile name and set hasCustomizedName to true", async () => {
+    const { login, updateProfileName } = useUserStore.getState();
+    await login("Maba TRPL 2026", "maba@student.polsri.ac.id");
+
+    const success = await updateProfileName("Rian Pratama S.Tr.Kom");
+    expect(success).toBe(true);
+
+    const { user } = useUserStore.getState();
+    expect(user?.name).toBe("Rian Pratama S.Tr.Kom");
+    expect(user?.hasCustomizedName).toBe(true);
+  });
+
+  it("should reject invalid profile names (too short or no letters)", async () => {
+    const { login, updateProfileName } = useUserStore.getState();
+    await login("Maba TRPL 2026", "maba@student.polsri.ac.id");
+
+    const tooShort = await updateProfileName("ab");
+    expect(tooShort).toBe(false);
+
+    const noLetters = await updateProfileName("12345");
+    expect(noLetters).toBe(false);
+
+    const onlySpaces = await updateProfileName("   ");
+    expect(onlySpaces).toBe(false);
+
+    // Name should remain unchanged
+    const { user } = useUserStore.getState();
+    expect(user?.name).toBe("Maba TRPL 2026");
+  });
+
+  it("should sync updated name to existing leaderboard entry", async () => {
+    const { login, updateProfileName } = useUserStore.getState();
+    await login("Old Name", "user@test.com");
+
+    const currentUid = useUserStore.getState().user?.uid || "";
+    useUserStore.setState({
+      leaderboard: [
+        { uid: currentUid, name: "Old Name", avatar: "avatar_default", xp: 100, level: "Code Padawan" },
+        { uid: "other-user", name: "Other Student", avatar: "avatar_default", xp: 50, level: "Script Kiddie" },
+      ],
+    });
+
+    await updateProfileName("New Official Name");
+
+    const { leaderboard } = useUserStore.getState();
+    const updatedEntry = leaderboard.find((u) => u.uid === currentUid);
+    expect(updatedEntry?.name).toBe("New Official Name");
+  });
 });
 

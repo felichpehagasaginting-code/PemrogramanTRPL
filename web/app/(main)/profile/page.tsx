@@ -3,7 +3,7 @@
 import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { User, Medal, Calendar, ShieldCheck, GameController, Star } from "@phosphor-icons/react";
+import { User, Medal, Calendar, ShieldCheck, GameController, Star, PencilSimple, Check, X, WarningCircle } from "@phosphor-icons/react";
 import { AvatarIcon, BadgeIcon } from "@/components/ui";
 import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
 import { SkillRadarChart } from "@/components/profile/SkillRadarChart";
@@ -19,15 +19,54 @@ const AVATARS = [
 ];
 
 export default function ProfilePage() {
-  const { user, isUserReady, updateAvatar, restoreCreatorProgress } = useUserStore();
+  const { user, isUserReady, updateAvatar, updateProfileName, restoreCreatorProgress } = useUserStore();
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || "avatar_default");
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [isSavingName, setIsSavingName] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
 
   if (!user || !isUserReady) return <SkeletonProfile />;
 
   const handleAvatarChange = (avatarId: string) => {
     setSelectedAvatar(avatarId);
     updateAvatar(avatarId);
+  };
+
+  const handleSaveName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNameError(null);
+    const trimmed = editedName.trim();
+    if (trimmed.length < 3) {
+      setNameError("Nama lengkap minimal 3 karakter.");
+      return;
+    }
+    if (trimmed.length > 60) {
+      setNameError("Nama lengkap maksimal 60 karakter.");
+      return;
+    }
+    if (!/[a-zA-Z]/.test(trimmed)) {
+      setNameError("Nama harus mengandung huruf alfabet.");
+      return;
+    }
+
+    setIsSavingName(true);
+    try {
+      const ok = await updateProfileName(trimmed);
+      if (ok) {
+        setIsEditingName(false);
+        setSaveSuccessMsg(true);
+        setTimeout(() => setSaveSuccessMsg(false), 3500);
+      } else {
+        setNameError("Gagal memperbarui nama. Format tidak valid.");
+      }
+    } catch {
+      setNameError("Terjadi kesalahan saat menyimpan ke database.");
+    } finally {
+      setIsSavingName(false);
+    }
   };
 
   const currentAvatarInfo = AVATARS.find((a) => a.id === selectedAvatar) || AVATARS[0];
@@ -65,29 +104,133 @@ export default function ProfilePage() {
           </div>
 
           <div style={{ flex: 1, minWidth: "220px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
-                {user.name}
-              </h2>
-              {isCreator(user) && (
-                <span
+            {!isEditingName ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                  {user.name}
+                </h2>
+                <button
+                  onClick={() => {
+                    setEditedName(user.name);
+                    setIsEditingName(true);
+                    setNameError(null);
+                  }}
+                  className="focus-ring"
+                  aria-label="Ubah nama akun profil"
+                  title="Ubah nama profil"
                   style={{
-                    fontSize: "0.72rem",
-                    background: "linear-gradient(135deg, #FF6B00, #F59E0B)",
-                    color: "#000",
-                    padding: "3px 10px",
+                    background: "var(--bg-page-alt)",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "var(--radius-full)",
-                    fontWeight: 800,
-                    boxShadow: "0 0 12px rgba(245,158,11,0.5)",
+                    padding: "3px 9px",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "var(--text-secondary)",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "4px",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
                   }}
                 >
-                  👑 Platform Creator & Lead Architect
-                </span>
-              )}
-            </div>
+                  <PencilSimple size={12} weight="bold" />
+                  <span>Ubah Nama</span>
+                </button>
+                {isCreator(user) && (
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      background: "linear-gradient(135deg, #FF6B00, #F59E0B)",
+                      color: "#000",
+                      padding: "3px 10px",
+                      borderRadius: "var(--radius-full)",
+                      fontWeight: 800,
+                      boxShadow: "0 0 12px rgba(245,158,11,0.5)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    👑 Platform Creator & Lead Architect
+                  </span>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleSaveName} style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%", maxWidth: "380px", marginBottom: "4px" }}>
+                <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => {
+                      setEditedName(e.target.value);
+                      if (nameError) setNameError(null);
+                    }}
+                    maxLength={60}
+                    placeholder="Nama Lengkap Mahasiswa"
+                    aria-label="Nama Lengkap Mahasiswa"
+                    className="focus-ring"
+                    autoFocus
+                    style={{
+                      flex: 1,
+                      padding: "6px 10px",
+                      borderRadius: "var(--radius-md)",
+                      border: nameError ? "1.5px solid var(--color-accent-red)" : "1.5px solid var(--border-color-strong)",
+                      background: "var(--bg-page)",
+                      color: "var(--text-primary)",
+                      fontSize: "0.95rem",
+                      fontWeight: 700,
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSavingName || editedName.trim().length < 3}
+                    className="btn btn-sm btn-primary focus-ring"
+                    aria-label="Simpan perubahan nama"
+                    style={{ padding: "6px 12px", gap: "4px" }}
+                  >
+                    <Check size={14} weight="bold" />
+                    <span>{isSavingName ? "..." : "Simpan"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingName(false);
+                      setNameError(null);
+                    }}
+                    disabled={isSavingName}
+                    className="btn btn-sm btn-secondary focus-ring"
+                    aria-label="Batal ubah nama"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    <X size={14} weight="bold" />
+                  </button>
+                </div>
+                {nameError && (
+                  <div style={{ fontSize: "0.75rem", color: "var(--color-accent-red)", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <WarningCircle size={14} weight="fill" /> {nameError}
+                  </div>
+                )}
+              </form>
+            )}
+
+            {saveSuccessMsg && (
+              <div
+                role="status"
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#10B981",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  marginTop: "3px",
+                }}
+              >
+                <Check size={14} weight="bold" />
+                <span>Nama berhasil diperbarui dan disinkronkan ke database</span>
+              </div>
+            )}
             <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
               <Calendar size={16} /> Mahasiswa TRPL Angkatan 2026
             </p>

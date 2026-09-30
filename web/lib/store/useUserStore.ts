@@ -54,6 +54,7 @@ export interface UserProfile {
   };
   isCreator?: boolean;
   isDosenPenguji?: boolean;
+  hasCustomizedName?: boolean;
 }
 
 export interface BadgeInfo {
@@ -166,6 +167,7 @@ interface UserState {
   closeMemePopup: () => void;
   triggerMeme: (memeUrl: string, caption: string) => void;
   updateAvatar: (avatarId: string) => Promise<void>;
+  updateProfileName: (name: string) => Promise<boolean>;
   saveTestResult: (testType: "preTest" | "postTest", result: TestSubmission) => Promise<void>;
   syncUserToFirestore: () => Promise<void>;
   resetUserProgress: (uid: string) => Promise<void>;
@@ -197,6 +199,7 @@ export const useUserStore = create<UserState>()(
           streak: isFelich ? 7 : (existingLocalUser?.streak || 1),
           progress: isFelich ? COMPLETED_FULL_PROGRESS : (existingLocalUser?.progress || INITIAL_PROGRESS),
           isCreator: isFelich,
+          hasCustomizedName: isFelich ? true : Boolean(existingLocalUser?.hasCustomizedName),
         };
 
         try {
@@ -221,6 +224,7 @@ export const useUserStore = create<UserState>()(
               progress: combinedProgress,
               tests: combinedTests,
               isCreator: isFelich || Boolean(data.isCreator),
+              hasCustomizedName: isFelich ? true : Boolean(data.hasCustomizedName || existingLocalUser?.hasCustomizedName),
             };
 
             await setDoc(userRef, finalProfile, { merge: true });
@@ -229,6 +233,7 @@ export const useUserStore = create<UserState>()(
           } else {
             const initialWithTests = {
               ...tempProfile,
+              hasCustomizedName: isFelich ? true : Boolean(existingLocalUser?.hasCustomizedName),
               tests: existingLocalUser?.tests || {},
             };
             await setDoc(userRef, initialWithTests, { merge: true });
@@ -279,6 +284,7 @@ export const useUserStore = create<UserState>()(
           streak: isFelich ? 7 : 1,
           progress: isFelich ? COMPLETED_FULL_PROGRESS : INITIAL_PROGRESS,
           isCreator: isFelich,
+          hasCustomizedName: isFelich ? true : Boolean(name && name !== "Maba TRPL 2026"),
         };
         if (!isMockFirebase) {
           try {
@@ -288,11 +294,11 @@ export const useUserStore = create<UserState>()(
               const data = userDoc.data() as UserProfile;
               if (isFelich) {
                 const updatedXP = Math.max(data.xp || 0, 1550);
-                const restored = { ...data, ...initialProfile, xp: updatedXP, level: "TRPL Legend" };
+                const restored = { ...data, ...initialProfile, xp: updatedXP, level: "TRPL Legend", hasCustomizedName: true };
                 await setDoc(userRef, restored, { merge: true });
                 set({ user: restored, isUserReady: true });
               } else {
-                set({ user: data, isUserReady: true });
+                set({ user: { ...data, hasCustomizedName: Boolean(data.hasCustomizedName) }, isUserReady: true });
               }
               setAuthCookie();
             } else {
@@ -341,6 +347,7 @@ export const useUserStore = create<UserState>()(
             progress: COMPLETED_FULL_PROGRESS,
             isCreator: true,
             isDosenPenguji: true,
+            hasCustomizedName: true,
           };
           set({ user: dosenProfile, isUserReady: true });
           setAuthCookie();
@@ -715,6 +722,39 @@ export const useUserStore = create<UserState>()(
         if (!isMockFirebase) {
           try { await updateDoc(doc(db, "users", user.uid), { avatar: avatarId }); } catch {}
         }
+      },
+
+      updateProfileName: async (name: string) => {
+        const { user, leaderboard } = get();
+        if (!user) return false;
+        const trimmed = name.trim();
+        if (trimmed.length < 3 || trimmed.length > 60 || !/[a-zA-Z]/.test(trimmed)) {
+          return false;
+        }
+
+        const updatedUser: UserProfile = {
+          ...user,
+          name: trimmed,
+          hasCustomizedName: true,
+        };
+
+        const updatedLeaderboard = leaderboard.map((u) =>
+          u.uid === user.uid ? { ...u, name: trimmed } : u
+        );
+
+        set({ user: updatedUser, leaderboard: updatedLeaderboard });
+
+        if (!isMockFirebase && user.uid) {
+          try {
+            await updateDoc(doc(db, "users", user.uid), {
+              name: trimmed,
+              hasCustomizedName: true,
+            });
+          } catch (e) {
+            console.warn("Failed to sync name to Firestore:", e);
+          }
+        }
+        return true;
       },
 
       saveTestResult: async (testType, result) => {

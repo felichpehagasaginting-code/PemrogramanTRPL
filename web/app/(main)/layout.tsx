@@ -12,6 +12,7 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { BroadcastBanner } from "@/components/ui/BroadcastBanner";
 import { useSessionTimeout } from "@/lib/auth/useSessionTimeout";
+import { NameOnboardingModal } from "@/components/auth/NameOnboardingModal";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -258,6 +259,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
       {/* Live Push Broadcast Announcement Banner */}
       <BroadcastBanner />
+
+      {/* Mandatory Name Onboarding Modal for New Students */}
+      <NameOnboardingModal />
 
       {/* Main Content Area */}
       <main style={{ flex: 1, padding: "var(--space-6) 0" }}>
