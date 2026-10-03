@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, Fira_Code } from "next/font/google";
+import localFont from "next/font/local";
 import dynamic from "next/dynamic";
 import "./globals.css";
 
@@ -10,25 +10,25 @@ const CommandPalette = dynamic(() => import("@/components/ui/CommandPalette").th
 const KeyboardShortcutsHelp = dynamic(() => import("@/components/ui/KeyboardShortcutsHelp").then((m) => m.KeyboardShortcutsHelp));
 const PWARegister = dynamic(() => import("@/components/pwa/PWARegister").then((m) => m.PWARegister));
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const spaceGrotesk = localFont({
+  src: "../public/fonts/space-grotesk-latin.woff2",
   variable: "--font-heading",
   display: "swap",
+  weight: "400 700",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const inter = localFont({
+  src: "../public/fonts/inter-latin.woff2",
   variable: "--font-body",
   display: "swap",
+  weight: "400 600",
 });
 
-const firaCode = Fira_Code({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const firaCode = localFont({
+  src: "../public/fonts/fira-code-latin.woff2",
   variable: "--font-code",
   display: "swap",
+  weight: "400 500",
 });
 
 export const viewport = {
