@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut, signInAnonymously } from "../firebase";
+import { isMockFirebase, db, auth, googleProvider, signInWithPopup, getRedirectResult, signOut as fbSignOut } from "../firebase";
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from "firebase/firestore";
 
 const setAuthCookie = () => { document.cookie = "matrikulasi-auth=true; path=/; max-age=86400; SameSite=Lax"; };
@@ -261,17 +261,6 @@ export const useUserStore = create<UserState>()(
 
       login: async (name, email) => {
         const isFelich = isCreator({ email, name });
-        if (!isMockFirebase) {
-          try {
-            const anonRes = await signInAnonymously(auth);
-            if (anonRes.user) {
-              await processFirebaseUser(anonRes.user);
-              return;
-            }
-          } catch (e) {
-            console.warn("signInAnonymously failed, falling back to direct document:", e);
-          }
-        }
         const uid = isFelich ? "creator-felich" : `user-${Date.now()}`;
         const initialProfile: UserProfile = {
           uid,
@@ -317,18 +306,24 @@ export const useUserStore = create<UserState>()(
 
       loginAsDosenPenguji: async (pin: string) => {
         let isVerified = false;
-        try {
-          const res = await fetch("/api/auth/verify-dosen-pin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ pin }),
-          });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            isVerified = true;
+        if (!isMockFirebase && typeof window !== "undefined") {
+          try {
+            const res = await fetch("/api/auth/verify-dosen-pin", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ pin }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+              isVerified = true;
+            }
+          } catch {
+            if (pin === "1213") {
+              isVerified = true;
+            }
           }
-        } catch {
-          // Fallback when running in unit tests or offline mock mode where local API server is unreachable
+        } else {
+          // Unit tests or mock environment
           if (pin === "1213") {
             isVerified = true;
           }
@@ -389,7 +384,7 @@ export const useUserStore = create<UserState>()(
             throw new Error("Popup login ditutup atau diblokir browser. Izinkan popup untuk login Google SSO.");
           }
           if (err?.code === "auth/missing-initial-state" || err?.message?.includes("missing initial state") || err?.message?.includes("storage-partitioned")) {
-            throw new Error("Safari membatasi sesi pihak ketiga (storage partitioning). Silakan nonaktifkan 'Prevent Cross-Site Tracking' di Pengaturan Safari atau gunakan Masuk Cepat.");
+            throw new Error("Safari membatasi sesi pihak ketiga (storage partitioning). Silakan nonaktifkan 'Prevent Cross-Site Tracking' di Pengaturan Safari atau coba buka di Chrome/Firefox.");
           }
           throw err;
         }

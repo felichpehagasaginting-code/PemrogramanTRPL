@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { isMockFirebase } from "@/lib/firebase";
-import { Code, GoogleLogo, User, ShieldCheck } from "@phosphor-icons/react";
+import { GoogleLogo, ShieldCheck } from "@phosphor-icons/react";
 import { FeaturePopupQueue } from "@/components/ui/FeaturePopupQueue";
 import { LOGIN_FEATURES } from "@/lib/features";
 import { SESSION_EXPIRED_KEY } from "@/lib/auth/useSessionTimeout";
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const loginWithGoogle = useUserStore((s) => s.loginWithGoogle);
-  const login = useUserStore((s) => s.login);
   const handleRedirectResult = useUserStore((s) => s.handleRedirectResult);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -156,15 +155,10 @@ export default function LoginPage() {
     } catch (e: any) {
       const msg = e?.code === "auth/unauthorized-domain"
         ? "Domain ini belum terdaftar di Firebase Console."
-        : e?.message || "Gagal login dengan Google. Silakan coba lagi atau gunakan Masuk Cepat.";
+        : e?.message || "Gagal login dengan Google. Silakan periksa koneksi internet Anda atau coba beberapa saat lagi.";
       setError(msg);
       setLoading(false);
     }
-  };
-
-  const handleGuestLogin = () => {
-    setLoading(true);
-    login("Maba TRPL 2026", "maba2026@student.polsri.ac.id");
   };
 
   return (
@@ -318,37 +312,6 @@ export default function LoginPage() {
           >
             <GoogleLogo size={20} weight="bold" color="var(--color-primary-500)" />
             {loading ? "Memproses Otentikasi..." : checkingRedirect ? "Memeriksa sesi..." : "Login dengan Akun Google"}
-          </button>
-
-          <div className="login-anim-item" style={{ display: "flex", alignItems: "center", gap: "8px", margin: "4px 0", color: "var(--text-muted)", fontSize: "0.75rem" }}>
-            <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
-            <span>ATAU</span>
-            <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
-          </div>
-
-          <button
-            onClick={handleGuestLogin}
-            disabled={loading || checkingRedirect}
-            className="focus-ring login-anim-item"
-            aria-label="Masuk langsung mode tamu / demo"
-            style={{
-              width: "100%",
-              padding: "var(--space-3) var(--space-4)",
-              borderRadius: "var(--radius-full)",
-              border: "1.5px dashed var(--border-color-strong)",
-              background: "transparent",
-              color: "var(--text-primary)",
-              fontWeight: 600,
-              fontSize: "0.875rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              cursor: "pointer",
-              transition: "transform 0.15s ease",
-            }}
-          >
-            <User size={18} aria-hidden="true" color="var(--color-primary-500)" /> Masuk Cepat (Mode Tamu / Maba)
           </button>
 
           <button

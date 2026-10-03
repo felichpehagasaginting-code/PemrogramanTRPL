@@ -43,8 +43,7 @@ Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dar
 
 ### 📱 6. Desain 100% Responsif (Desktop Widescreen hingga iPhone 15 Plus Safari)
 - **Desktop Widescreen**: Layout grid 2-kolom terpusat presisi (`margin: 0 auto; max-width: 1280px`).
-- **Mobile Safari iOS (iPhone 15 Plus)**: Tata letak ramah sentuhan, tombol full-width, dan font size input 16px untuk mencegah *auto-zoom* iOS yang mengganggu.
-- **Resilient Firebase Auth**: Penanganan khusus isolasi penyimpanan Safari iOS (*Storage Partitioning / ITP*) dengan fallback tombol **"Masuk Cepat (Mode Tamu)"**.
+- **Resilient Firebase Auth**: Penanganan khusus isolasi penyimpanan Safari iOS (*Storage Partitioning / ITP*) dengan Google SSO dan akses Dosen Penguji via PIN Khusus.
 
 ### 🤖 7. Auto-Grader & Automated Submission Checker
 - Penguji koding otomatis berbasis *Multi-Test-Case Verification* & *Structural Rule Check* (memeriksa keberadaan `for`, `while`, `def`, `return`).
@@ -107,7 +106,7 @@ PemrogramanTRPL/
 └── web/                       # Aplikasi Utama Next.js
     ├── __tests__/             # Vitest test suites (grader, api, store, ui)
     ├── app/                   # Next.js App Router Pages
-    │   ├── (auth)/login/      # Halaman Login SSO & Mode Tamu
+    │   ├── (auth)/login/      # Halaman Login Google SSO & PIN Dosen Penguji
     │   ├── (main)/            # Layout utama aplikasi
     │   │   ├── dashboard/     # Dashboard progres belajar mahasiswa
     │   │   ├── learn/         # Modul interaktif (M0–M8), kuis, dan latihan koding
