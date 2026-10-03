@@ -92,7 +92,7 @@ export default function PostTestPage() {
           </p>
 
           <div style={{ marginTop: "28px", display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/learn/M0" className="btn btn-primary" style={{ gap: "8px" }}>
+            <Link href="/pre-test" className="btn btn-primary" style={{ gap: "8px" }}>
               <Sparkle size={16} weight="fill" /> Kerjakan Pre-Test Sekarang
             </Link>
             <Link href="/dashboard" className="btn btn-secondary">

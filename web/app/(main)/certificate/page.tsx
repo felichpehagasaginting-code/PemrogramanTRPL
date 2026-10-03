@@ -3,7 +3,7 @@
 import { useUserStore } from "@/lib/store/useUserStore";
 import { CertificateGenerator } from "@/components/certificate/CertificateGenerator";
 import Link from "next/link";
-import { ArrowLeft, LockKey, SealCheck, Sparkle, Trophy } from "@phosphor-icons/react";
+import { ArrowLeft, LockKey, SealCheck, Sparkle, Trophy, CheckCircle, Clock } from "@phosphor-icons/react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function CertificatePage() {
@@ -89,9 +89,11 @@ export default function CertificatePage() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ color: isPreTestDone ? "#22C55E" : "var(--text-muted)", fontSize: "1.1rem" }}>
-                  {isPreTestDone ? "✅" : "⏳"}
-                </span>
+                {isPreTestDone ? (
+                  <CheckCircle size={20} weight="fill" color="#22C55E" />
+                ) : (
+                  <Clock size={20} color="var(--text-muted)" />
+                )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--text-primary)" }}>
                     1. Pre-Test Diagnostik (M0)
@@ -102,7 +104,7 @@ export default function CertificatePage() {
                 </div>
               </div>
               {!isPreTestDone && (
-                <Link href="/learn/M0" className="btn btn-primary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px" }}>
+                <Link href="/pre-test" className="btn btn-primary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px" }}>
                   Kerjakan
                 </Link>
               )}
@@ -121,9 +123,11 @@ export default function CertificatePage() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ color: isAllModulesDone ? "#22C55E" : "var(--text-muted)", fontSize: "1.1rem" }}>
-                  {isAllModulesDone ? "✅" : "⏳"}
-                </span>
+                {isAllModulesDone ? (
+                  <CheckCircle size={20} weight="fill" color="#22C55E" />
+                ) : (
+                  <Clock size={20} color="var(--text-muted)" />
+                )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--text-primary)" }}>
                     2. Seluruh Modul Materi (M0 s/d M8)
@@ -153,9 +157,11 @@ export default function CertificatePage() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ color: isPostTestDone ? "#22C55E" : "var(--text-muted)", fontSize: "1.1rem" }}>
-                  {isPostTestDone ? "✅" : "⏳"}
-                </span>
+                {isPostTestDone ? (
+                  <CheckCircle size={20} weight="fill" color="#22C55E" />
+                ) : (
+                  <Clock size={20} color="var(--text-muted)" />
+                )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--text-primary)" }}>
                     3. Post-Test Evaluasi Akhir

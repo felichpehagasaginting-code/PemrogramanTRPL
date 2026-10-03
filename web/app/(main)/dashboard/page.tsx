@@ -223,11 +223,11 @@ export default function DashboardPage() {
                         Diagnostik Pemetaan
                       </div>
                       <Link
-                        href="/learn/M0"
+                        href="/pre-test"
                         className="btn btn-sm btn-secondary"
                         style={{ marginTop: "8px", width: "100%", fontSize: "0.72rem", padding: "4px" }}
                       >
-                        {isPreDone ? "Tinjau Hasil Pre-Test" : "Mulai Pre-Test 📝"}
+                        {isPreDone ? "Tinjau Hasil Pre-Test" : "Mulai Pre-Test"}
                       </Link>
                     </div>
                   );

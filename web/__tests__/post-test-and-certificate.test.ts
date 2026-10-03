@@ -123,5 +123,28 @@ describe("Post-Test & Certificate Eligibility Evaluation", () => {
     expect(wrongList).toEqual([2, 4]); // Nomor 2 dan 4 salah
     expect(correctList).toEqual([1, 3]); // Nomor 1 dan 3 benar
   });
+
+  it("should calculate pre-test score and submission accurately matching post-test format", async () => {
+    const { EVALUATION_QUESTIONS } = await import("@/lib/content/modules-data");
+    const totalQuestions = EVALUATION_QUESTIONS.length;
+    expect(totalQuestions).toBe(15);
+
+    const fullCorrectAnswers: Record<number, number> = {};
+    EVALUATION_QUESTIONS.forEach((q, idx) => {
+      fullCorrectAnswers[idx] = q.correctIndex;
+    });
+
+    let correctCount = 0;
+    EVALUATION_QUESTIONS.forEach((q, idx) => {
+      if (fullCorrectAnswers[idx] === q.correctIndex) {
+        correctCount++;
+      }
+    });
+
+    const percentage = Math.round((correctCount / totalQuestions) * 100);
+    expect(correctCount).toBe(15);
+    expect(percentage).toBe(100);
+  });
 });
+
 

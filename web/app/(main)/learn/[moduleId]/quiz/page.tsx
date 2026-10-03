@@ -17,6 +17,7 @@ import {
 import { fireConfetti } from "@/lib/confetti";
 import { getRandomMemes, Meme } from "@/lib/content/memes";
 import { EVALUATION_QUESTIONS } from "@/lib/content/modules-data";
+import { PreTestExamView } from "@/components/quiz/PreTestExamView";
 
 interface QuestionData {
   text: string;
@@ -28,6 +29,11 @@ interface QuestionData {
 export default function QuizPage() {
   const router = useRouter();
   const { moduleId } = useParams();
+
+  if (moduleId === "M0") {
+    return <PreTestExamView />;
+  }
+
   const { user, completeModule, completeSubModule, addXP, unlockBadge } = useUserStore();
 
   const [currentIdx, setCurrentIdx] = useState(0);

@@ -394,22 +394,25 @@ export default function LearnModulePage() {
           ),
         },
         {
-          title: "Kuis Pemetaan Petualang Koding",
+          title: "Petunjuk & Panduan Ujian Pre-Test",
           type: "text",
           content: (
             <div>
               <p style={{ color: "var(--text-secondary)", lineHeight: 1.75, marginBottom: "var(--space-4)" }}>
-                Sebelum mulai belajar, kita akan melakukan pemetaan awal yang santai.
-                Tujuannya bukan untuk memberi nilai jelek atau menentukan lulus-tidak lulus, melainkan untuk mengetahui gaya belajarmu!
+                Setelah membaca pengantar orientasi ini, kamu akan mengerjakan <strong>Pre-Test Diagnostik TRPL 2026</strong>.
+                Tujuannya adalah mengidentifikasi pemahaman awalan kamu dalam logika dan pemrograman komputer sebelum materi dimulai.
               </p>
-              <ul style={{ color: "var(--text-secondary)", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                <li>Durasi: sekitar 5 - 10 menit</li>
-                <li>Format: 5 Soal Pilihan Ganda Logika Santai</li>
-                <li>Sifat: Pemetaan diri (Bebas stres, santai aja bro!)</li>
-              </ul>
+              <div style={{ background: "var(--bg-page-alt)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-lg)", padding: "16px", marginBottom: "20px" }}>
+                <ul style={{ color: "var(--text-primary)", paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px", fontSize: "0.875rem", margin: 0 }}>
+                  <li><strong>Jumlah Soal:</strong> 15 Soal Pilihan Ganda (Konsep Komputer, Logika, Variabel, Branching, Loop, &amp; Fungsi)</li>
+                  <li><strong>Durasi:</strong> Waktu Bebas (rata-rata 10–15 menit, santai tanpa tekanan timer)</li>
+                  <li><strong>Sifat Ujian:</strong> Diagnostik murni (tidak ada penalti atau vonis kelulusan, kerjakan semampumu!)</li>
+                  <li><strong>Navigasi:</strong> Terdapat panel nomor untuk melompat antar soal secara bebas</li>
+                </ul>
+              </div>
               <div style={{ marginTop: "var(--space-6)", textAlign: "center" }}>
-                <Link href={`/learn/${moduleId}/quiz`} className="btn btn-primary">
-                  Mulai Kuis Pemetaan Sekarang &rarr;
+                <Link href="/pre-test?mode=exam" className="btn btn-primary" style={{ gap: "8px", padding: "10px 24px" }}>
+                  <Sparkle size={18} weight="fill" /> Mulai Kerjakan 15 Soal Pre-Test Sekarang &rarr;
                 </Link>
               </div>
             </div>
