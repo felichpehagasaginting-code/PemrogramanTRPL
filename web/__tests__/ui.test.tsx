@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
+import { CreatorBadge, CreatorIcon } from "@/components/ui";
 
 describe("LoadingSpinner", () => {
   it("should render with default text", () => {
@@ -80,6 +81,26 @@ describe("LoadingScreen with GSAP Skeleton", () => {
     const { container } = render(<LoadingScreen text="Memuat Halaman TRPL..." fullPage={true} />);
     expect(screen.getByText("Memuat Halaman TRPL...")).toBeTruthy();
     expect(container.querySelectorAll(".sk-item").length).toBeGreaterThan(5);
+  });
+});
+
+describe("CreatorBadge & CreatorIcon", () => {
+  it("should render CreatorIcon as SVG with accessibility title", () => {
+    const { container } = render(<CreatorIcon size={20} title="Platform Creator" ariaHidden={false} />);
+    const svg = container.querySelector("svg");
+    expect(svg).toBeTruthy();
+    expect(svg?.getAttribute("width")).toBe("20");
+    expect(svg?.getAttribute("height")).toBe("20");
+  });
+
+  it("should render CreatorBadge with label and icon", () => {
+    render(<CreatorBadge size="sm" variant="pill" label="Creator" />);
+    expect(screen.getByText("Creator")).toBeTruthy();
+  });
+
+  it("should support hero variant for profile view", () => {
+    render(<CreatorBadge size="md" variant="hero" label="Platform Creator & Lead Architect" />);
+    expect(screen.getByText("Platform Creator & Lead Architect")).toBeTruthy();
   });
 });
 

@@ -6,7 +6,7 @@ import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { MODULES_META } from "@/lib/content/modules-data";
 import Link from "next/link";
 import { LockKey, CheckCircle, Lightning, Trophy, ChartBar, Medal, Rocket, FileText, Sparkle } from "@phosphor-icons/react";
-import { BadgeIcon } from "@/components/ui";
+import { BadgeIcon, CreatorBadge } from "@/components/ui";
 import { SkillTree } from "@/components/learning/SkillTree";
 import { DailyStreakWidget } from "@/components/dashboard/DailyStreakWidget";
 import { SkeletonDashboard } from "@/components/ui/Skeleton";
@@ -608,7 +608,7 @@ export default function DashboardPage() {
                     <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px" }}>
                       {item.name}
                       {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
-                        <span title="Platform Creator" style={{ fontSize: "0.7rem", background: "linear-gradient(135deg, #FF6B00, #F59E0B)", color: "#000", padding: "1px 6px", borderRadius: "10px", fontWeight: 800 }}>👑 Creator</span>
+                        <CreatorBadge size="xs" variant="solid" />
                       )}
                     </span>
                   </div>

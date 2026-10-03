@@ -4,7 +4,7 @@ import { useUserStore, BADGES, isCreator } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Medal, Calendar, ShieldCheck, GameController, Star, PencilSimple, Check, X, WarningCircle } from "@phosphor-icons/react";
-import { AvatarIcon, BadgeIcon } from "@/components/ui";
+import { AvatarIcon, BadgeIcon, CreatorBadge } from "@/components/ui";
 import { AvatarCustomizer } from "@/components/profile/AvatarCustomizer";
 import { SkillRadarChart } from "@/components/profile/SkillRadarChart";
 import { SkeletonProfile } from "@/components/ui/Skeleton";
@@ -137,22 +137,11 @@ export default function ProfilePage() {
                   <span>Ubah Nama</span>
                 </button>
                 {isCreator(user) && (
-                  <span
-                    style={{
-                      fontSize: "0.72rem",
-                      background: "linear-gradient(135deg, #FF6B00, #F59E0B)",
-                      color: "#000",
-                      padding: "3px 10px",
-                      borderRadius: "var(--radius-full)",
-                      fontWeight: 800,
-                      boxShadow: "0 0 12px rgba(245,158,11,0.5)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    👑 Platform Creator & Lead Architect
-                  </span>
+                  <CreatorBadge
+                    size="md"
+                    variant="hero"
+                    label="Platform Creator & Lead Architect"
+                  />
                 )}
               </div>
             ) : (

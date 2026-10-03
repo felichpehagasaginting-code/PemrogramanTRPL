@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useUserStore, isCreator, isStaff, isTester } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
-import { AvatarIcon } from "@/components/ui";
+import { AvatarIcon, CreatorBadge } from "@/components/ui";
 import { soundFX } from "@/lib/audio";
 import { SkeletonLeaderboard } from "@/components/ui/Skeleton";
 
@@ -156,9 +156,7 @@ export default function LeaderboardPage() {
               {sortedList[1].name}
             </div>
             {(sortedList[1].isCreator || isCreator({ email: sortedList[1].email, name: sortedList[1].name })) && (
-              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
-                👑 Creator
-              </span>
+              <CreatorBadge size="sm" variant="solid" style={{ marginTop: "3px" }} />
             )}
             {(sortedList[1].isStaff || isStaff({ email: sortedList[1].email })) && (
               <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
@@ -202,9 +200,7 @@ export default function LeaderboardPage() {
               {sortedList[0].name}
             </div>
             {(sortedList[0].isCreator || isCreator({ email: sortedList[0].email, name: sortedList[0].name })) && (
-              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
-                👑 Creator
-              </span>
+              <CreatorBadge size="sm" variant="solid" style={{ marginTop: "3px" }} />
             )}
             {(sortedList[0].isStaff || isStaff({ email: sortedList[0].email })) && (
               <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
@@ -244,9 +240,7 @@ export default function LeaderboardPage() {
               {sortedList[2].name}
             </div>
             {(sortedList[2].isCreator || isCreator({ email: sortedList[2].email, name: sortedList[2].name })) && (
-              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
-                👑 Creator
-              </span>
+              <CreatorBadge size="sm" variant="solid" style={{ marginTop: "3px" }} />
             )}
             {(sortedList[2].isStaff || isStaff({ email: sortedList[2].email })) && (
               <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
@@ -341,18 +335,7 @@ export default function LeaderboardPage() {
                         <span>{item.name}</span>
                         {isSelf && <span style={{ fontSize: "0.7rem", background: "var(--color-primary-500)", color: "white", padding: "1px 6px", borderRadius: "var(--radius-full)" }}>KAMU</span>}
                         {(item.isCreator || isCreator({ email: item.email, name: item.name })) && (
-                          <span
-                            style={{
-                              fontSize: "0.68rem",
-                              fontWeight: 800,
-                              background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)",
-                              color: "#000",
-                              padding: "1px 6px",
-                              borderRadius: "10px",
-                            }}
-                          >
-                            👑 Creator
-                          </span>
+                          <CreatorBadge size="xs" variant="pill" />
                         )}
                         {(item.isStaff || isStaff({ email: item.email })) && (
                           <span

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useUserStore, BADGES, LEVELS, isAdmin, isStaff, isCreator, isTester } from "@/lib/store/useUserStore";
 import { SkeletonAdmin } from "@/components/ui/Skeleton";
+import { CreatorBadge } from "@/components/ui";
 import {
   ShieldCheck, Users, Trophy, MagnifyingGlass,
   DownloadSimple, ArrowCounterClockwise, PlusCircle, X,
@@ -821,18 +822,7 @@ export default function AdminPage() {
                           )}
                         </span>
                         {(Boolean(u.isCreator || isCreator({ email: u.email, name: u.name }))) && (
-                          <span
-                            style={{
-                              fontSize: "0.68rem",
-                              padding: "1px 6px",
-                              borderRadius: "4px",
-                              background: "rgba(255, 107, 0, 0.15)",
-                              color: "var(--color-primary-500)",
-                              fontWeight: 800,
-                            }}
-                          >
-                            👑 Creator
-                          </span>
+                          <CreatorBadge size="xs" variant="subtle" />
                         )}
                         {(Boolean(u.isStaff || isStaff({ email: u.email }))) && (
                           <span
