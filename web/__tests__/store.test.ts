@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useUserStore, LEVELS, BADGES } from "@/lib/store/useUserStore";
+import { useUserStore, LEVELS, BADGES, isStaff, isCreator, isTester } from "@/lib/store/useUserStore";
 
 describe("useUserStore", () => {
   beforeEach(() => {
@@ -155,6 +155,42 @@ describe("useUserStore", () => {
     const { leaderboard } = useUserStore.getState();
     const updatedEntry = leaderboard.find((u) => u.uid === currentUid);
     expect(updatedEntry?.name).toBe("New Official Name");
+  });
+
+  describe("Role & Batch Discrimination Helpers", () => {
+    it("should correctly identify creator accounts", () => {
+      expect(isCreator({ email: "felich@mhs.cwe.ac.id" })).toBe(true);
+      expect(isCreator({ email: "felichpehagasa@gmail.com" })).toBe(true);
+      expect(isCreator({ email: "berkah1hsanul@gmail.com" })).toBe(false);
+      expect(isCreator({ email: "random@mhs.cwe.ac.id" })).toBe(false);
+    });
+
+    it("should correctly identify staff accounts", () => {
+      expect(isStaff({ email: "berkah1hsanul@gmail.com" })).toBe(true);
+      expect(isStaff({ email: "khairoummh0828@gmail.com" })).toBe(true);
+      expect(isStaff({ email: "felichpehagasa@gmail.com" })).toBe(false);
+      expect(isStaff({ email: "maba2026@gmail.com" })).toBe(false);
+    });
+
+    it("should correctly identify Angkatan 2025 tester accounts", () => {
+      // Tester in tester emails list
+      expect(isTester({ email: "vitobima@mhs.cwe.ac.id" })).toBe(true);
+      expect(isTester({ email: "myaaprilia@mhs.cwe.ac.id" })).toBe(true);
+      expect(isTester({ email: "sukronyusuf089@gmail.com" })).toBe(true);
+
+      // Explicit flag or batch
+      expect(isTester({ email: "user1@example.com", isTester: true })).toBe(true);
+      expect(isTester({ email: "user2@example.com", batch: "2025" })).toBe(true);
+
+      // Creator and staff must NEVER be classified as testers
+      expect(isTester({ email: "felichpehagasa@gmail.com", batch: "2025" })).toBe(false);
+      expect(isTester({ email: "felich@mhs.cwe.ac.id" })).toBe(false);
+      expect(isTester({ email: "berkah1hsanul@gmail.com", batch: "2025" })).toBe(false);
+      expect(isTester({ email: "khairoummh0828@gmail.com" })).toBe(false);
+
+      // New Maba 2026 should not be classified as tester
+      expect(isTester({ email: "maba2026baru@mhs.cwe.ac.id" })).toBe(false);
+    });
   });
 });
 

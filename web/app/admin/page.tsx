@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useUserStore, BADGES, LEVELS, isAdmin } from "@/lib/store/useUserStore";
+import { useUserStore, BADGES, LEVELS, isAdmin, isStaff, isCreator, isTester } from "@/lib/store/useUserStore";
 import { SkeletonAdmin } from "@/components/ui/Skeleton";
 import {
   ShieldCheck, Users, Trophy, MagnifyingGlass,
@@ -53,6 +53,7 @@ export default function AdminPage() {
   const subscribeAllUsersRealtime = useUserStore((s) => s.subscribeAllUsersRealtime);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [batchFilter, setBatchFilter] = useState<"maba2026" | "testers" | "all">("maba2026");
   const [statusFilter, setStatusFilter] = useState<"all" | "struggling" | "postTestReady" | "certified">("all");
   const [csvPreviewModalOpen, setCsvPreviewModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"users" | "analytics" | "helpdesk" | "plagiarism" | "broadcast" | "testcases">("users");
@@ -199,14 +200,28 @@ export default function AdminPage() {
 
   if (loading || !isAllUsersReady || !isLeaderboardReady) return <SkeletonAdmin />;
 
-  const allModuleKeys = Object.keys(MODULE_LABELS);
-  const totalStudents = allUsers.length;
-  const totalXP = allUsers.reduce((s, u) => s + u.xp, 0);
-  const avgXP = totalStudents > 0 ? Math.round(totalXP / totalStudents) : 0;
-  const completedAll = allUsers.filter((u) => u.level === "TRPL Legend").length;
-  const avgStreak = totalStudents > 0 ? Math.round(allUsers.reduce((s, u) => s + (u.streak || 0), 0) / totalStudents) : 0;
+  const isTesterAccount = (u: any) => Boolean(u.isTester || isTester(u));
+  const mabaCount = allUsers.filter((u) => !isTesterAccount(u)).length;
+  const testerCount = allUsers.filter((u) => isTesterAccount(u)).length;
 
-  const filteredUsers = allUsers.filter((u) => {
+  const targetUsers = useMemo(() => {
+    if (batchFilter === "maba2026") {
+      return allUsers.filter((u) => !isTesterAccount(u));
+    }
+    if (batchFilter === "testers") {
+      return allUsers.filter((u) => isTesterAccount(u));
+    }
+    return allUsers;
+  }, [allUsers, batchFilter]);
+
+  const allModuleKeys = Object.keys(MODULE_LABELS);
+  const totalStudents = targetUsers.length;
+  const totalXP = targetUsers.reduce((s, u) => s + u.xp, 0);
+  const avgXP = totalStudents > 0 ? Math.round(totalXP / totalStudents) : 0;
+  const completedAll = targetUsers.filter((u) => u.level === "TRPL Legend").length;
+  const avgStreak = totalStudents > 0 ? Math.round(targetUsers.reduce((s, u) => s + (u.streak || 0), 0) / totalStudents) : 0;
+
+  const filteredUsers = targetUsers.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
@@ -240,11 +255,11 @@ export default function AdminPage() {
   });
 
   const moduleStats = allModuleKeys.map((key) => {
-    const completed = allUsers.filter((u) => u.progress[key]?.status === "completed").length;
+    const completed = targetUsers.filter((u) => u.progress[key]?.status === "completed").length;
     return { module: key, label: MODULE_LABELS[key], completed, total: totalStudents, pct: totalStudents > 0 ? Math.round((completed / totalStudents) * 100) : 0 };
   });
 
-  const sorted = [...allUsers].sort((a, b) => b.xp - a.xp);
+  const sorted = [...targetUsers].sort((a, b) => b.xp - a.xp);
 
   const exportCSV = () => {
     const header = [
@@ -280,7 +295,7 @@ export default function AdminPage() {
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `matrikulasi-rekap-evaluasi-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    a.href = url; a.download = `matrikulasi-${batchFilter}-rekap-evaluasi-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -488,7 +503,7 @@ export default function AdminPage() {
         </div>
 
         {viewMode === "plagiarism" ? (
-          <PlagiarismDetector users={allUsers} />
+          <PlagiarismDetector users={targetUsers} />
         ) : viewMode === "broadcast" ? (
           <BroadcastManager />
         ) : viewMode === "testcases" ? (
@@ -497,8 +512,8 @@ export default function AdminPage() {
           <HelpDeskQueue />
         ) : viewMode === "analytics" ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            <AnalyticsDashboard users={allUsers} />
-            <StruggleHeatmap users={allUsers} />
+            <AnalyticsDashboard users={targetUsers} />
+            <StruggleHeatmap users={targetUsers} />
           </div>
         ) : (
           <>
@@ -510,7 +525,7 @@ export default function AdminPage() {
               Progress Mahasiswa
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
-              Total {totalStudents} mahasiswa terdaftar
+              Total {totalStudents} mahasiswa {batchFilter === "maba2026" ? "baru (Angkatan 2026)" : batchFilter === "testers" ? "penguji (Angkatan 2025)" : "terdaftar"}
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -527,6 +542,113 @@ export default function AdminPage() {
               <DownloadSimple size={16} /> Export CSV
             </button>
           </div>
+        </div>
+
+        {/* Batch / Angkatan Segmented Filter Tabs */}
+        <div
+          style={{
+            display: "inline-flex",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "var(--radius-lg)",
+            padding: "4px",
+            gap: "4px",
+            marginBottom: "var(--space-6)",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            onClick={() => setBatchFilter("maba2026")}
+            style={{
+              padding: "7px 16px",
+              borderRadius: "calc(var(--radius-lg) - 2px)",
+              border: "none",
+              fontSize: "0.85rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              background: batchFilter === "maba2026" ? "var(--color-primary-500)" : "transparent",
+              color: batchFilter === "maba2026" ? "white" : "var(--text-secondary)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            <span>🎓 Mahasiswa Baru (2026)</span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: batchFilter === "maba2026" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.06)",
+                color: batchFilter === "maba2026" ? "white" : "var(--text-muted)",
+              }}
+            >
+              {mabaCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setBatchFilter("testers")}
+            style={{
+              padding: "7px 16px",
+              borderRadius: "calc(var(--radius-lg) - 2px)",
+              border: "none",
+              fontSize: "0.85rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              background: batchFilter === "testers" ? "#A855F7" : "transparent",
+              color: batchFilter === "testers" ? "white" : "var(--text-secondary)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            <span>🧪 Penguji Angkatan 2025</span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: batchFilter === "testers" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.06)",
+                color: batchFilter === "testers" ? "white" : "var(--text-muted)",
+              }}
+            >
+              {testerCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setBatchFilter("all")}
+            style={{
+              padding: "7px 16px",
+              borderRadius: "calc(var(--radius-lg) - 2px)",
+              border: "none",
+              fontSize: "0.85rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              background: batchFilter === "all" ? "var(--text-primary)" : "transparent",
+              color: batchFilter === "all" ? "var(--bg-card)" : "var(--text-secondary)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            <span>🌐 Semua Akun</span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: batchFilter === "all" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.06)",
+                color: batchFilter === "all" ? "var(--bg-card)" : "var(--text-muted)",
+              }}
+            >
+              {allUsers.length}
+            </span>
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -589,19 +711,19 @@ export default function AdminPage() {
                 {
                   id: "struggling",
                   label: "🔴 Perlu Bantuan (M1-M3)",
-                  count: allUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.filter((k) => u.progress?.[k]?.status === "completed").length <= 3 && !u.tests?.postTest?.completed).length,
+                  count: targetUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.filter((k) => u.progress?.[k]?.status === "completed").length <= 3 && !u.tests?.postTest?.completed).length,
                   color: "#EF4444",
                 },
                 {
                   id: "postTestReady",
                   label: "🟡 Mengerjakan Post-Test",
-                  count: allUsers.filter((u) => u.tests?.preTest?.completed && !u.tests?.postTest?.completed).length,
+                  count: targetUsers.filter((u) => u.tests?.preTest?.completed && !u.tests?.postTest?.completed).length,
                   color: "#F59E0B",
                 },
                 {
                   id: "certified",
                   label: "🟢 Lulus Lengkap",
-                  count: allUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") && u.tests?.postTest?.completed).length,
+                  count: targetUsers.filter((u) => u.tests?.preTest?.completed && allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") && u.tests?.postTest?.completed).length,
                   color: "#22C55E",
                 },
               ].map((chip) => {
@@ -680,21 +802,67 @@ export default function AdminPage() {
                   >
                     <td style={{ padding: "8px 12px", fontWeight: 800, color: i < 3 ? "#FFD93D" : "var(--text-muted)" }}>#{i + 1}</td>
                     <td style={{ padding: "8px 12px", fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>
-                      {search.trim() ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                         <span>
-                          {u.name.split(new RegExp(`(${search})`, "gi")).map((part: string, idx: number) =>
-                            part.toLowerCase() === search.toLowerCase() ? (
-                              <mark key={idx} style={{ background: "rgba(255, 107, 0, 0.35)", color: "inherit", borderRadius: "2px", padding: "0 2px" }}>
-                                {part}
-                              </mark>
-                            ) : (
-                              part
-                            )
+                          {search.trim() ? (
+                            <span>
+                              {u.name.split(new RegExp(`(${search})`, "gi")).map((part: string, idx: number) =>
+                                part.toLowerCase() === search.toLowerCase() ? (
+                                  <mark key={idx} style={{ background: "rgba(255, 107, 0, 0.35)", color: "inherit", borderRadius: "2px", padding: "0 2px" }}>
+                                    {part}
+                                  </mark>
+                                ) : (
+                                  part
+                                )
+                              )}
+                            </span>
+                          ) : (
+                            u.name
                           )}
                         </span>
-                      ) : (
-                        u.name
-                      )}
+                        {(Boolean(u.isCreator || isCreator({ email: u.email, name: u.name }))) && (
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              padding: "1px 6px",
+                              borderRadius: "4px",
+                              background: "rgba(255, 107, 0, 0.15)",
+                              color: "var(--color-primary-500)",
+                              fontWeight: 800,
+                            }}
+                          >
+                            👑 Creator
+                          </span>
+                        )}
+                        {(Boolean(u.isStaff || isStaff({ email: u.email }))) && (
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              padding: "1px 6px",
+                              borderRadius: "4px",
+                              background: "rgba(59, 130, 246, 0.15)",
+                              color: "#3B82F6",
+                              fontWeight: 800,
+                            }}
+                          >
+                            🛡️ Staff
+                          </span>
+                        )}
+                        {isTesterAccount(u) && (
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              padding: "1px 6px",
+                              borderRadius: "4px",
+                              background: "rgba(168, 85, 247, 0.15)",
+                              color: "#A855F7",
+                              fontWeight: 800,
+                            }}
+                          >
+                            🧪 Penguji 2025
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td style={{ padding: "8px 12px", color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
                       {search.trim() ? (
@@ -1120,7 +1288,7 @@ export default function AdminPage() {
         <AcademicGradebookModal
           isOpen={academicModalOpen}
           onClose={() => setAcademicModalOpen(false)}
-          users={allUsers}
+          users={targetUsers}
         />
 
         {/* Detailed Examination Answer Sheet Modal */}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useUserStore } from "@/lib/store/useUserStore";
+import { useUserStore, isCreator, isStaff, isTester } from "@/lib/store/useUserStore";
 import { CertificateGenerator } from "@/components/certificate/CertificateGenerator";
 import Link from "next/link";
-import { ArrowLeft, LockKey, SealCheck, Sparkle, Trophy, CheckCircle, Clock } from "@phosphor-icons/react";
+import { ArrowLeft, LockKey, SealCheck, Sparkle, Trophy, CheckCircle, Clock, Info } from "@phosphor-icons/react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function CertificatePage() {
@@ -26,6 +26,7 @@ export default function CertificatePage() {
   );
 
   const isEligible = isPreTestDone && isAllModulesDone && isPostTestDone;
+  const isTesterUser = Boolean(user && isTester(user));
 
   return (
     <div className="section-container" style={{ maxWidth: "960px", margin: "0 auto", paddingBottom: "80px" }}>
@@ -40,7 +41,55 @@ export default function CertificatePage() {
         </span>
       </div>
 
-      {!isEligible ? (
+      {isTesterUser ? (
+        <div
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "var(--radius-xl)",
+            padding: "40px 24px",
+            textAlign: "center",
+            maxWidth: "600px",
+            margin: "30px auto",
+          }}
+        >
+          <div
+            style={{
+              width: "64px",
+              height: "64px",
+              background: "rgba(59, 130, 246, 0.12)",
+              color: "#3B82F6",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}
+          >
+            <Info size={32} />
+          </div>
+          <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>
+            Akun Penguji Mahasiswa (Angkatan 2025)
+          </h2>
+          <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginTop: "12px", lineHeight: 1.6 }}>
+            Akun kamu terdata sebagai tim penguji/kakak tingkat angkatan 2025. Terima kasih telah membantu pengujian sistem matrikulasi TRPL!
+          </p>
+          <div
+            style={{
+              background: "var(--bg-page-alt)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "var(--radius-lg)",
+              padding: "16px",
+              marginTop: "20px",
+              fontSize: "0.85rem",
+              color: "var(--text-muted)",
+              lineHeight: 1.5,
+            }}
+          >
+            Penerbitan Sertifikat Kelulusan resmi dengan No. SK Prodi dikhususkan bagi <strong>Mahasiswa Baru TRPL Angkatan 2026</strong>.
+          </div>
+        </div>
+      ) : !isEligible ? (
         <div
           style={{
             background: "var(--bg-card)",

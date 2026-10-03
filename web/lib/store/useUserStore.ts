@@ -22,6 +22,55 @@ export const isCreator = (user: { email?: string; name?: string } | null): boole
   );
 };
 
+export const STAFF_EMAILS = [
+  "berkah1hsanul@gmail.com",
+  "khairoummh0828@gmail.com",
+];
+
+export const isStaff = (user: { email?: string } | null): boolean => {
+  if (!user?.email) return false;
+  return STAFF_EMAILS.includes(user.email.toLowerCase().trim());
+};
+
+export const TESTER_2025_EMAILS = [
+  "vitobima@mhs.cwe.ac.id",
+  "myaaprilia@mhs.cwe.ac.id",
+  "alllikaaullia@gmail.com",
+  "4tune.labs@gmail.com",
+  "miftasalsabilah2@gmail.com",
+  "sukronyusuf089@gmail.com",
+  "dikadika123ass@gmail.com",
+  "adelahandirasyahputri@gmail.com",
+  "irfanames28@gmail.com",
+  "evanuel@mhs.cwe.ac.id",
+  "alifianomarsha@gmail.com",
+  "nanarari54@gmail.com",
+  "khairo@mhs.cwe.ac.id",
+  "sriwahyuni@mhs.cwe.ac.id",
+  "luthfi260307@gmail.com",
+  "berkahihsanul@mhs.cwe.ac.id",
+  "dendiramadhan@mhs.cwe.ac.id",
+  "detapratama06@gmail.com",
+  "aliyya@mhs.cwe.ac.id",
+  "livienzelina2298@gmail.com",
+  "miftahulnurulqolbi26@gmail.com",
+  "jovanleotha@mhs.cwe.ac.id",
+  "ahmadzlkfli1@gmail.com",
+  "andijohan1705@gmail.com",
+  "petrusfederico@gmail.com",
+  "sabrinasasi@mhs.cwe.ac.id",
+];
+
+export const isTester = (user: { email?: string; isTester?: boolean; batch?: string; isCreator?: boolean; isStaff?: boolean; name?: string } | null): boolean => {
+  if (!user) return false;
+  if (isCreator(user)) return false;
+  if (isStaff(user)) return false;
+  if (user.isTester === true) return true;
+  if (user.batch === "2025") return true;
+  if (user.email && TESTER_2025_EMAILS.includes(user.email.toLowerCase().trim())) return true;
+  return false;
+};
+
 export interface UserProgress {
   [moduleId: string]: {
     completedSubModules: string[];
@@ -53,6 +102,9 @@ export interface UserProfile {
     postTest?: TestSubmission;
   };
   isCreator?: boolean;
+  isStaff?: boolean;
+  isTester?: boolean;
+  batch?: string;
   isDosenPenguji?: boolean;
   hasCustomizedName?: boolean;
 }
@@ -73,6 +125,8 @@ export interface LeaderboardUser {
   xp: number;
   level: string;
   isCreator?: boolean;
+  isStaff?: boolean;
+  isTester?: boolean;
 }
 
 export const LEVELS = [
@@ -184,10 +238,12 @@ export const useUserStore = create<UserState>()(
         const uid = fbUser.uid;
         const userRef = doc(db, "users", uid);
         const isFelich = isCreator({ email: fbUser.email, name: fbUser.displayName });
+        const isStaffUser = isStaff({ email: fbUser.email });
         const existingLocalUser = get().user;
         const localXP = existingLocalUser && existingLocalUser.uid === uid ? (existingLocalUser.xp || 0) : 0;
         
         const baseXP = isFelich ? Math.max(1550, localXP) : localXP;
+        const isTesterUserBool = isTester({ email: fbUser.email });
         const tempProfile: UserProfile = {
           uid,
           name: fbUser.displayName || (isFelich ? "Felich Pehagasa Ginting" : "Maba TRPL"),
@@ -199,7 +255,10 @@ export const useUserStore = create<UserState>()(
           streak: isFelich ? 7 : (existingLocalUser?.streak || 1),
           progress: isFelich ? COMPLETED_FULL_PROGRESS : (existingLocalUser?.progress || INITIAL_PROGRESS),
           isCreator: isFelich,
-          hasCustomizedName: isFelich ? true : Boolean(existingLocalUser?.hasCustomizedName),
+          isStaff: isStaffUser,
+          isTester: isTesterUserBool,
+          batch: isTesterUserBool ? "2025" : (existingLocalUser?.batch || "2026"),
+          hasCustomizedName: isFelich || isStaffUser ? true : Boolean(existingLocalUser?.hasCustomizedName),
         };
 
         try {
@@ -214,6 +273,7 @@ export const useUserStore = create<UserState>()(
               ...(data.tests || {}),
               ...(existingLocalUser?.tests || {}),
             };
+            const resolvedTester = isTester({ email: fbUser.email, isTester: data.isTester, batch: data.batch });
 
             const finalProfile: UserProfile = {
               ...tempProfile,
@@ -224,7 +284,10 @@ export const useUserStore = create<UserState>()(
               progress: combinedProgress,
               tests: combinedTests,
               isCreator: isFelich || Boolean(data.isCreator),
-              hasCustomizedName: isFelich ? true : Boolean(data.hasCustomizedName || existingLocalUser?.hasCustomizedName),
+              isStaff: isStaffUser || Boolean(data.isStaff),
+              isTester: resolvedTester,
+              batch: data.batch || (resolvedTester ? "2025" : "2026"),
+              hasCustomizedName: isFelich || isStaffUser ? true : Boolean(data.hasCustomizedName || existingLocalUser?.hasCustomizedName),
             };
 
             await setDoc(userRef, finalProfile, { merge: true });
@@ -233,7 +296,10 @@ export const useUserStore = create<UserState>()(
           } else {
             const initialWithTests = {
               ...tempProfile,
-              hasCustomizedName: isFelich ? true : Boolean(existingLocalUser?.hasCustomizedName),
+              isStaff: isStaffUser,
+              isTester: isTesterUserBool,
+              batch: isTesterUserBool ? "2025" : "2026",
+              hasCustomizedName: isFelich || isStaffUser ? true : Boolean(existingLocalUser?.hasCustomizedName),
               tests: existingLocalUser?.tests || {},
             };
             await setDoc(userRef, initialWithTests, { merge: true });
@@ -406,15 +472,23 @@ export const useUserStore = create<UserState>()(
           return;
         }
         try {
-          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
+          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(100));
           const snapshot = await getDocs(q);
           const list: LeaderboardUser[] = [];
           snapshot.forEach((doc) => {
-            const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean };
+            const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean; isStaff?: boolean; isTester?: boolean; batch?: string };
             if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
               return;
             }
             const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+            const isStaffUser = Boolean(d.isStaff || isStaff({ email: d.email }));
+            const isTesterUser = Boolean(d.isTester || isTester(d));
+
+            // Exclude testers from leaderboard unless they are Creator or Staff
+            if (isTesterUser && !isCreatorUser && !isStaffUser) {
+              return;
+            }
+
             const userXP = Number(d.xp) || 0;
             list.push({
               uid: d.uid || doc.id,
@@ -424,6 +498,8 @@ export const useUserStore = create<UserState>()(
               xp: userXP,
               level: d.level || getLevelName(userXP),
               isCreator: isCreatorUser,
+              isStaff: isStaffUser,
+              isTester: isTesterUser,
             });
           });
           set({ leaderboard: list, isLeaderboardReady: true });
@@ -439,17 +515,25 @@ export const useUserStore = create<UserState>()(
           return () => {};
         }
         try {
-          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
+          const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(100));
           const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
               const list: LeaderboardUser[] = [];
               snapshot.forEach((doc) => {
-                const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean };
+                const d = doc.data() as Partial<UserProfile> & { isDosenPenguji?: boolean; isStaff?: boolean; isTester?: boolean; batch?: string };
                 if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
                   return;
                 }
                 const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+                const isStaffUser = Boolean(d.isStaff || isStaff({ email: d.email }));
+                const isTesterUser = Boolean(d.isTester || isTester(d));
+
+                // Exclude testers from leaderboard unless they are Creator or Staff
+                if (isTesterUser && !isCreatorUser && !isStaffUser) {
+                  return;
+                }
+
                 const userXP = Number(d.xp) || 0;
                 list.push({
                   uid: d.uid || doc.id,
@@ -459,6 +543,8 @@ export const useUserStore = create<UserState>()(
                   xp: userXP,
                   level: d.level || getLevelName(userXP),
                   isCreator: isCreatorUser,
+                  isStaff: isStaffUser,
+                  isTester: isTesterUser,
                 });
               });
               set({ leaderboard: list, isLeaderboardReady: true });
@@ -522,7 +608,17 @@ export const useUserStore = create<UserState>()(
                 if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
                   return;
                 }
-                list.push(d);
+                const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+                const isStaffUser = Boolean(d.isStaff || isStaff({ email: d.email }));
+                const isTesterUser = Boolean(d.isTester || isTester(d));
+                list.push({
+                  ...d,
+                  uid: d.uid || doc.id,
+                  isCreator: isCreatorUser,
+                  isStaff: isStaffUser,
+                  isTester: isTesterUser,
+                  batch: d.batch || (isTesterUser ? "2025" : "2026"),
+                });
               });
               set({ allUsers: list, isAllUsersReady: true });
             },
@@ -552,7 +648,17 @@ export const useUserStore = create<UserState>()(
             if (d.isDosenPenguji || d.uid === "dosen-penguji-trpl" || (d.email && d.email.toLowerCase().includes("dosen.penguji"))) {
               return;
             }
-            list.push(d);
+            const isCreatorUser = Boolean(d.isCreator || isCreator({ email: d.email, name: d.name }));
+            const isStaffUser = Boolean(d.isStaff || isStaff({ email: d.email }));
+            const isTesterUser = Boolean(d.isTester || isTester(d));
+            list.push({
+              ...d,
+              uid: d.uid || doc.id,
+              isCreator: isCreatorUser,
+              isStaff: isStaffUser,
+              isTester: isTesterUser,
+              batch: d.batch || (isTesterUser ? "2025" : "2026"),
+            });
           });
           set({ allUsers: list, isAllUsersReady: true });
         } catch {

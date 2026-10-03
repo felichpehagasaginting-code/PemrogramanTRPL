@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore, isCreator } from "@/lib/store/useUserStore";
+import { useUserStore, isCreator, isStaff, isTester } from "@/lib/store/useUserStore";
 import { motion } from "framer-motion";
 import { Trophy, Star, Sparkle, User, Medal } from "@phosphor-icons/react";
 import { AvatarIcon } from "@/components/ui";
@@ -21,16 +21,26 @@ export default function LeaderboardPage() {
 
   if (!user || !isLeaderboardReady) return <SkeletonLeaderboard />;
 
-  // Filter out Dosen Penguji from public student leaderboard
-  const baseList = leaderboard.filter(
-    (u) => !u.email?.includes("dosen.penguji") && u.uid !== "dosen-penguji-trpl"
-  );
+  // Filter out Dosen Penguji and Testers from public student leaderboard
+  const baseList = leaderboard.filter((u) => {
+    if (u.email?.includes("dosen.penguji") || u.uid === "dosen-penguji-trpl") return false;
+    const isCreatorUser = Boolean(u.isCreator || isCreator({ email: u.email, name: u.name }));
+    const isStaffUser = Boolean(u.isStaff || isStaff({ email: u.email }));
+    const isTesterUser = Boolean(u.isTester || isTester(u));
+    if (isTesterUser && !isCreatorUser && !isStaffUser) return false;
+    return true;
+  });
 
   // Use the synchronized real-time Firestore list
   const fullLeaderboardList = [...baseList];
 
+  const isCurrentUserCreator = Boolean(user.isCreator || isCreator({ email: user.email, name: user.name }));
+  const isCurrentUserStaff = Boolean(user.isStaff || isStaff({ email: user.email }));
+  const isCurrentUserTester = isTester(user);
+  const shouldShowCurrentUser = !user.isDosenPenguji && (!isCurrentUserTester || isCurrentUserCreator || isCurrentUserStaff);
+
   if (
-    !user.isDosenPenguji &&
+    shouldShowCurrentUser &&
     !fullLeaderboardList.some(
       (u) =>
         u.uid === user.uid ||
@@ -44,7 +54,9 @@ export default function LeaderboardPage() {
       xp: user.xp,
       level: user.level,
       email: user.email,
-      isCreator: user.isCreator,
+      isCreator: isCurrentUserCreator,
+      isStaff: isCurrentUserStaff,
+      isTester: isCurrentUserTester,
     });
   }
 
@@ -59,6 +71,8 @@ export default function LeaderboardPage() {
   );
   const userRank = user.isDosenPenguji
     ? "Mode Dosen"
+    : isCurrentUserTester && !isCurrentUserCreator && !isCurrentUserStaff
+    ? "Akun Tester"
     : userRankIndex !== -1
     ? `#${userRankIndex + 1}`
     : "#1";
@@ -141,6 +155,16 @@ export default function LeaderboardPage() {
             <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[1].name}
             </div>
+            {(sortedList[1].isCreator || isCreator({ email: sortedList[1].email, name: sortedList[1].name })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                👑 Creator
+              </span>
+            )}
+            {(sortedList[1].isStaff || isStaff({ email: sortedList[1].email })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                🛡️ Staff
+              </span>
+            )}
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[1].level}
             </div>
@@ -177,6 +201,16 @@ export default function LeaderboardPage() {
             <div style={{ fontSize: "0.975rem", fontWeight: 900, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[0].name}
             </div>
+            {(sortedList[0].isCreator || isCreator({ email: sortedList[0].email, name: sortedList[0].name })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                👑 Creator
+              </span>
+            )}
+            {(sortedList[0].isStaff || isStaff({ email: sortedList[0].email })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                🛡️ Staff
+              </span>
+            )}
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[0].level}
             </div>
@@ -209,6 +243,16 @@ export default function LeaderboardPage() {
             <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--text-primary)", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {sortedList[2].name}
             </div>
+            {(sortedList[2].isCreator || isCreator({ email: sortedList[2].email, name: sortedList[2].name })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "linear-gradient(135deg, #FF6B00 0%, #F59E0B 100%)", color: "#000", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                👑 Creator
+              </span>
+            )}
+            {(sortedList[2].isStaff || isStaff({ email: sortedList[2].email })) && (
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "rgba(16, 185, 129, 0.12)", color: "#10B981", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "1px 7px", borderRadius: "10px", marginTop: "3px" }}>
+                🛡️ Staff
+              </span>
+            )}
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
               {sortedList[2].level}
             </div>
@@ -308,6 +352,21 @@ export default function LeaderboardPage() {
                             }}
                           >
                             👑 Creator
+                          </span>
+                        )}
+                        {(item.isStaff || isStaff({ email: item.email })) && (
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              fontWeight: 800,
+                              background: "rgba(16, 185, 129, 0.12)",
+                              color: "#10B981",
+                              border: "1px solid rgba(16, 185, 129, 0.3)",
+                              padding: "1px 6px",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            🛡️ Staff
                           </span>
                         )}
                       </div>
