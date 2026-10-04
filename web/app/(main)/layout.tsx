@@ -21,7 +21,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const isUserReady = useUserStore((s) => s.isUserReady);
   const logout = useUserStore((s) => s.logout);
   const subscribeCurrentUserRealtime = useUserStore((s) => s.subscribeCurrentUserRealtime);
-  const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
   const { checkDailyStreak } = useGameStore();
   const [mounted, setMounted] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -43,12 +42,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
 
     const unsubUser = subscribeCurrentUserRealtime(user.uid);
-    const unsubLb = subscribeLeaderboardRealtime();
     return () => {
       unsubUser();
-      unsubLb();
     };
-  }, [user?.uid, router, checkDailyStreak, subscribeCurrentUserRealtime, subscribeLeaderboardRealtime]);
+  }, [user?.uid, router, checkDailyStreak, subscribeCurrentUserRealtime]);
 
   const handleLogout = () => {
     logout();

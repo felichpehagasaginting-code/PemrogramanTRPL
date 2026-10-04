@@ -25,17 +25,12 @@ export default function DashboardPage() {
   const isLeaderboardReady = useUserStore((s) => s.isLeaderboardReady);
   const leaderboard = useUserStore((s) => s.leaderboard);
   const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
-  const subscribeLeaderboardRealtime = useUserStore((s) => s.subscribeLeaderboardRealtime);
 
   const [skillTreeOpen, setSkillTreeOpen] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
-    const unsub = subscribeLeaderboardRealtime();
-    return () => {
-      unsub();
-    };
-  }, [fetchLeaderboard, subscribeLeaderboardRealtime]);
+  }, [fetchLeaderboard]);
 
   if (!user || !isUserReady || !isLeaderboardReady) {
     return <SkeletonDashboard />;

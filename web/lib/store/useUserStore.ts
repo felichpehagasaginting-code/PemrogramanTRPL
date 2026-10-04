@@ -696,11 +696,15 @@ export const useUserStore = create<UserState>()(
         const badge = BADGES.find((b) => b.id === badgeId);
         if (!badge) return;
         const updatedBadges = [...user.badges, badgeId];
-        set({ user: { ...user, badges: updatedBadges }, badgePopup: { isOpen: true, badge } });
-        await get().addXP(50);
+        const newXP = user.xp + 50;
+        const oldLevel = user.level;
+        const newLevel = getLevelName(newXP);
+        const updatedUser: UserProfile = { ...user, badges: updatedBadges, xp: newXP, level: newLevel };
+        set({ user: updatedUser, badgePopup: { isOpen: true, badge } });
+        if (oldLevel !== newLevel) set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
         if (!isMockFirebase && user.uid) {
           try {
-            await setDoc(doc(db, "users", user.uid), { badges: updatedBadges }, { merge: true });
+            await setDoc(doc(db, "users", user.uid), { badges: updatedBadges, xp: newXP, level: newLevel }, { merge: true });
           } catch (err) {
             console.warn("Failed to sync unlockBadge to Firestore:", err);
           }
@@ -712,15 +716,37 @@ export const useUserStore = create<UserState>()(
         if (!user) return false;
         const currentModule = user.progress[moduleId] || { completedSubModules: [], status: "locked" as const };
         if (currentModule.completedSubModules.includes(subModuleId)) return false;
-        const updated = { ...user.progress, [moduleId]: { ...currentModule, completedSubModules: [...currentModule.completedSubModules, subModuleId] } };
-        set({ user: { ...user, progress: updated } });
+        const updatedProgress = {
+          ...user.progress,
+          [moduleId]: {
+            ...currentModule,
+            completedSubModules: [...currentModule.completedSubModules, subModuleId],
+          },
+        };
+
         const earnedXP = customXP !== undefined ? customXP : 15;
-        if (earnedXP > 0) {
-          await get().addXP(earnedXP);
+        const newXP = user.xp + (earnedXP > 0 ? earnedXP : 0);
+        const oldLevel = user.level;
+        const newLevel = getLevelName(newXP);
+        const updatedUser: UserProfile = {
+          ...user,
+          xp: newXP,
+          level: newLevel,
+          progress: updatedProgress,
+        };
+
+        set({ user: updatedUser });
+        if (oldLevel !== newLevel) {
+          set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
         }
+
         if (!isMockFirebase && user.uid) {
           try {
-            await setDoc(doc(db, "users", user.uid), { progress: updated }, { merge: true });
+            await setDoc(
+              doc(db, "users", user.uid),
+              { xp: newXP, level: newLevel, progress: updatedProgress },
+              { merge: true }
+            );
           } catch (err) {
             console.warn("Failed to sync completeSubModule to Firestore:", err);
           }
@@ -738,16 +764,69 @@ export const useUserStore = create<UserState>()(
         const idx = MODULE_KEYS.indexOf(moduleId);
         if (idx !== -1 && idx + 1 < MODULE_KEYS.length) {
           const nextId = MODULE_KEYS[idx + 1];
-          if (updatedProgress[nextId]?.status === "locked") updatedProgress[nextId] = { ...updatedProgress[nextId], status: "active" };
+          if (updatedProgress[nextId]?.status === "locked") {
+            updatedProgress[nextId] = { ...updatedProgress[nextId], status: "active" };
+          }
         }
-        set({ user: { ...user, progress: updatedProgress } });
-        await get().addXP(50);
-        const badgeMap: Record<string, string> = { M1: "workspace_master", M2: "pemikir_logis", M3: "penampung_data", M4: "pembuat_keputusan", M5: "master_loop", M6: "function_wizard", M7: "data_collector" };
-        if (badgeMap[moduleId]) await get().unlockBadge(badgeMap[moduleId]);
-        if (moduleId === "M8") { await get().unlockBadge("junior_developer"); await get().unlockBadge("graduated"); }
+
+        let addedXP = 50;
+        const badgeMap: Record<string, string> = {
+          M1: "workspace_master",
+          M2: "pemikir_logis",
+          M3: "penampung_data",
+          M4: "pembuat_keputusan",
+          M5: "master_loop",
+          M6: "function_wizard",
+          M7: "data_collector",
+        };
+        const candidateBadges: string[] = [];
+        if (badgeMap[moduleId]) candidateBadges.push(badgeMap[moduleId]);
+        if (moduleId === "M8") {
+          candidateBadges.push("junior_developer", "graduated");
+        }
+
+        const newBadgesToUnlock = candidateBadges.filter((bId) => !user.badges.includes(bId));
+        addedXP += newBadgesToUnlock.length * 50;
+
+        const newXP = user.xp + addedXP;
+        const oldLevel = user.level;
+        const newLevel = getLevelName(newXP);
+        const updatedBadges = [...user.badges, ...newBadgesToUnlock];
+
+        set({
+          user: {
+            ...user,
+            xp: newXP,
+            level: newLevel,
+            badges: updatedBadges,
+            progress: updatedProgress,
+          },
+        });
+
+        if (oldLevel !== newLevel) {
+          set({ levelUpPopup: { isOpen: true, oldLevel, newLevel } });
+        }
+
+        if (newBadgesToUnlock.length > 0) {
+          const firstBadgeId = newBadgesToUnlock[0];
+          const badge = BADGES.find((b) => b.id === firstBadgeId);
+          if (badge) {
+            set({ badgePopup: { isOpen: true, badge } });
+          }
+        }
+
         if (!isMockFirebase && user.uid) {
           try {
-            await setDoc(doc(db, "users", user.uid), { progress: updatedProgress }, { merge: true });
+            await setDoc(
+              doc(db, "users", user.uid),
+              {
+                xp: newXP,
+                level: newLevel,
+                badges: updatedBadges,
+                progress: updatedProgress,
+              },
+              { merge: true }
+            );
           } catch (err) {
             console.warn("Failed to sync completeModule to Firestore:", err);
           }
