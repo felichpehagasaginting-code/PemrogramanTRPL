@@ -521,8 +521,33 @@ STEPS:
 
 ---
 
+## 9. Addendum Implementasi Produksi (TRPL 2026 Production Release)
+
+Dalam fase implementasi dan pengujian pra-rilis, arsitektur teknis disempurnakan untuk efisiensi operasional maksimal, keamanan pemula, dan biaya operasional $0:
+
+### 9.1 Zero-Cost Execution via Pyodide WASM Engine
+- Menggantikan kebutuhan backend sandbox container (Piston API) dengan **Pyodide WebAssembly (Python 3.11 WASM)** langsung di browser pengguna.
+- Eksekusi kode instan (0ms network latency), tahan uji jutaan run tanpa biaya server eksternal, anti-loop execution, dan preheating worker non-blocking via `requestIdleCallback`.
+
+### 9.2 Firestore Quota Optimization (Spark Plan Scale: 80+ Pengguna Konkuren)
+- **Problem**: Pengujian 25 pengguna awal mengonsumsi 12.000 reads (24.2%) akibat listener global `onSnapshot` yang berjalan di layout utama secara pasif.
+- **Solusi Arsitektur**:
+  1. **Targeted Realtime**: Langganan `onSnapshot` ke koleksi `users` hanya diaktifkan saat user berada di halaman `/leaderboard`. Saat membaca modul atau latihan, listener leaderboard dilepas dari memori.
+  2. **Atomic Single-Write**: Penggabungan operasi tulis terpisah pada penyelesaian submodule, modul, dan badge menjadi tepat satu payload `setDoc` gabungan per aksi.
+  3. **Multi-Tab IndexedDB Persistent Cache**: Membuka banyak tab (misal tab modul + tab sandbox) saling berbagi cache lokal yang sama tanpa menduplikasi pembacaan Firestore.
+
+### 9.3 Multi-Tier Role & Isolation Engine
+- **Creator**: Hak akses penuh kurikulum dan penanda `👑 Creator`.
+- **Staff**: Panitia teknis divisi pemrograman yang tampil di leaderboard dengan penanda `🛡️ Staff`.
+- **Mahasiswa 2026**: Peserta matrikulasi resmi dengan hak pre-test, post-test, dan sertifikat resmi prodi.
+- **Penguji Angkatan 2025**: Diisolasi secara otomatis dari leaderboard publik dan rekapitulasi data mahasiswa baru angkatan 2026.
+- **Dosen Penguji**: Akses bypass PIN khusus (`1213`).
+
+---
+
 ## Referensi
 
-- Dokumen terkait: `prd.md`, `design.md`, `agents.md`
+- Dokumen terkait: `prd.md`, `design.md`, `agents.md`, `TOR_Matrikulasi_Pemrograman_TRPL_2026.md`
 - Dibuat: Juli 2026
-- Versi: 1.0.0
+- Diperbarui: Oktober 2026 (Versi Produksi TRPL 2026)
+- Versi: 1.2.0

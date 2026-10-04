@@ -13,10 +13,10 @@ npm run dev
 # 2. Pengujian tipe data TypeScript
 npx tsc --noEmit
 
-# 3. Jalankan unit test (Vitest)
+# 3. Jalankan unit test (Vitest — 70 tests passed)
 npm run test
 
-# 4. Build produksi (Static Pre-rendering 41 Halaman)
+# 4. Build produksi (Static Pre-rendering 54 Halaman)
 npm run build
 ```
 
@@ -32,4 +32,6 @@ npm run build
 - **Parsons Problem**: Teka-teki susun blok kode acak (`@/components/learning/ParsonsProblem.tsx`).
 - **Interactive SVG SkillTree**: Peta jalan kurikulum 2D interaktif (`@/components/learning/SkillTree.tsx`).
 - **3D Podium Leaderboard**: Klasemen peringkat kelas (`@/app/(main)/leaderboard/page.tsx`).
+- **Firestore Spark Plan Quota Optimizer**: Targeted realtime streaming, atomic single-write batching, dan multi-tab persistent cache (`@/lib/firebase.ts`, `@/lib/store/useUserStore.ts`).
+- **Multi-Tier Role & Isolation Engine**: Creator, Staff HIMA, Peserta Maba 2026, dan isolasi otomatis penguji angkatan 2025.
 - **Admin Analytics Dashboard**: Dashboard analitik & ekspor laporan PDF/CSV (`@/components/admin/AnalyticsDashboard.tsx`).

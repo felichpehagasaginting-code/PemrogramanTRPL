@@ -4,7 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![Python](https://img.shields.io/badge/Python-WASM%20Pyodide-yellow?style=for-the-badge&logo=python)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-orange?style=for-the-badge&logo=firebase)
-![Vitest](https://img.shields.io/badge/Vitest-60%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
+![Vitest](https://img.shields.io/badge/Vitest-70%20Tests%20Passed-green?style=for-the-badge&logo=vitest)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
 Platform pembelajaran pemrograman interaktif, adaptif, ramah pemula, dan tergamifikasi modern yang dirancang khusus untuk mahasiswa baru Program Studi **Teknologi Rekayasa Perangkat Lunak (TRPL) 2026** di **Politeknik Kelapa Sawit Citra Widya Edukasi (CWE)**.
@@ -51,14 +51,27 @@ Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dar
 
 ### 🏆 8. Gamifikasi, Podium 3D & Sertifikat Resmi Anti-AI-Slop
 - **Podium 3D Leaderboard**: Papan peringkat mahasiswa satu angkatan dengan efek podium 3D berkilau untuk peringkat 3 besar.
-- **Badge Prestasi**: 13 badge pencapaian (Langkah Pertama, Master Loop, Ahli Fungsi, Arsitek Kasir, dll).
-- **Label Creator Khusus**: Badge verifikasi eksklusif pada akun pembuat/senior.
+- **Badge Prestasi**: 16 badge pencapaian (Langkah Pertama, Master Loop, Ahli Fungsi, Arsitek Kasir, dll).
+- **Label Creator & Staff Khusus**: Badge verifikasi eksklusif pada akun pembuat (`👑 Creator`) dan staf panitia (`🛡️ Staff`).
 - **Sertifikat Digital Resmi "Royal Deep Purple & Warm Gold"**:
   - Warna solid non-gradien anti-AI-slop (`#180D30` & `#D4AF37`).
   - Nama mahasiswa dicetak dengan tipografi huruf tegak bersambung (kaligrafi resmi Google Font `Great Vibes`).
   - Dilengkapi nomor SK Kelulusan resmi prodi: `042/CWE-TRPL/SK-MATRIK/2026`.
   - Tanda tangan Instruktur Utama (*Felich Pehagasa Ginting*) dan Dosen Pembina (disertai NIDN).
   - Dynamic QR Code verifikasi online publik (`/verify/[certId]`) dan format kartu media sosial Story (9:16).
+
+### ⚡ 9. Optimasi Kuota Firestore & Arsitektur Skala 80+ Pengguna
+- **Spark Plan Safety (Batas 50.000 Reads/Hari)**: Dirancang agar 80 pengguna serentak (74 mahasiswa baru + panitia) dapat belajar intensif tanpa risiko menyentuh batas kuota gratis.
+- **Targeted Real-time Leaderboard**: Papan peringkat tetap 100% real-time (*live streaming*) saat dibuka di `/leaderboard`, namun mematikan listener global pasif di layout utama sehingga tidak membakar reads saat user membaca modul.
+- **Atomic Single-Write**: Menggabungkan penulisan terpisah (XP, kenaikan level, badges, dan progres modul) menjadi satu payload `setDoc` tunggal per aksi (menghemat >50% operasi write).
+- **Multi-Tab IndexedDB Persistent Cache**: Membuka banyak tab di browser berbagi cache lokal yang sama secara transparan.
+
+### 🛡️ 10. Multi-Tier Role & Isolasi Penguji 2025
+- **Creator**: Hak akses penuh pembuatan konten, preview, dan badge `👑 Creator`.
+- **Staff Divisi Pemrograman**: Panitia teknis berhak tampil di leaderboard dengan penanda `🛡️ Staff`.
+- **Mahasiswa TRPL 2026**: Peserta matrikulasi resmi dengan evaluasi pre-test, post-test, dan sertifikat kelulusan.
+- **Isolasi Tester 2025**: Akun penguji awal dari angkatan 2025 tetap memiliki riwayat belajar utuh di database, namun secara otomatis diisolasi dari leaderboard publik dan rekapitulasi data mahasiswa baru.
+- **Dosen Penguji**: Akses evaluasi menggunakan PIN 4 digit khusus (`1213`).
 
 ---
 
@@ -90,8 +103,9 @@ Dibangun dengan filosofi **"Friendly Senior Mentor"** yang memandu mahasiswa dar
 - **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 
 ### Quality Assurance & Automated Testing
-- **Unit Testing**: Vitest test suite (`npm run test` -> **31/31 passed**)
+- **Unit Testing**: Vitest test suite (`npm run test` -> **70/70 passed**)
 - **Static Type Safety**: `npx tsc --noEmit` (**0 errors**)
+- **Production Build**: Turbopack (`npm run build` -> **54 static/dynamic routes pre-rendered**)
 - **CI/CD Pipeline**: GitHub Actions Automated Testing Workflow (`.github/workflows/ci.yml`)
 
 ---
