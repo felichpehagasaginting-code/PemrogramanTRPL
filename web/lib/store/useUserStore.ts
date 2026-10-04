@@ -226,7 +226,7 @@ interface UserState {
   syncUserToFirestore: () => Promise<void>;
   resetUserProgress: (uid: string) => Promise<void>;
   awardXP: (uid: string, amount: number) => Promise<void>;
-  addUser: (data: { name: string; email: string; xp?: number; level?: string; badges?: string[]; streak?: number }) => Promise<void>;
+  addUser: (data: { name: string; email: string; xp?: number; level?: string; badges?: string[]; streak?: number; isStaff?: boolean; isTester?: boolean; batch?: string }) => Promise<void>;
   updateUser: (uid: string, data: Partial<UserProfile>) => Promise<void>;
   deleteUser: (uid: string) => Promise<void>;
 }
@@ -869,10 +869,24 @@ export const useUserStore = create<UserState>()(
 
       addUser: async (data) => {
         const uid = `user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        const isFelich = isCreator({ email: data.email, name: data.name });
+        const isStaffUser = Boolean(data.isStaff || isStaff({ email: data.email }));
+        const isTesterUser = Boolean(data.isTester || isTester({ email: data.email, isTester: data.isTester, batch: data.batch }));
+
         const newUser: UserProfile = {
-          uid, name: data.name, email: data.email, avatar: "avatar_default",
-          xp: data.xp ?? 0, level: data.level ?? getLevelName(data.xp ?? 0),
-          badges: data.badges ?? ["langkah_pertama"], streak: data.streak ?? 1, progress: INITIAL_PROGRESS,
+          uid,
+          name: data.name,
+          email: data.email,
+          avatar: "avatar_default",
+          xp: data.xp ?? 0,
+          level: data.level ?? getLevelName(data.xp ?? 0),
+          badges: data.badges ?? ["langkah_pertama"],
+          streak: data.streak ?? 1,
+          progress: INITIAL_PROGRESS,
+          isCreator: isFelich,
+          isStaff: isStaffUser,
+          isTester: isTesterUser,
+          batch: data.batch || (isTesterUser ? "2025" : "2026"),
         };
         set((s) => ({ allUsers: [...s.allUsers, newUser] }));
         if (!isMockFirebase) {

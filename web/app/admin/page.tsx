@@ -34,18 +34,20 @@ const MODULE_LABELS: Record<string, string> = {
   M6: "Fungsi", M7: "Array", M8: "Mini Project",
 };
 
-const INITIAL_FORM = { name: "", email: "", xp: 0 };
+const INITIAL_FORM = {
+  name: "",
+  email: "",
+  xp: 0,
+  role: "maba" as "maba" | "staff" | "tester",
+};
 
 export default function AdminPage() {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   useSessionTimeout();
-  const leaderboard = useUserStore((s) => s.leaderboard);
   const allUsers = useUserStore((s) => s.allUsers);
-  const fetchLeaderboard = useUserStore((s) => s.fetchLeaderboard);
   const fetchAllUsers = useUserStore((s) => s.fetchAllUsers);
   const isAllUsersReady = useUserStore((s) => s.isAllUsersReady);
-  const isLeaderboardReady = useUserStore((s) => s.isLeaderboardReady);
   const resetUserProgress = useUserStore((s) => s.resetUserProgress);
   const awardXP = useUserStore((s) => s.awardXP);
   const addUser = useUserStore((s) => s.addUser);
@@ -54,7 +56,7 @@ export default function AdminPage() {
   const subscribeAllUsersRealtime = useUserStore((s) => s.subscribeAllUsersRealtime);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [batchFilter, setBatchFilter] = useState<"maba2026" | "testers" | "all">("maba2026");
+  const [batchFilter, setBatchFilter] = useState<"maba2026" | "staff" | "testers" | "all">("maba2026");
   const [statusFilter, setStatusFilter] = useState<"all" | "struggling" | "postTestReady" | "certified">("all");
   const [csvPreviewModalOpen, setCsvPreviewModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"users" | "analytics" | "helpdesk" | "plagiarism" | "broadcast" | "testcases">("users");
@@ -79,22 +81,26 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    fetchLeaderboard();
     fetchAllUsers().finally(() => setLoading(false));
     const unsubscribe = subscribeAllUsersRealtime();
     return () => {
       unsubscribe();
     };
-  }, [fetchLeaderboard, fetchAllUsers, subscribeAllUsersRealtime]);
+  }, [fetchAllUsers, subscribeAllUsersRealtime]);
 
   const resetForm = () => setFormData(INITIAL_FORM);
 
   const handleAdd = async () => {
     if (!formData.name.trim() || !formData.email.trim()) return;
+    const isStaffRole = formData.role === "staff";
+    const isTesterRole = formData.role === "tester";
     await addUser({
       name: formData.name.trim(),
       email: formData.email.trim(),
       xp: Number(formData.xp) || 0,
+      isStaff: isStaffRole,
+      isTester: isTesterRole,
+      batch: isTesterRole ? "2025" : "2026",
     });
     resetForm();
     setAddModal(false);
@@ -102,10 +108,15 @@ export default function AdminPage() {
 
   const handleEdit = async () => {
     if (!editUser || !formData.name.trim() || !formData.email.trim()) return;
+    const isStaffRole = formData.role === "staff";
+    const isTesterRole = formData.role === "tester";
     await updateUser(editUser, {
       name: formData.name.trim(),
       email: formData.email.trim(),
       xp: Number(formData.xp) || 0,
+      isStaff: isStaffRole,
+      isTester: isTesterRole,
+      batch: isTesterRole ? "2025" : "2026",
     });
     setEditUser(null);
     resetForm();
@@ -131,7 +142,15 @@ export default function AdminPage() {
   const openEdit = (uid: string) => {
     const target = allUsers.find((u) => u.uid === uid);
     if (!target) return;
-    setFormData({ name: target.name, email: target.email, xp: target.xp });
+    const targetIsStaff = Boolean(target.isStaff || isStaff({ email: target.email }));
+    const targetIsTester = Boolean(target.isTester || isTester(target));
+    const role: "maba" | "staff" | "tester" = targetIsStaff ? "staff" : targetIsTester ? "tester" : "maba";
+    setFormData({
+      name: target.name,
+      email: target.email,
+      xp: target.xp,
+      role,
+    });
     setEditUser(uid);
   };
 
@@ -199,15 +218,23 @@ export default function AdminPage() {
     );
   }
 
-  if (loading || !isAllUsersReady || !isLeaderboardReady) return <SkeletonAdmin />;
+  if (loading || !isAllUsersReady) return <SkeletonAdmin />;
 
+  const isCreatorAccount = (u: any) => Boolean(u.isCreator || isCreator({ email: u.email, name: u.name }));
+  const isStaffAccount = (u: any) => Boolean(u.isStaff || isStaff({ email: u.email }));
   const isTesterAccount = (u: any) => Boolean(u.isTester || isTester(u));
-  const mabaCount = allUsers.filter((u) => !isTesterAccount(u)).length;
+  const isPureMaba = (u: any) => !isTesterAccount(u) && !isCreatorAccount(u) && !isStaffAccount(u);
+
+  const mabaCount = allUsers.filter((u) => isPureMaba(u)).length;
+  const staffCount = allUsers.filter((u) => isCreatorAccount(u) || isStaffAccount(u)).length;
   const testerCount = allUsers.filter((u) => isTesterAccount(u)).length;
 
   const targetUsers = useMemo(() => {
     if (batchFilter === "maba2026") {
-      return allUsers.filter((u) => !isTesterAccount(u));
+      return allUsers.filter((u) => isPureMaba(u));
+    }
+    if (batchFilter === "staff") {
+      return allUsers.filter((u) => isCreatorAccount(u) || isStaffAccount(u));
     }
     if (batchFilter === "testers") {
       return allUsers.filter((u) => isTesterAccount(u));
@@ -264,7 +291,7 @@ export default function AdminPage() {
 
   const exportCSV = () => {
     const header = [
-      "Nama", "Email", "XP", "Level", "Streak", "Badges",
+      "Nama", "Email", "Peran", "XP", "Level", "Streak", "Badges",
       "PreTest_Skor", "PreTest_Pct", "PostTest_Skor", "PostTest_Pct", "Status_Sertifikat",
       ...allModuleKeys.map((k) => MODULE_LABELS[k])
     ];
@@ -276,10 +303,18 @@ export default function AdminPage() {
         allModuleKeys.every((k) => u.progress?.[k]?.status === "completed") &&
         postTest?.completed
       );
+      const roleStr = isCreatorAccount(u)
+        ? "CREATOR"
+        : isStaffAccount(u)
+        ? "STAFF"
+        : isTesterAccount(u)
+        ? "PENGUJI_2025"
+        : "MABA_2026";
 
       return [
         `"${u.name.replace(/"/g, '""')}"`,
         u.email,
+        roleStr,
         u.xp,
         u.level,
         u.streak || 0,
@@ -526,7 +561,15 @@ export default function AdminPage() {
               Progress Mahasiswa
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
-              Total {totalStudents} mahasiswa {batchFilter === "maba2026" ? "baru (Angkatan 2026)" : batchFilter === "testers" ? "penguji (Angkatan 2025)" : "terdaftar"}
+              Total {totalStudents} akun {
+                batchFilter === "maba2026"
+                  ? "mahasiswa baru (Angkatan 2026)"
+                  : batchFilter === "staff"
+                  ? "panitia & staf (Divisi Pemrograman TRPL)"
+                  : batchFilter === "testers"
+                  ? "penguji awal (Angkatan 2025)"
+                  : "terdaftar (seluruh kategori)"
+              }
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -586,6 +629,37 @@ export default function AdminPage() {
               }}
             >
               {mabaCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setBatchFilter("staff")}
+            style={{
+              padding: "7px 16px",
+              borderRadius: "calc(var(--radius-lg) - 2px)",
+              border: "none",
+              fontSize: "0.85rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              background: batchFilter === "staff" ? "#3B82F6" : "transparent",
+              color: batchFilter === "staff" ? "white" : "var(--text-secondary)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            <span>🛡️ Panitia & Staff</span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: batchFilter === "staff" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.06)",
+                color: batchFilter === "staff" ? "white" : "var(--text-muted)",
+              }}
+            >
+              {staffCount}
             </span>
           </button>
 
@@ -775,6 +849,7 @@ export default function AdminPage() {
                   <th style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700 }}>#</th>
                   <th style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700 }}>Nama</th>
                   <th style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700 }}>Email</th>
+                  <th style={{ padding: "10px 12px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700 }}>Peran</th>
                   <th style={{ padding: "10px 12px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700 }}>XP</th>
                   <th style={{ padding: "10px 12px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700 }}>Level</th>
                   <th style={{ padding: "10px 8px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.75rem" }} title="Pre-Test (M0)">Pre-Test</th>
@@ -787,7 +862,7 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {filteredUsers.length === 0 ? (
-                  <tr><td colSpan={17} style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Tidak ada data mahasiswa</td></tr>
+                  <tr><td colSpan={18} style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Tidak ada data mahasiswa</td></tr>
                 ) : (filteredUsers.map((u, i) => {
                   const pre = u.tests?.preTest;
                   const post = u.tests?.postTest;
@@ -869,6 +944,50 @@ export default function AdminPage() {
                         </span>
                       ) : (
                         u.email
+                      )}
+                    </td>
+                    <td style={{ padding: "8px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                      {isCreatorAccount(u) ? (
+                        <CreatorBadge size="xs" variant="solid" />
+                      ) : isStaffAccount(u) ? (
+                        <span
+                          style={{
+                            fontSize: "0.7rem",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: "rgba(59, 130, 246, 0.15)",
+                            color: "#3B82F6",
+                            fontWeight: 800,
+                          }}
+                        >
+                          🛡️ Staff
+                        </span>
+                      ) : isTesterAccount(u) ? (
+                        <span
+                          style={{
+                            fontSize: "0.7rem",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: "rgba(168, 85, 247, 0.15)",
+                            color: "#A855F7",
+                            fontWeight: 800,
+                          }}
+                        >
+                          🧪 Penguji 2025
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            fontSize: "0.7rem",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: "rgba(34, 197, 94, 0.15)",
+                            color: "#22C55E",
+                            fontWeight: 800,
+                          }}
+                        >
+                          🎓 Maba 2026
+                        </span>
                       )}
                     </td>
                     <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "var(--color-primary-600)" }}>{u.xp}</td>
@@ -1005,7 +1124,25 @@ export default function AdminPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-4)", marginBottom: "var(--space-4)" }}>
                 <div style={{ background: "var(--bg-card)", padding: "var(--space-4)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-color)" }}>
                   <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, marginBottom: "8px" }}>INFORMASI AKUN</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "0.875rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "0.875rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <strong>Peran / Kategori:</strong>
+                      {isCreatorAccount(selectedUser) ? (
+                        <CreatorBadge size="xs" variant="solid" />
+                      ) : isStaffAccount(selectedUser) ? (
+                        <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)", background: "rgba(59, 130, 246, 0.15)", color: "#3B82F6", fontWeight: 800 }}>
+                          🛡️ Staff
+                        </span>
+                      ) : isTesterAccount(selectedUser) ? (
+                        <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)", background: "rgba(168, 85, 247, 0.15)", color: "#A855F7", fontWeight: 800 }}>
+                          🧪 Penguji 2025
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)", background: "rgba(34, 197, 94, 0.15)", color: "#22C55E", fontWeight: 800 }}>
+                          🎓 Mahasiswa Baru 2026
+                        </span>
+                      )}
+                    </div>
                     <span><strong>Email:</strong> {selectedUser.email}</span>
                     <span><strong>XP:</strong> {selectedUser.xp}</span>
                     <span><strong>Level:</strong> {selectedUser.level}</span>
@@ -1146,6 +1283,29 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, xp: parseInt(e.target.value) || 0 })}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1.5px solid var(--border-color)", fontSize: "0.9rem", color: "var(--text-primary)", background: "var(--bg-page)", outline: "none" }}
                 />
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>
+                    Kategori / Peran:
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-md)",
+                      border: "1.5px solid var(--border-color)",
+                      fontSize: "0.875rem",
+                      color: "var(--text-primary)",
+                      background: "var(--bg-page)",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="maba">🎓 Mahasiswa Baru 2026</option>
+                    <option value="staff">🛡️ Staff Divisi Pemrograman</option>
+                    <option value="tester">🧪 Penguji Angkatan 2025</option>
+                  </select>
+                </div>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button onClick={() => { setAddModal(false); resetForm(); }} className="btn btn-secondary" style={{ flex: 1 }}>Batal</button>
@@ -1186,6 +1346,29 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, xp: parseInt(e.target.value) || 0 })}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1.5px solid var(--border-color)", fontSize: "0.9rem", color: "var(--text-primary)", background: "var(--bg-page)", outline: "none" }}
                 />
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>
+                    Kategori / Peran:
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-md)",
+                      border: "1.5px solid var(--border-color)",
+                      fontSize: "0.875rem",
+                      color: "var(--text-primary)",
+                      background: "var(--bg-page)",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="maba">🎓 Mahasiswa Baru 2026</option>
+                    <option value="staff">🛡️ Staff Divisi Pemrograman</option>
+                    <option value="tester">🧪 Penguji Angkatan 2025</option>
+                  </select>
+                </div>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button onClick={() => { setEditUser(null); resetForm(); }} className="btn btn-secondary" style={{ flex: 1 }}>Batal</button>
@@ -1340,6 +1523,7 @@ export default function AdminPage() {
                       <th style={{ padding: "8px", textAlign: "left" }}>#</th>
                       <th style={{ padding: "8px", textAlign: "left" }}>Nama</th>
                       <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Peran</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>XP</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>Pre-Test</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>Post-Test</th>
@@ -1363,6 +1547,25 @@ export default function AdminPage() {
                           <td style={{ padding: "6px 8px", color: "var(--text-muted)" }}>{idx + 1}</td>
                           <td style={{ padding: "6px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>{u.name}</td>
                           <td style={{ padding: "6px 8px", color: "var(--text-secondary)" }}>{u.email}</td>
+                          <td style={{ padding: "6px 8px", whiteSpace: "nowrap" }}>
+                            {isCreatorAccount(u) ? (
+                              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 6px", borderRadius: "4px", background: "rgba(168,85,247,0.15)", color: "#9333ea" }}>
+                                CREATOR
+                              </span>
+                            ) : isStaffAccount(u) ? (
+                              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 6px", borderRadius: "4px", background: "rgba(59,130,246,0.15)", color: "#2563eb" }}>
+                                STAFF
+                              </span>
+                            ) : isTesterAccount(u) ? (
+                              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 6px", borderRadius: "4px", background: "rgba(245,158,11,0.15)", color: "#d97706" }}>
+                                PENGUJI
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "rgba(34,197,94,0.15)", color: "#16a34a" }}>
+                                MABA 2026
+                              </span>
+                            )}
+                          </td>
                           <td style={{ padding: "6px 8px", textAlign: "center", fontWeight: 700, color: "var(--color-primary-600)" }}>{u.xp}</td>
                           <td style={{ padding: "6px 8px", textAlign: "center" }}>{pre ? `${pre.percentage}%` : "-"}</td>
                           <td style={{ padding: "6px 8px", textAlign: "center" }}>{post ? `${post.percentage}%` : "-"}</td>
