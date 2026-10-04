@@ -41,6 +41,11 @@ const INITIAL_FORM = {
   role: "maba" as "maba" | "staff" | "tester",
 };
 
+const isCreatorAccount = (u: any) => Boolean(u?.isCreator || isCreator({ email: u?.email, name: u?.name }));
+const isStaffAccount = (u: any) => Boolean(u?.isStaff || isStaff({ email: u?.email }));
+const isTesterAccount = (u: any) => Boolean(u?.isTester || isTester(u));
+const isPureMaba = (u: any) => !isTesterAccount(u) && !isCreatorAccount(u) && !isStaffAccount(u);
+
 export default function AdminPage() {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
@@ -73,6 +78,19 @@ export default function AdminPage() {
   const [playbackUser, setPlaybackUser] = useState<any | null>(null);
   const [playbackStartTime, setPlaybackStartTime] = useState<number>(0);
   const [formData, setFormData] = useState(INITIAL_FORM);
+
+  const targetUsers = useMemo(() => {
+    if (batchFilter === "maba2026") {
+      return allUsers.filter((u) => isPureMaba(u));
+    }
+    if (batchFilter === "staff") {
+      return allUsers.filter((u) => isCreatorAccount(u) || isStaffAccount(u));
+    }
+    if (batchFilter === "testers") {
+      return allUsers.filter((u) => isTesterAccount(u));
+    }
+    return allUsers;
+  }, [allUsers, batchFilter]);
 
   const openTestDetail = (targetUser: any, tab: "preTest" | "postTest" = "preTest") => {
     setTestDetailUser(targetUser);
@@ -220,27 +238,9 @@ export default function AdminPage() {
 
   if (loading || !isAllUsersReady) return <SkeletonAdmin />;
 
-  const isCreatorAccount = (u: any) => Boolean(u.isCreator || isCreator({ email: u.email, name: u.name }));
-  const isStaffAccount = (u: any) => Boolean(u.isStaff || isStaff({ email: u.email }));
-  const isTesterAccount = (u: any) => Boolean(u.isTester || isTester(u));
-  const isPureMaba = (u: any) => !isTesterAccount(u) && !isCreatorAccount(u) && !isStaffAccount(u);
-
   const mabaCount = allUsers.filter((u) => isPureMaba(u)).length;
   const staffCount = allUsers.filter((u) => isCreatorAccount(u) || isStaffAccount(u)).length;
   const testerCount = allUsers.filter((u) => isTesterAccount(u)).length;
-
-  const targetUsers = useMemo(() => {
-    if (batchFilter === "maba2026") {
-      return allUsers.filter((u) => isPureMaba(u));
-    }
-    if (batchFilter === "staff") {
-      return allUsers.filter((u) => isCreatorAccount(u) || isStaffAccount(u));
-    }
-    if (batchFilter === "testers") {
-      return allUsers.filter((u) => isTesterAccount(u));
-    }
-    return allUsers;
-  }, [allUsers, batchFilter]);
 
   const allModuleKeys = Object.keys(MODULE_LABELS);
   const totalStudents = targetUsers.length;
